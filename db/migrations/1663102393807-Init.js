@@ -1,9 +1,8 @@
-module.exports = class Data1663102393807 {
-  name = 'Data1663102393807'
+module.exports = class Init1663102393807 {
+  name = 'Init1663102393807'
 
   async up(db) {
     await db.query(`CREATE TABLE "preimage" ("id" character varying NOT NULL, "hash" text, "index" integer, "proposer" text, "deposit" numeric, "proposed_call" jsonb, "status" character varying(11) NOT NULL, "status_history" jsonb NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_dff8526c5d16d71afbefb55b286" PRIMARY KEY ("id"))`)
-    await db.query(`CREATE UNIQUE INDEX "IDX_c6e9bc6f69c924e85a44174d35" ON "preimage" ("hash") `)
     await db.query(`CREATE INDEX "IDX_9b26f67b5e37e30914cb7ca3b4" ON "preimage" ("index") `)
     await db.query(`CREATE INDEX "IDX_8961b767f111466724025930b0" ON "preimage" ("created_at_block") `)
     await db.query(`CREATE INDEX "IDX_146c48e4f4bf54acb708686897" ON "preimage" ("created_at") `)
