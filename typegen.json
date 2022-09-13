@@ -1,0 +1,28 @@
+{
+  "outDir": "./src/types",
+  "specVersions": "https://kusama.archive.subsquid.io/graphql",
+  "storage": [
+    "Democracy.PublicPropCount",
+    "Balances.TotalIssuance",
+    "Democracy.Preimages",
+    "Democracy.PublicProps",
+    "Democracy.ReferendumInfoOf"
+  ],
+  "events": [
+    "Democracy.Proposed",
+    "Democracy.Tabled",
+    "Democracy.Started",
+    "Democracy.Passed",
+    "Democracy.NotPassed",
+    "Democracy.Cancelled",
+    "Democracy.Executed",
+    "Democracy.PreimageNoted",
+    "Democracy.PreimageUsed",
+    "Democracy.PreimageInvalid",
+    "Democracy.PreimageMissing",
+    "Democracy.PreimageReaped"
+  ],
+  "calls": [
+    "Democracy.vote"
+  ]
+}

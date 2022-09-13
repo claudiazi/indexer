@@ -1,0 +1,138 @@
+enum ReferendumStatus {
+  Noted
+  Proposed
+  Tabled
+  Started
+  Passed
+  NotPassed
+  Cancelled
+  Executed
+  Used
+  Invalid
+  Missing
+  Reaped
+  Approved
+  Disapproved
+  Closed
+  Awarded
+  Rejected
+  Retracted
+  Slashed
+  Active
+  Extended
+  Claimed
+}
+
+enum PreimageStatus {
+  Noted
+  Proposed
+  Tabled
+  Started
+  Passed
+  NotPassed
+  Cancelled
+  Executed
+  Used
+  Invalid
+  Missing
+  Reaped
+  Approved
+  Disapproved
+  Closed
+  Awarded
+  Rejected
+  Retracted
+  Slashed
+  Active
+  Extended
+  Claimed
+}
+
+enum ReferendumThresholdType {
+  SuperMajorityApprove
+  SuperMajorityAgainst
+  SimpleMajority
+}
+
+type ReferendumThreshold {
+  type: ReferendumThresholdType!
+}
+
+type Referendum @entity {
+  id: ID!
+  hash: String! @index
+  index: Int! @index
+  threshold: ReferendumThreshold!
+  status: ReferendumStatus!
+  statusHistory: [ReferendumStatusHistory!]!
+  createdAtBlock: Int! @index
+  createdAt: DateTime! @index
+  endedAtBlock: Int
+  endedAt: DateTime
+  updatedAtBlock: Int
+  updatedAt: DateTime
+  preimage: Preimage
+  voting: [Vote!] @derivedFrom(field: "referendum")
+}
+
+type Preimage @entity {
+  id: ID!
+  hash: String! @index
+  proposer: String!
+  deposit: BigInt!
+  proposedCall: ProposedCall
+  status: PreimageStatus!
+  statusHistory: [PreimageStatusHistory!]!
+  createdAtBlock: Int! @index
+  createdAt: DateTime! @index
+  updatedAtBlock: Int
+  updatedAt: DateTime
+}
+
+type ReferendumStatusHistory {
+  status: ReferendumStatus!
+  block: Int!
+  timestamp: DateTime!
+}
+
+type PreimageStatusHistory {
+  status: PreimageStatus!
+  block: Int!
+  timestamp: DateTime!
+}
+
+type ProposedCall {
+  section: String!
+  method: String!
+  args: JSON
+  description: String!
+}
+
+enum VoteDecision {
+  yes
+  no
+  abstain
+}
+
+type StandardVoteBalance {
+  value: BigInt
+}
+
+type SplitVoteBalance {
+  aye: BigInt
+  nay: BigInt
+}
+
+union VoteBalance = StandardVoteBalance | SplitVoteBalance
+
+type Vote @entity {
+  id: ID!
+  voter: String
+  referendumId: ID!
+  referendum: Referendum!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  decision: VoteDecision!
+  balance: VoteBalance!
+  lockPeriod: Int
+}
