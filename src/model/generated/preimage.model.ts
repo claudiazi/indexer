@@ -26,7 +26,7 @@ export class Preimage {
   @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.toJSON(), from: obj => obj == null ? undefined : new ProposedCall(undefined, obj)}, nullable: true})
   proposedCall!: ProposedCall | undefined | null
 
-  @Column_("varchar", {length: 11, nullable: false})
+  @Column_("varchar", {length: 7, nullable: false})
   status!: PreimageStatus
 
   @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => marshal.fromList(obj, val => new PreimageStatusHistory(undefined, marshal.nonNull(val)))}, nullable: false})

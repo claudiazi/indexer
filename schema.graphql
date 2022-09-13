@@ -1,51 +1,17 @@
 enum ReferendumStatus {
-  Noted
-  Proposed
-  Tabled
   Started
   Passed
   NotPassed
   Cancelled
   Executed
-  Used
-  Invalid
-  Missing
-  Reaped
-  Approved
-  Disapproved
-  Closed
-  Awarded
-  Rejected
-  Retracted
-  Slashed
-  Active
-  Extended
-  Claimed
 }
 
 enum PreimageStatus {
   Noted
-  Proposed
-  Tabled
-  Started
-  Passed
-  NotPassed
-  Cancelled
-  Executed
   Used
   Invalid
   Missing
   Reaped
-  Approved
-  Disapproved
-  Closed
-  Awarded
-  Rejected
-  Retracted
-  Slashed
-  Active
-  Extended
-  Claimed
 }
 
 enum ReferendumThresholdType {

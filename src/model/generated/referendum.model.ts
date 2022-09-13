@@ -26,7 +26,7 @@ export class Referendum {
   @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => new ReferendumThreshold(undefined, marshal.nonNull(obj))}, nullable: false})
   threshold!: ReferendumThreshold
 
-  @Column_("varchar", {length: 11, nullable: false})
+  @Column_("varchar", {length: 9, nullable: false})
   status!: ReferendumStatus
 
   @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => marshal.fromList(obj, val => new ReferendumStatusHistory(undefined, marshal.nonNull(val)))}, nullable: false})
