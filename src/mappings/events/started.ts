@@ -28,9 +28,6 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
 
     const preimage = await ctx.store.get(Preimage, { where: { hash: toHex(hash) } })
 
-    const storageTotalIssuance = new BalancesTotalIssuanceStorage(ctx)
-    const totalIssuance = (await storageTotalIssuance.getAsV1020()).toString()
-
     const referendum = new Referendum({
         id,
         index,
@@ -42,7 +39,7 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
         statusHistory: [],
         createdAtBlock: ctx.block.height,
         createdAt: new Date(ctx.block.timestamp),
-        totalIssuance: totalIssuance,
+        totalIssuance: await new BalancesTotalIssuanceStorage(ctx).getAsV1020() || 0n,
         preimage,
     })
 

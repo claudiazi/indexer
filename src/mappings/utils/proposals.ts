@@ -8,6 +8,7 @@ import {
     ReferendumStatus,
     ReferendumStatusHistory,
 } from '../../model'
+import { BalancesTotalIssuanceStorage } from '../../types/storage'
 import { MissingPreimageWarn, MissingReferendumWarn } from './errors'
 
 export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: number, status: ReferendumStatus, totalIssuance?: string) {
@@ -28,19 +29,14 @@ export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: 
     referendum.updatedAt = new Date(ctx.block.timestamp)
     referendum.updatedAtBlock = ctx.block.height
     referendum.status = status
-    if (totalIssuance) {
-        referendum.totalIssuance = totalIssuance
-    }
+    referendum.totalIssuance = await new BalancesTotalIssuanceStorage(ctx).getAsV1020() || 0n
 
     switch (status) {
-        case ReferendumStatus.Executed:
+        case ReferendumStatus.Passed:
         case ReferendumStatus.NotPassed:
         case ReferendumStatus.Cancelled:
             referendum.endedAt = referendum.updatedAt
             referendum.endedAtBlock = referendum.updatedAtBlock
-            if (totalIssuance) {
-                referendum.totalIssuance = totalIssuance
-            }
             ctx.log.info(`Referendum ${index} ended at ${referendum.endedAtBlock} (${referendum.endedAt})`)
     }
 

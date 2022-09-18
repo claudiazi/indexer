@@ -7,8 +7,5 @@ import { getNotPassedData } from './getters'
 
 export async function handleNotPassed(ctx: EventHandlerContext<Store>) {
     const index = getNotPassedData(ctx)
-    const storageTotalIssuance = new BalancesTotalIssuanceStorage(ctx)
-    const totalIssuance = (await storageTotalIssuance.getAsV1020()).toString()
-
-    await updateReferendum(ctx, index, ReferendumStatus.NotPassed, totalIssuance)
+    await updateReferendum(ctx, index, ReferendumStatus.NotPassed)
 }

@@ -56,8 +56,8 @@ export class Referendum {
   @ManyToOne_(() => Preimage, {nullable: true})
   preimage!: Preimage | undefined | null
 
-  @Column_("text", {nullable: true})
-  totalIssuance!: string | undefined | null
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+  totalIssuance!: bigint
 
   @OneToMany_(() => Vote, e => e.referendum)
   voting!: Vote[]

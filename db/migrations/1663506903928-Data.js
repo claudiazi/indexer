@@ -1,5 +1,5 @@
-module.exports = class Data1663498309553 {
-  name = 'Data1663498309553'
+module.exports = class Data1663506903928 {
+  name = 'Data1663506903928'
 
   async up(db) {
     await db.query(`CREATE TABLE "preimage" ("id" character varying NOT NULL, "hash" text NOT NULL, "proposer" text NOT NULL, "deposit" numeric NOT NULL, "proposed_call" jsonb, "status" character varying(7) NOT NULL, "status_history" jsonb NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_dff8526c5d16d71afbefb55b286" PRIMARY KEY ("id"))`)
@@ -10,7 +10,7 @@ module.exports = class Data1663498309553 {
     await db.query(`CREATE INDEX "IDX_6c157f7819d8bf5869a9e2ab86" ON "vote" ("referendum_id") `)
     await db.query(`CREATE INDEX "IDX_6d54f04fc9dd3a4c15cb607c9e" ON "vote" ("block_number") `)
     await db.query(`CREATE INDEX "IDX_8d701dbd422ac5e3e1d7a9a0d1" ON "vote" ("timestamp") `)
-    await db.query(`CREATE TABLE "referendum" ("id" character varying NOT NULL, "hash" text NOT NULL, "index" integer NOT NULL, "threshold" jsonb NOT NULL, "status" character varying(9) NOT NULL, "status_history" jsonb NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "ended_at_block" integer, "ended_at" TIMESTAMP WITH TIME ZONE, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, "total_issuance" text, "preimage_id" character varying, CONSTRAINT "PK_772fc260f18c235a6327252ce00" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "referendum" ("id" character varying NOT NULL, "hash" text NOT NULL, "index" integer NOT NULL, "threshold" jsonb NOT NULL, "status" character varying(9) NOT NULL, "status_history" jsonb NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "ended_at_block" integer, "ended_at" TIMESTAMP WITH TIME ZONE, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, "total_issuance" numeric NOT NULL, "preimage_id" character varying, CONSTRAINT "PK_772fc260f18c235a6327252ce00" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_d8d1763676047e95e67925b942" ON "referendum" ("hash") `)
     await db.query(`CREATE INDEX "IDX_33436e93497e1ac9ea28eb288e" ON "referendum" ("index") `)
     await db.query(`CREATE INDEX "IDX_5880aad6fdaa1d4092e7a25435" ON "referendum" ("created_at_block") `)
