@@ -10,6 +10,7 @@ import {
 import { Store } from '@subsquid/typeorm-store'
 import { getStartedData } from './getters'
 import { getReferendumInfoOf } from '../../storage'
+import { BalancesTotalIssuanceStorage } from '../../types/storage'
 
 export async function handleStarted(ctx: EventHandlerContext<Store>) {
     const { index, threshold } = getStartedData(ctx)
@@ -27,6 +28,9 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
 
     const preimage = await ctx.store.get(Preimage, { where: { hash: toHex(hash) } })
 
+    const storageTotalIssuance = new BalancesTotalIssuanceStorage(ctx)
+    const totalIssuance = (await storageTotalIssuance.getAsV1020()).toString()
+
     const referendum = new Referendum({
         id,
         index,
@@ -38,6 +42,7 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
         statusHistory: [],
         createdAtBlock: ctx.block.height,
         createdAt: new Date(ctx.block.timestamp),
+        totalIssuance: totalIssuance,
         preimage,
     })
 

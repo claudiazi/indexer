@@ -10,7 +10,7 @@ import {
 } from '../../model'
 import { MissingPreimageWarn, MissingReferendumWarn } from './errors'
 
-export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: number, status: ReferendumStatus) {
+export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: number, status: ReferendumStatus, totalIssuance?: string) {
     const referendum = await ctx.store.get(Referendum, {
         where: {
             index,
@@ -28,6 +28,9 @@ export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: 
     referendum.updatedAt = new Date(ctx.block.timestamp)
     referendum.updatedAtBlock = ctx.block.height
     referendum.status = status
+    if (totalIssuance) {
+        referendum.totalIssuance = totalIssuance
+    }
 
     switch (status) {
         case ReferendumStatus.Executed:
@@ -35,6 +38,9 @@ export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: 
         case ReferendumStatus.Cancelled:
             referendum.endedAt = referendum.updatedAt
             referendum.endedAtBlock = referendum.updatedAtBlock
+            if (totalIssuance) {
+                referendum.totalIssuance = totalIssuance
+            }
             ctx.log.info(`Referendum ${index} ended at ${referendum.endedAtBlock} (${referendum.endedAt})`)
     }
 
