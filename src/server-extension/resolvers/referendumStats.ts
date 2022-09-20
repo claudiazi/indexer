@@ -45,7 +45,6 @@ export class ReferendumStats {
     @Field(() => Number, { nullable: true })
     voted_amount_nay!: number
 
-
     @Field(() => Number, { nullable: true })
     voted_amount_total!: number
 
@@ -60,7 +59,7 @@ export class ReferendumStats {
 
     @Field(() => Number, { nullable: true })
     turnout_total_perc!: number
-    
+
     @Field(() => Number, { nullable: true })
     count_new!: number
 
@@ -93,15 +92,19 @@ export class ReferendumStats {
     }
 }
 
+let cache = new Map<string, ReferendumStats>()
+
 @Resolver()
 export class ReferendumStatsResolver {
     // Set by depenency injection
     constructor(private tx: () => Promise<EntityManager>) { }
 
     @Query(() => [ReferendumStats])
-    async referendumStats(): Promise<ReferendumStats> {
+    async referendumStats(): Promise<ReferendumStats[]> {
         const manager = await this.tx()
-        const result = await manager.getRepository(Vote).query(referendumStats, [])
+        const newRefs: ReferendumStats[] = await manager.getRepository(Vote).query(referendumStats, [Array.from(cache.keys())])
+        const result: ReferendumStats[] = [...cache.values(), ...newRefs]
+        newRefs.forEach((r: ReferendumStats) => { if (r.ended_at) cache.set(r.referendum_id, r) })
         return result
     }
 }
