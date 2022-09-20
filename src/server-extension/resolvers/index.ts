@@ -1,1 +1,1 @@
-export * from './totalVotes'
+export * from './referendumStats'
