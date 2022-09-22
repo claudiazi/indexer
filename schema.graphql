@@ -96,6 +96,7 @@ type Vote @entity {
   id: ID!
   voter: String
   referendumId: ID!
+  referendumIndex: Int!
   referendum: Referendum!
   blockNumber: Int! @index
   timestamp: DateTime! @index

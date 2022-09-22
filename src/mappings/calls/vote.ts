@@ -52,6 +52,7 @@ export async function handleVote(ctx: CallHandlerContext<Store>) {
     await ctx.store.insert(
         new Vote({
             id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
+            referendumIndex: index,
             voter: ctx.call.origin ? getOriginAccountId(ctx.call.origin) : null,
             blockNumber: ctx.block.height,
             decision,

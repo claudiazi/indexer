@@ -19,6 +19,9 @@ export class Vote {
   @Column_("text", {nullable: false})
   referendumId!: string
 
+  @Column_("int4", {nullable: false})
+  referendumIndex!: number
+
   @Index_()
   @ManyToOne_(() => Referendum, {nullable: true})
   referendum!: Referendum
