@@ -2,97 +2,44 @@ import { Arg, Field, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { Vote } from '../../model/generated'
 import { referendumStats } from '../queries/referendum';
+import { referendaCache } from './referendaStats';
 
 // Define custom GraphQL ObjectType of the query result
 @ObjectType()
 export class ReferendumStats {
-    @Field(() => String, { nullable: false })
-    referendum_id!: string
-
     @Field(() => Number, { nullable: false })
-    index!: number
+    referendum_index!: number
+
+    @Field(() => String, { nullable: false })
+    voter!: string
+
+    @Field(() => String, { nullable: false })
+    decision!: string
 
     @Field(() => Date, { nullable: false })
-    created_at!: Date
+    timestamp!: Date
 
-    @Field(() => Date, { nullable: true })
-    ended_at!: Date
+    @Field(() => Number, { nullable: false })
+    is_new_account!: number
 
-    @Field(() => String, { nullable: false })
-    status!: string
+    @Field(() => Number, { nullable: false })
+    voted_amount_with_conviction!: number
 
-    @Field(() => String, { nullable: true })
-    proposer!: string
+    @Field(() => Number, { nullable: false })
+    cum_voted_amount_with_conviction_aye!: number
 
-    @Field(() => String, { nullable: true })
-    method!: string
+    @Field(() => Number, { nullable: false })
+    cum_voted_amount_with_conviction_nay!: number
 
-    @Field(() => String, { nullable: true })
-    section!: string
-
-    @Field(() => Number, { nullable: true })
-    count_aye!: number
-
-    @Field(() => Number, { nullable: true })
-    count_nay!: number
-
-    @Field(() => Number, { nullable: true })
-    count_total!: number
-
-    @Field(() => Number, { nullable: true })
-    voted_amount_aye!: number
-
-    @Field(() => Number, { nullable: true })
-    voted_amount_nay!: number
-
-    @Field(() => Number, { nullable: true })
-    voted_amount_total!: number
-
-    @Field(() => Number, { nullable: true })
-    total_issuance!: number
-
-    @Field(() => Number, { nullable: true })
-    turnout_aye_perc!: number
-
-    @Field(() => Number, { nullable: true })
-    turnout_nay_perc!: number
-
-    @Field(() => Number, { nullable: true })
-    turnout_total_perc!: number
-
-    @Field(() => Number, { nullable: true })
-    count_new!: number
-
-    @Field(() => Number, { nullable: true })
-    count_new_perc!: number
-
-    @Field(() => Number, { nullable: true })
-    vote_duration!: number
-
-    @Field(() => Number, { nullable: true })
-    conviction_mean_aye!: number
-
-    @Field(() => Number, { nullable: true })
-    conviction_mean_nay!: number
-
-    @Field(() => Number, { nullable: true })
-    conviction_mean!: number
-
-    @Field(() => Number, { nullable: true })
-    conviction_median_aye!: number
-
-    @Field(() => Number, { nullable: true })
-    conviction_median_nay!: number
-
-    @Field(() => Number, { nullable: true })
-    conviction_median!: number
+    @Field(() => Number, { nullable: false })
+    cum_new_accounts!: number
 
     constructor(props: Partial<ReferendumStats>) {
         Object.assign(this, props);
     }
 }
 
-let cache = new Map<string, ReferendumStats>()
+let referendumCache = new Map<number, ReferendumStats>()
 
 @Resolver()
 export class ReferendumStatsResolver {
@@ -100,11 +47,16 @@ export class ReferendumStatsResolver {
     constructor(private tx: () => Promise<EntityManager>) { }
 
     @Query(() => [ReferendumStats])
-    async referendumStats(): Promise<ReferendumStats[]> {
+    async referendumStats(
+        @Arg("id", {nullable: false})
+        id: number
+    ): Promise<ReferendumStats> {
         const manager = await this.tx()
-        const newRefs: ReferendumStats[] = await manager.getRepository(Vote).query(referendumStats, [Array.from(cache.keys())])
-        const result: ReferendumStats[] = [...cache.values(), ...newRefs]
-        newRefs.forEach((r: ReferendumStats) => { if (r.ended_at) cache.set(r.referendum_id, r) })
+        let result: ReferendumStats
+        result = referendumCache.get(id) || await manager.getRepository(Vote).query(referendumStats, [id])
+        if (referendaCache.get(id)?.ended_at){
+            referendumCache.set(id, result)
+        } 
         return result
     }
 }
