@@ -1,6 +1,99 @@
 export const referendaStats = `
             WITH 
 
+            referendum_data AS (
+
+              SELECT
+                index AS referendum_index
+              , preimage_id
+              , index
+              , status
+              , created_at::timestamp AS created_at
+              , ended_at::timestamp AS ended_at
+              , DATE_PART('day', ended_at::timestamp - created_at::timestamp) + 
+                DATE_PART('hour', ended_at::timestamp - created_at::timestamp) / 24 AS vote_duration
+              , total_issuance::decimal(38,0) / 1000000000000 AS total_issuance
+              , (threshold ->> 'type') AS threshold_type
+              FROM referendum
+              WHERE NOT (index::text = ANY ($1) )
+
+            ),
+
+            referendum_timeline_flatten AS (
+
+              SELECT
+                index AS referendum_index
+              , (status_history_flatten ->> 'status')::text AS status
+              , (status_history_flatten ->> 'timestamp')::timestamp AS timestamp
+              FROM referendum, 
+              jsonb_array_elements(status_history) AS status_history_flatten
+              WHERE NOT (index::text = ANY ($1) )
+
+            ),
+
+            timeline_executed AS (
+
+              SELECT 
+                referendum_index
+              , timestamp as executed_at
+              FROM referendum_timeline_flatten
+              WHERE status = 'Executed'
+            
+            ), 
+
+            timeline_passed AS (
+
+              SELECT 
+                referendum_index
+              , timestamp as passed_at
+              FROM referendum_timeline_flatten
+              WHERE status = 'Passed'
+            
+            ), 
+
+            timeline_not_passed AS (
+
+              SELECT 
+                referendum_index
+              , timestamp as not_passed_at
+              FROM referendum_timeline_flatten
+              WHERE status = 'NotPassed'
+            
+            ), 
+
+            timeline_cancelled AS (
+
+              SELECT 
+                referendum_index
+              , timestamp as cancelled_at
+              FROM referendum_timeline_flatten
+              WHERE status = 'Cancelled'
+            
+            ), 
+
+            refined_timeline AS (
+
+              SELECT * 
+              FROM timeline_executed
+              FULL OUTER JOIN timeline_passed
+                USING (referendum_index)
+              FULL OUTER JOIN timeline_not_passed
+                USING (referendum_index)
+              FULL OUTER JOIN timeline_cancelled
+                USING (referendum_index)
+
+            ),
+
+            refined_referendum AS (
+              
+              SELECT *
+              , vote_duration / 4 As vote_duration_1_4
+              , vote_duration / 2 As vote_duration_1_2
+              , vote_duration * 3 / 4 As vote_duration_3_4
+              FROM referendum_data
+
+            ),
+
             vote_sequence AS (
 
               SELECT 
@@ -14,8 +107,25 @@ export const referendaStats = `
             valid_vote AS (
 
               SELECT 
-                *
-              FROM vote_sequence
+                voter
+              , referendum_index
+              , decision
+              , CASE WHEN lock_period = 0 THEN 0.1
+                     WHEN lock_period = 4 THEN 3
+                     WHEN lock_period = 8 THEN 4
+                     WHEN lock_period = 16 THEN 5
+                     WHEN lock_period = 32 THEN 6
+                     ELSE lock_period 
+                END AS conviction
+              , (balance ->> 'value')::bigint AS balance_value
+              , (balance ->> 'aye')::bigint AS balance_aye
+              , (balance ->> 'nay')::bigint AS balance_nay
+              , DATE_PART('day', v.timestamp - r.created_at) + 
+                DATE_PART('hour', v.timestamp - r.created_at) / 24 As voting_time
+              , v.timestamp
+              FROM vote_sequence AS v
+              LEFT JOIN refined_referendum AS r
+                USING(referendum_index)
               WHERE seq = 1
 
             ),
@@ -49,19 +159,24 @@ export const referendaStats = `
               , CASE WHEN v.referendum_index = n.referendum_index THEN 1
                      ELSE 0 
                 END AS is_new_account
-              , CASE WHEN lock_period = 0 THEN 0.1
-                     WHEN lock_period = 4 THEN 3
-                     WHEN lock_period = 8 THEN 4
-                     WHEN lock_period = 16 THEN 5
-                     WHEN lock_period = 32 THEN 6
-                     ELSE lock_period 
-                END AS conviction
-              , (balance ->> 'value')::bigint as balance_value
-              , (balance ->> 'aye')::bigint as balance_aye
-              , (balance ->> 'nay')::bigint as balance_nay
+              , conviction
+              , balance_value
+              , balance_aye
+              , balance_nay
+              , CASE WHEN voting_time < vote_duration_1_4 
+                          THEN '0/4 - 1/4 vote duration'
+                     WHEN voting_time >= vote_duration_1_4 AND voting_time < vote_duration_1_2 
+                          THEN '1/4 - 1/2 vote duration'
+                     WHEN voting_time >= vote_duration_1_2 AND voting_time < vote_duration_3_4 
+                          THEN '1/2 - 3/4 vote duration'       
+                     WHEN voting_time >= vote_duration_3_4
+                          THEN '3/4 - 4/4 vote duration'    
+                END AS voting_time_group
               FROM valid_vote AS v     
               LEFT JOIN new_ref AS n
                 USING (voter)
+              LEFT JOIN refined_referendum as r
+                ON v.referendum_index = r.referendum_index
 
             ),
 
@@ -109,6 +224,31 @@ export const referendaStats = `
 
             ),
 
+            voting_time_groups AS (
+
+              SELECT
+                referendum_index
+              , SUM(CASE WHEN voting_time_group = '0/4 - 1/4 vote duration' THEN
+                         CASE WHEN decision = 'abstain' THEN 2
+                              ELSE 1 END
+                    ELSE 0 END) AS count_0_4_1_4_vote_duration
+              , SUM(CASE WHEN voting_time_group = '1/4 - 1/2 vote duration' THEN
+                         CASE WHEN decision = 'abstain' THEN 2
+                              ELSE 1 END
+                    ELSE 0 END) AS count_1_4_2_4_vote_duration              
+               , SUM(CASE WHEN voting_time_group = '1/2 - 3/4 vote duration' THEN
+                          CASE WHEN decision = 'abstain' THEN 2
+                               ELSE 1 END
+                          ELSE 0 END) AS count_2_4_3_4_vote_duration              
+                , SUM(CASE WHEN voting_time_group = '3/4 - 4/4 vote duration' THEN
+                           CASE WHEN decision = 'abstain' THEN 2
+                                ELSE 1 END
+                      ELSE 0 END) AS count_3_4_4_4_vote_duration
+              FROM refined_votes
+              GROUP BY 1
+
+            ),
+
             total_calculation AS (
 
               SELECT 
@@ -136,27 +276,18 @@ export const referendaStats = `
               , COALESCE(conviction_median_nay, 0) AS conviction_median_nay
               , COALESCE(conviction_median, 0) AS conviction_median
               , count_new
+              , COALESCE(count_0_4_1_4_vote_duration, 0) AS count_0_4_1_4_vote_duration
+              , COALESCE(count_1_4_2_4_vote_duration, 0) AS count_1_4_2_4_vote_duration
+              , COALESCE(count_2_4_3_4_vote_duration, 0) AS count_2_4_3_4_vote_duration
+              , COALESCE(count_3_4_4_4_vote_duration, 0) AS count_3_4_4_4_vote_duration
               FROM aye_calculation
               FULL OUTER JOIN nay_calculation
                 USING (referendum_index)
               FULL OUTER JOIN total_calculation
                 USING (referendum_index)
+              FULL OUTER JOIN voting_time_groups
+                USING (referendum_index)
 
-
-            ),
-
-            refined_referendum AS (
-              
-              SELECT
-                index AS referendum_index
-              , preimage_id
-              , index
-              , status
-              , created_at::timestamp AS created_at
-              , ended_at::timestamp AS ended_at
-              , total_issuance::decimal(38,0) / 1000000000000 AS total_issuance
-              FROM referendum
-              WHERE NOT (index::text = ANY ($1) )
 
             ),
 
@@ -168,42 +299,62 @@ export const referendaStats = `
               , proposed_call ->> 'method' AS method
               , proposed_call ->> 'section' AS section
               FROM preimage
-            )
+            ),
 
-            SELECT 
-              c.referendum_index
-            , index
-            , r.created_at
-            , r.ended_at
-            , r.status
-            , proposer
-            , method
-            , section
-            , count_aye
-            , count_nay
-            , count_aye + count_nay AS count_total
-            , voted_amount_aye
-            , voted_amount_nay
-            , voted_amount_aye + voted_amount_nay AS voted_amount_total
-            , total_issuance::decimal(38,0) AS total_issuance
-            , total_issuance
-            , COALESCE(voted_amount_aye / total_issuance * 100, 0) AS turnout_aye_perc
-            , COALESCE(voted_amount_nay / total_issuance * 100, 0) AS turnout_nay_perc
-            , COALESCE((voted_amount_aye + voted_amount_nay) / total_issuance * 100, 0) AS turnout_total_perc
-            , count_new
-            , count_new / (count_aye + count_nay) * 100 as count_new_perc
-            , DATE_PART('day', r.ended_at - r.created_at) + 
-              DATE_PART('hour', r.ended_at - r.created_at) / 24 As vote_duration
-            , conviction_mean_aye
-            , conviction_mean_nay
-            , conviction_mean
-            , conviction_median_aye
-            , conviction_median_nay
-            , conviction_median
-            FROM calculation AS c
-            INNER JOIN refined_referendum AS r
-              ON c.referendum_index = r.referendum_index
-            LEFT JOIN refined_preimage AS p
-              ON p.preimage_id = r.preimage_id
+            final AS (
+
+              SELECT 
+                c.referendum_index
+              , index
+              , r.created_at
+              , r.ended_at
+              , r.status
+              , proposer
+              , method
+              , section
+              , count_aye
+              , count_nay
+              , count_aye + count_nay AS count_total
+              , voted_amount_aye
+              , voted_amount_nay
+              , voted_amount_aye + voted_amount_nay AS voted_amount_total
+              , total_issuance::decimal(38,0) AS total_issuance
+              , total_issuance
+              , COALESCE(voted_amount_aye / total_issuance * 100, 0) AS turnout_aye_perc
+              , COALESCE(voted_amount_nay / total_issuance * 100, 0) AS turnout_nay_perc
+              , COALESCE((voted_amount_aye + voted_amount_nay) / total_issuance * 100, 0) AS turnout_total_perc
+              , count_new
+              , count_new / (count_aye + count_nay) * 100 as count_new_perc
+              , vote_duration
+              , conviction_mean_aye
+              , conviction_mean_nay
+              , conviction_mean
+              , conviction_median_aye
+              , conviction_median_nay
+              , conviction_median
+              , count_0_4_1_4_vote_duration
+              , count_1_4_2_4_vote_duration
+              , count_2_4_3_4_vote_duration
+              , count_3_4_4_4_vote_duration
+              , count_0_4_1_4_vote_duration / (count_aye + count_nay) AS count_0_4_1_4_vote_duration_perc
+              , count_1_4_2_4_vote_duration / (count_aye + count_nay) AS count_1_4_2_4_vote_duration_perc
+              , count_2_4_3_4_vote_duration / (count_aye + count_nay) AS count_2_4_3_4_vote_duration_perc
+              , count_3_4_4_4_vote_duration / (count_aye + count_nay) AS count_3_4_4_4_vote_duration_perc
+              , executed_at
+              , passed_at
+              , not_passed_at
+              , cancelled_at
+              , threshold_type
+              FROM calculation AS c
+              INNER JOIN refined_referendum AS r
+                ON c.referendum_index = r.referendum_index
+              LEFT JOIN  refined_timeline AS t
+                ON t.referendum_index = c.referendum_index
+              LEFT JOIN refined_preimage AS p
+                ON p.preimage_id = r.preimage_id
+              
+              )
+
+              select * from final
             `
           

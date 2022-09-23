@@ -87,6 +87,45 @@ export class ReferendaStats {
     @Field(() => Number, { nullable: true })
     conviction_median!: number
 
+    @Field(() => Number, { nullable: true })
+    count_0_4_1_4_vote_duration!: number
+
+    @Field(() => Number, { nullable: true })
+    count_1_4_2_4_vote_duration!: number
+
+    @Field(() => Number, { nullable: true })
+    count_2_4_3_4_vote_duration!: number
+
+    @Field(() => Number, { nullable: true })
+    count_3_4_4_4_vote_duration!: number
+
+    @Field(() => Number, { nullable: true })
+    count_0_4_1_4_vote_duration_perc!: number
+
+    @Field(() => Number, { nullable: true })
+    count_1_4_2_4_vote_duration_perc!: number
+
+    @Field(() => Number, { nullable: true })
+    count_2_4_3_4_vote_duration_perc!: number
+
+    @Field(() => Number, { nullable: true })
+    count_3_4_4_4_vote_duration_perc!: number
+
+    @Field(() => Date, { nullable: true })
+    executed_at!: Date
+
+    @Field(() => Date, { nullable: true })
+    passed_at!: Date
+
+    @Field(() => Date, { nullable: true })
+    not_passed_at!: Date
+
+    @Field(() => Date, { nullable: true })
+    cancelled_at!: Date
+
+    @Field(() => String, { nullable: false })
+    threshold_type!: string
+
     constructor(props: Partial<ReferendaStats>) {
         Object.assign(this, props);
     }
@@ -106,7 +145,9 @@ export class ReferendaStatsResolver {
     ): Promise<ReferendaStats[]> {
         const manager = await this.tx()
         const newRefs: ReferendaStats[] = await manager.getRepository(Vote).query(referendaStats, [[...(Array.from(referendaCache.keys())), ...ids]])
-        const result: ReferendaStats[] = [...referendaCache.values(), ...newRefs]
+        let toSendBack: ReferendaStats[] = []
+        referendaCache.forEach((value: ReferendaStats, key: number) => { if (!(key in ids)) (toSendBack.push(value)) })
+        const result: ReferendaStats[] = [...toSendBack, ...newRefs]
         newRefs.forEach((r: ReferendaStats) => { if (r.ended_at) referendaCache.set(r.referendum_index, r) })
         return result
     }
