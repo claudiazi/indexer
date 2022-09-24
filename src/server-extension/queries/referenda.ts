@@ -336,10 +336,10 @@ export const referendaStats = `
               , count_1_4_2_4_vote_duration
               , count_2_4_3_4_vote_duration
               , count_3_4_4_4_vote_duration
-              , count_0_4_1_4_vote_duration / (count_aye + count_nay) AS count_0_4_1_4_vote_duration_perc
-              , count_1_4_2_4_vote_duration / (count_aye + count_nay) AS count_1_4_2_4_vote_duration_perc
-              , count_2_4_3_4_vote_duration / (count_aye + count_nay) AS count_2_4_3_4_vote_duration_perc
-              , count_3_4_4_4_vote_duration / (count_aye + count_nay) AS count_3_4_4_4_vote_duration_perc
+              , count_0_4_1_4_vote_duration / (count_aye + count_nay) * 100 AS count_0_4_1_4_vote_duration_perc
+              , count_1_4_2_4_vote_duration / (count_aye + count_nay) * 100 AS count_1_4_2_4_vote_duration_perc
+              , count_2_4_3_4_vote_duration / (count_aye + count_nay) * 100 AS count_2_4_3_4_vote_duration_perc
+              , count_3_4_4_4_vote_duration / (count_aye + count_nay) * 100 AS count_3_4_4_4_vote_duration_perc
               , executed_at
               , passed_at
               , not_passed_at
