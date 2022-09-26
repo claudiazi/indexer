@@ -1,20 +1,7 @@
 import { lookupArchive } from '@subsquid/archive-registry'
 import { SubstrateProcessor } from '@subsquid/substrate-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import {
-    handleCancelled,
-    handleExecuted,
-    handleNotPassed,
-    handlePassed,
-    handlePreimageInvalid,
-    handlePreimageMissing,
-    handlePreimageNoted,
-    handlePreimageReaped,
-    handlePreimageUsed,
-    handleStarted,
-    handleVote,
-} from './mappings'
-
+import * as modules from './mappings'
 const db = new TypeormDatabase()
 const processor = new SubstrateProcessor(db)
 
@@ -24,17 +11,27 @@ processor.setDataSource({
     archive: lookupArchive('kusama', { release: 'FireSquid' }),
 })
 
-processor.addEventHandler('Democracy.Started', handleStarted)
-processor.addEventHandler('Democracy.Passed', handlePassed)
-processor.addEventHandler('Democracy.NotPassed', handleNotPassed)
-processor.addEventHandler('Democracy.Cancelled', handleCancelled)
-processor.addEventHandler('Democracy.Executed', handleExecuted)
-processor.addCallHandler('Democracy.vote', handleVote)
+processor.addEventHandler('Democracy.Proposed',modules.democracy.events.handleProposed)
+processor.addEventHandler('Democracy.Started', modules.democracy.events.handleStarted)
+processor.addEventHandler('Democracy.Passed', modules.democracy.events.handlePassed)
+processor.addEventHandler('Democracy.NotPassed', modules.democracy.events.handleNotPassed)
+processor.addEventHandler('Democracy.Cancelled', modules.democracy.events.handleCancelled)
+processor.addEventHandler('Democracy.Executed', modules.democracy.events.handleExecuted)
+processor.addEventHandler('Democracy.Tabled', modules.democracy.events.handleTabled)
+processor.addCallHandler('Democracy.vote', modules.democracy.extrinsics.handleVote)
 
-processor.addEventHandler('Democracy.PreimageNoted', handlePreimageNoted)
-processor.addEventHandler('Democracy.PreimageUsed', handlePreimageUsed)
-processor.addEventHandler('Democracy.PreimageInvalid', handlePreimageInvalid)
-processor.addEventHandler('Democracy.PreimageMissing', handlePreimageMissing)
-processor.addEventHandler('Democracy.PreimageReaped', handlePreimageReaped)
+processor.addEventHandler('Democracy.PreimageNoted', modules.democracy.events.handlePreimageNoted)
+processor.addEventHandler('Democracy.PreimageUsed', modules.democracy.events.handlePreimageUsed)
+processor.addEventHandler('Democracy.PreimageInvalid', modules.democracy.events.handlePreimageInvalid)
+processor.addEventHandler('Democracy.PreimageMissing', modules.democracy.events.handlePreimageMissing)
+processor.addEventHandler('Democracy.PreimageReaped', modules.democracy.events.handlePreimageReaped)
+
+processor.addEventHandler('Council.Proposed', modules.council.events.handleProposed)
+processor.addEventHandler('Council.Closed', modules.council.events.handleClosed)
+
+processor.addEventHandler('TechnicalCommittee.Proposed', modules.techComittee.events.handleProposed)
+processor.addEventHandler('TechnicalCommittee.Closed', modules.techComittee.events.handleClosed)
+// processor.addEventHandler('TechnicalCommittee.Approved', modules.techComittee.events.handleApproved)
+
 
 processor.run()

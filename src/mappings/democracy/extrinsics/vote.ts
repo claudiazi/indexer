@@ -5,10 +5,10 @@ import {
     Vote,
     VoteBalance,
     VoteDecision,
-} from '../../model'
-import { getOriginAccountId } from '../../common/tools'
+} from '../../../model'
+import { getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
-import { MissingReferendumWarn } from '../utils/errors'
+import { MissingReferendumWarn } from '../../utils/errors'
 import {CallHandlerContext, CommonHandlerContext} from '@subsquid/substrate-processor'
 import {Store} from '@subsquid/typeorm-store'
 

@@ -20,7 +20,12 @@
     "Democracy.PreimageUsed",
     "Democracy.PreimageInvalid",
     "Democracy.PreimageMissing",
-    "Democracy.PreimageReaped"
+    "Democracy.PreimageReaped",
+    "Council.Proposed",
+    "TechnicalCommittee.Proposed",
+    "TechnicalCommittee.Closed",
+    "Council.Closed",
+    "TechnicalCommittee.Approved"
   ],
   "calls": [
     "Democracy.vote"

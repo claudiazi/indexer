@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { EventHandlerContext, toHex } from '@subsquid/substrate-processor'
-import { parseProposalCall, ss58codec } from '../../common/tools'
+import { parseProposalCall, ss58codec } from '../../../common/tools'
 import { Chain } from '@subsquid/substrate-processor/lib/chain'
 import { getPreimageNotedData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
-import { Preimage, PreimageStatus, PreimageStatusHistory, ProposedCall, Referendum } from '../../model'
+import { Preimage, PreimageStatus, PreimageStatusHistory, ProposedCall, Referendum } from '../../../model'
 import { toJSON } from '@subsquid/util-internal-json'
-import { getPreimageData } from '../../storage'
+import { getPreimageData } from '../../../storage'
 
 function decodeProposal(chain: Chain, data: Uint8Array) {
     // @ts-ignore

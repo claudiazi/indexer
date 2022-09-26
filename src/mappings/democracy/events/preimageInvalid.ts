@@ -1,7 +1,7 @@
 import { toHex } from '@subsquid/substrate-processor'
-import { PreimageStatus } from '../../model'
+import { PreimageStatus } from '../../../model'
 import { EventHandlerContext } from '@subsquid/substrate-processor'
-import { updatePreimage } from '../utils/proposals'
+import { updatePreimage } from '../../utils/proposals'
 import { getPreimageInvalidData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
 

@@ -21,6 +21,12 @@ export class ReferendaStats {
     @Field(() => String, { nullable: false })
     status!: string
 
+    @Field(() => Number, { nullable: false })
+    delay!: number
+
+    @Field(() => Number, { nullable: false })
+    ends_at!: number
+
     @Field(() => String, { nullable: true })
     proposer!: string
 

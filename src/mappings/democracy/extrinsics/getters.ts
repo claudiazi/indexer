@@ -1,6 +1,6 @@
-import { UnknownVersionError } from '../../common/errors'
-import { DemocracyVoteCall } from '../../types/calls'
-import { CallContext } from '../../types/support'
+import { UnknownVersionError } from '../../../common/errors'
+import { DemocracyVoteCall } from '../../../types/calls'
+import { CallContext } from '../../../types/support'
 
 type DemocracyVote =
     | {

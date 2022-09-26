@@ -8,6 +8,98 @@ import * as v9160 from './v9160'
 import * as v9170 from './v9170'
 import * as v9190 from './v9190'
 
+export class CouncilClosedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Council.Closed')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  A proposal was closed after its duration was up.
+   */
+  get isV1050(): boolean {
+    return this._chain.getEventHash('Council.Closed') === '7d509ca6ee36d401f2d5410aa32038550c256cc3ce4b34cdfe1f8adea0e1679c'
+  }
+
+  /**
+   *  A proposal was closed after its duration was up.
+   */
+  get asV1050(): [Uint8Array, number, number] {
+    assert(this.isV1050)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A proposal was closed because its threshold was reached or after its duration was up.
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('Council.Closed') === '084e73926c22836c888c17e49053d3b72e2feaa904b8f0175d21fb5b800542f9'
+  }
+
+  /**
+   * A proposal was closed because its threshold was reached or after its duration was up.
+   */
+  get asV9130(): {proposalHash: Uint8Array, yes: number, no: number} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class CouncilProposedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Council.Proposed')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  A motion (given hash) has been proposed (by given account) with a threshold (given
+   *  `MemberCount`).
+   */
+  get isV1020(): boolean {
+    return this._chain.getEventHash('Council.Proposed') === '8d3dc2ef388c0264b2a1bd5e18788f415f4c08186c50dbbee2c60e61d81cb025'
+  }
+
+  /**
+   *  A motion (given hash) has been proposed (by given account) with a threshold (given
+   *  `MemberCount`).
+   */
+  get asV1020(): [Uint8Array, number, Uint8Array, number] {
+    assert(this.isV1020)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A motion (given hash) has been proposed (by given account) with a threshold (given
+   * `MemberCount`).
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('Council.Proposed') === '63978c884e95719fd416c8a38a2ec2ec5a691a58a28349d62b0173643f0d8262'
+  }
+
+  /**
+   * A motion (given hash) has been proposed (by given account) with a threshold (given
+   * `MemberCount`).
+   */
+  get asV9130(): {account: Uint8Array, proposalIndex: number, proposalHash: Uint8Array, threshold: number} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
 export class DemocracyCancelledEvent {
   private readonly _chain: Chain
   private readonly event: Event
@@ -564,6 +656,142 @@ export class DemocracyTabledEvent {
    * A public proposal has been tabled for referendum vote.
    */
   get asV9130(): {proposalIndex: number, deposit: bigint, depositors: Uint8Array[]} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class TechnicalCommitteeApprovedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'TechnicalCommittee.Approved')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  A motion was approved by the required threshold.
+   */
+  get isV1020(): boolean {
+    return this._chain.getEventHash('TechnicalCommittee.Approved') === '21ea0c8f2488eafafdea1de92b54cd17d8b1caff525e37616abf0ff93f11531d'
+  }
+
+  /**
+   *  A motion was approved by the required threshold.
+   */
+  get asV1020(): Uint8Array {
+    assert(this.isV1020)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A motion was approved by the required threshold.
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('TechnicalCommittee.Approved') === 'b8668610145a6851ad2d5b7dd4bfc15e29402d9a8558401ab955896007f866a5'
+  }
+
+  /**
+   * A motion was approved by the required threshold.
+   */
+  get asV9130(): {proposalHash: Uint8Array} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class TechnicalCommitteeClosedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'TechnicalCommittee.Closed')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  A proposal was closed after its duration was up.
+   */
+  get isV1050(): boolean {
+    return this._chain.getEventHash('TechnicalCommittee.Closed') === '7d509ca6ee36d401f2d5410aa32038550c256cc3ce4b34cdfe1f8adea0e1679c'
+  }
+
+  /**
+   *  A proposal was closed after its duration was up.
+   */
+  get asV1050(): [Uint8Array, number, number] {
+    assert(this.isV1050)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A proposal was closed because its threshold was reached or after its duration was up.
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('TechnicalCommittee.Closed') === '084e73926c22836c888c17e49053d3b72e2feaa904b8f0175d21fb5b800542f9'
+  }
+
+  /**
+   * A proposal was closed because its threshold was reached or after its duration was up.
+   */
+  get asV9130(): {proposalHash: Uint8Array, yes: number, no: number} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class TechnicalCommitteeProposedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'TechnicalCommittee.Proposed')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  A motion (given hash) has been proposed (by given account) with a threshold (given
+   *  `MemberCount`).
+   */
+  get isV1020(): boolean {
+    return this._chain.getEventHash('TechnicalCommittee.Proposed') === '8d3dc2ef388c0264b2a1bd5e18788f415f4c08186c50dbbee2c60e61d81cb025'
+  }
+
+  /**
+   *  A motion (given hash) has been proposed (by given account) with a threshold (given
+   *  `MemberCount`).
+   */
+  get asV1020(): [Uint8Array, number, Uint8Array, number] {
+    assert(this.isV1020)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A motion (given hash) has been proposed (by given account) with a threshold (given
+   * `MemberCount`).
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('TechnicalCommittee.Proposed') === '63978c884e95719fd416c8a38a2ec2ec5a691a58a28349d62b0173643f0d8262'
+  }
+
+  /**
+   * A motion (given hash) has been proposed (by given account) with a threshold (given
+   * `MemberCount`).
+   */
+  get asV9130(): {account: Uint8Array, proposalIndex: number, proposalHash: Uint8Array, threshold: number} {
     assert(this.isV9130)
     return this._chain.decodeEvent(this.event)
   }

@@ -5,6 +5,7 @@ import {ReferendumStatus} from "./_referendumStatus"
 import {ReferendumStatusHistory} from "./_referendumStatusHistory"
 import {Preimage} from "./preimage.model"
 import {Vote} from "./vote.model"
+import {ReferendumOriginType} from "./_referendumOriginType"
 
 @Entity_()
 export class Referendum {
@@ -61,4 +62,13 @@ export class Referendum {
 
   @OneToMany_(() => Vote, e => e.referendum)
   voting!: Vote[]
+
+  @Column_("int4", {nullable: true})
+  endsAt!: number | undefined | null
+
+  @Column_("int4", {nullable: true})
+  delay!: number | undefined | null
+
+  @Column_("varchar", {length: 19, nullable: true})
+  origin!: ReferendumOriginType | undefined | null
 }

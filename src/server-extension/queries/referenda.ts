@@ -14,6 +14,8 @@ export const referendaStats = `
                 DATE_PART('hour', ended_at::timestamp - created_at::timestamp) / 24 AS vote_duration
               , total_issuance::decimal(38,0) / 1000000000000 AS total_issuance
               , (threshold ->> 'type') AS threshold_type
+              , delay
+              , ends_at
               FROM referendum
               WHERE NOT (index::text = ANY ($1) )
 
@@ -309,6 +311,8 @@ export const referendaStats = `
               , r.created_at
               , r.ended_at
               , r.status
+              , r.delay
+              , r.ends_at
               , proposer
               , method
               , section

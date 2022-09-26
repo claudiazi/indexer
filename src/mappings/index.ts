@@ -1,2 +1,5 @@
-export * from './events'
-export * from './calls'
+import democracy from './democracy'
+import council from './council'
+import techComittee from './techCommittee'
+
+export { democracy, council, techComittee }

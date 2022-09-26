@@ -6,11 +6,13 @@ import {
     ReferendumStatusHistory,
     ReferendumThreshold,
     ReferendumThresholdType,
-} from '../../model'
+} from '../../../model'
 import { Store } from '@subsquid/typeorm-store'
 import { getStartedData } from './getters'
-import { getReferendumInfoOf } from '../../storage'
-import { BalancesTotalIssuanceStorage } from '../../types/storage'
+import { getReferendumInfoOf } from '../../../storage'
+import { BalancesTotalIssuanceStorage } from '../../../types/storage'
+import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
+import { MissingReferendumRelationWarn } from '../../utils/errors'
 
 export async function handleStarted(ctx: EventHandlerContext<Store>) {
     const { index, threshold } = getStartedData(ctx)
@@ -21,6 +23,11 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
     if (storageData.status === 'Finished') {
         ctx.log.warn(`Referendum with index ${index} has already finished at block ${ctx.block.height}`)
         return
+    }
+
+    let delay, end
+    if (storageData.status === 'Ongoing') {
+        ({ delay, end } = storageData)
     }
 
     const { hash } = storageData
@@ -41,6 +48,8 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
         createdAt: new Date(ctx.block.timestamp),
         totalIssuance: await new BalancesTotalIssuanceStorage(ctx).getAsV1020() || 0n,
         preimage,
+        delay,
+        endsAt: end
     })
 
     referendum.statusHistory.push(
@@ -52,6 +61,22 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
     )
 
     await ctx.store.insert(referendum)
+
+    //update relation
+    const referendumRelation = await ctx.store.get(ReferendumRelation, {
+        where: {
+            referendumId : undefined,
+            hash: toHex(hash)
+        }
+    })
+    if (!referendumRelation) {
+        ctx.log.warn(MissingReferendumRelationWarn(index))
+        return
+    }
+
+    referendumRelation.referendumIndex = index
+    referendumRelation.referendumId = id
+    ctx.store.save(referendumRelation)
 }
 
 async function getReferendumId(store: Store) {

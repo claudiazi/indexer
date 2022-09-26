@@ -1,4 +1,4 @@
-import { UnknownVersionError } from '../../common/errors'
+import { UnknownVersionError } from '../../../common/errors'
 import {
     DemocracyCancelledEvent,
     DemocracyExecutedEvent,
@@ -9,9 +9,11 @@ import {
     DemocracyPreimageNotedEvent,
     DemocracyPreimageReapedEvent,
     DemocracyPreimageUsedEvent,
+    DemocracyProposedEvent,
     DemocracyStartedEvent,
-} from '../../types/events'
-import { EventContext } from '../../types/support'
+    DemocracyTabledEvent,
+} from '../../../types/events'
+import { EventContext } from '../../../types/support'
 
 export function getCancelledData(ctx: EventContext): number {
     const event = new DemocracyCancelledEvent(ctx)
@@ -207,6 +209,54 @@ export function getStartedData(ctx: EventContext): ReferendumEventData {
         return {
             index,
             threshold: threshold.__kind,
+        }
+    } else {
+        throw new UnknownVersionError(event.constructor.name)
+    }
+}
+
+export interface ProposedData {
+    index: number
+}
+
+export function getProposedData(ctx: EventContext): ProposedData {
+    const event = new DemocracyProposedEvent(ctx)
+    if (event.isV1020) {
+        const [index, deposit] = event.asV1020
+        return {
+            index,
+        }
+    } else if (event.isV9130) {
+        const { proposalIndex: index, deposit } = event.asV9130
+        return {
+            index,
+        }
+    } else {
+        throw new UnknownVersionError(event.constructor.name)
+    }
+}
+
+interface TabledEventData {
+    index: number
+    deposit: bigint
+    depositors: Uint8Array[]
+}
+
+export function getTabledEventData(ctx: EventContext): TabledEventData {
+    const event = new DemocracyTabledEvent(ctx)
+    if (event.isV1020) {
+        const [index, deposit, depositors] = event.asV1020
+        return {
+            index,
+            deposit,
+            depositors,
+        }
+    } else if (event.isV9130) {
+        const { proposalIndex: index, deposit, depositors } = event.asV9130
+        return {
+            index,
+            deposit,
+            depositors,
         }
     } else {
         throw new UnknownVersionError(event.constructor.name)
