@@ -6,7 +6,11 @@
     "Balances.TotalIssuance",
     "Democracy.Preimages",
     "Democracy.PublicProps",
-    "Democracy.ReferendumInfoOf"
+    "Democracy.ReferendumInfoOf",
+    "TechnicalCommittee.ProposalOf",
+    "Council.ProposalOf",
+    "Instance2Collective.ProposalOf",
+    "Instance1Collective.ProposalOf"
   ],
   "events": [
     "Democracy.Proposed",
@@ -23,8 +27,8 @@
     "Democracy.PreimageReaped",
     "Council.Proposed",
     "TechnicalCommittee.Proposed",
-    "TechnicalCommittee.Closed",
-    "Council.Closed",
+    "TechnicalCommittee.Approved",
+    "Council.Approved",
     "TechnicalCommittee.Approved"
   ],
   "calls": [

@@ -1,2 +1,2 @@
 export { handleProposed } from './proposed'
-export { handleClosed } from './closed'
+export { handleApproved } from './approved'

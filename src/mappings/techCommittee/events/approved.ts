@@ -1,13 +1,13 @@
 import { toHex } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { EventHandlerContext } from '@subsquid/substrate-processor'
-import { TechCommitteeMotion } from '../../../model'
-import { getClosedData } from './getters'
+import { ReferendumOriginType, TechCommitteeMotion } from '../../../model'
+import { getApprovedData } from './getters'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
-import { MissingTechCommitteeMotionWarn } from '../../utils/errors'
+import { NoRecordExistsWarn } from '../../../common/errors'
 
-export async function handleClosed(ctx: EventHandlerContext<Store>) {
-    const hash = getClosedData(ctx)
+export async function handleApproved(ctx: EventHandlerContext<Store>) {
+    const hash = getApprovedData(ctx)
 
     const hexHash = toHex(hash)
 
@@ -19,14 +19,17 @@ export async function handleClosed(ctx: EventHandlerContext<Store>) {
     })
 
     if (!techCommitteeMotion) {
-        ctx.log.warn(MissingTechCommitteeMotionWarn(hexHash))
+        ctx.log.warn(NoRecordExistsWarn(ReferendumOriginType.TechCommitteeMotion, hexHash))
         return
     }
 
     const referendumRelation = new ReferendumRelation({
         id: relationId,
-        underlying: techCommitteeMotion.id,
-        hash: techCommitteeMotion.hash
+        underlyingId: techCommitteeMotion.id,
+        underlyingIndex: techCommitteeMotion.index,
+        proposer: techCommitteeMotion.proposer,
+        proposalHash: techCommitteeMotion.proposalHash,
+        underlyingType: ReferendumOriginType.TechCommitteeMotion
     })
 
     await ctx.store.insert(referendumRelation)

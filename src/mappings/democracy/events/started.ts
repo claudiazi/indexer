@@ -1,18 +1,23 @@
 import { EventHandlerContext, toHex } from '@subsquid/substrate-processor'
 import {
+    CouncilMotion,
+    DemocracyProposal,
     Preimage,
     Referendum,
+    ReferendumOriginType,
     ReferendumStatus,
     ReferendumStatusHistory,
     ReferendumThreshold,
     ReferendumThresholdType,
+    TechCommitteeMotion,
 } from '../../../model'
 import { Store } from '@subsquid/typeorm-store'
 import { getStartedData } from './getters'
-import { getReferendumInfoOf } from '../../../storage'
+import { getReferendumInfoOf } from '../../../storage/democracy'
 import { BalancesTotalIssuanceStorage } from '../../../types/storage'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
 import { MissingReferendumRelationWarn } from '../../utils/errors'
+import { NoRecordExistsWarn } from '../../../common/errors'
 
 export async function handleStarted(ctx: EventHandlerContext<Store>) {
     const { index, threshold } = getStartedData(ctx)
@@ -59,14 +64,14 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
             status: referendum.status,
         })
     )
-
     await ctx.store.insert(referendum)
-
     //update relation
     const referendumRelation = await ctx.store.get(ReferendumRelation, {
         where: {
-            referendumId : undefined,
-            hash: toHex(hash)
+            referendumId: undefined,
+            proposalHash: toHex(hash)
+        }, order: {
+            id: 'DESC',
         }
     })
     if (!referendumRelation) {
@@ -74,9 +79,50 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
         return
     }
 
+    let proposer
+
+    switch (referendumRelation.underlyingType) {
+        case ReferendumOriginType.DemocracyProposal:
+            const democracyProposal = await ctx.store.get(DemocracyProposal, {
+                where: {
+                    id: referendumRelation.underlyingId
+                }
+            })
+            if (!democracyProposal) {
+                ctx.log.warn(NoRecordExistsWarn(ReferendumOriginType.DemocracyProposal, referendumRelation.underlyingId))
+                return
+            }
+            proposer = democracyProposal.proposer
+            break;
+        case ReferendumOriginType.CouncilMotion:
+            const councilMotion = await ctx.store.get(CouncilMotion, {
+                where: {
+                    id: referendumRelation.underlyingId
+                }
+            })
+            if (!councilMotion) {
+                ctx.log.warn(NoRecordExistsWarn(ReferendumOriginType.CouncilMotion, referendumRelation.underlyingId))
+                return
+            }
+            proposer = councilMotion.proposer
+            break;
+        case ReferendumOriginType.TechCommitteeMotion:
+            const techCommitteeMotion = await ctx.store.get(TechCommitteeMotion, {
+                where: {
+                    id: referendumRelation.underlyingId
+                }
+            })
+            if (!techCommitteeMotion) {
+                ctx.log.warn(NoRecordExistsWarn(ReferendumOriginType.TechCommitteeMotion, referendumRelation.underlyingId))
+                return
+            }
+            proposer = techCommitteeMotion.proposer
+            break;
+    }
+
     referendumRelation.referendumIndex = index
     referendumRelation.referendumId = id
-    ctx.store.save(referendumRelation)
+    await ctx.store.save(referendumRelation)
 }
 
 async function getReferendumId(store: Store) {

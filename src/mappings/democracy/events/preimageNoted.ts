@@ -6,7 +6,7 @@ import { getPreimageNotedData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
 import { Preimage, PreimageStatus, PreimageStatusHistory, ProposedCall, Referendum } from '../../../model'
 import { toJSON } from '@subsquid/util-internal-json'
-import { getPreimageData } from '../../../storage'
+import { getPreimageData } from '../../../storage/democracy'
 
 function decodeProposal(chain: Chain, data: Uint8Array) {
     // @ts-ignore

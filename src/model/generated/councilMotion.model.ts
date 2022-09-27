@@ -18,6 +18,9 @@ export class CouncilMotion {
   hash!: string | undefined | null
 
   @Column_("text", {nullable: true})
+  proposalHash!: string | undefined | null
+
+  @Column_("text", {nullable: true})
   proposer!: string | undefined | null
 
   @Column_("varchar", {length: 19, nullable: true})

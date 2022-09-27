@@ -1,6 +1,6 @@
-import { UnknownVersionError } from '../common/errors'
-import { DemocracyPreimagesStorage } from '../types/storage'
-import { BlockContext } from '../types/support'
+import { UnknownVersionError } from '../../common/errors'
+import { DemocracyPreimagesStorage } from '../../types/storage'
+import { BlockContext } from '../../types/support'
 
 interface PreimageStorageData {
     data: Uint8Array

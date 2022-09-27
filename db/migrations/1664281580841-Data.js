@@ -1,14 +1,14 @@
-module.exports = class Data1664226241558 {
-  name = 'Data1664226241558'
+module.exports = class Data1664281580841 {
+  name = 'Data1664281580841'
 
   async up(db) {
-    await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_efd55f5a8e4bac965618860331" ON "council_motion" ("index") `)
-    await db.query(`CREATE TABLE "tech_committee_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_b325b64b767ccbc5a6e25bbde83" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "tech_committee_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_b325b64b767ccbc5a6e25bbde83" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_c05e239bcb276b4daef438162e" ON "tech_committee_motion" ("index") `)
-    await db.query(`CREATE TABLE "democracy_proposal" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_7a1e958ebe21dca11725bcd7e3c" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "democracy_proposal" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_7a1e958ebe21dca11725bcd7e3c" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_fc09ba7858321c1a105def18b0" ON "democracy_proposal" ("index") `)
-    await db.query(`CREATE TABLE "referendum_relation" ("id" character varying NOT NULL, "referendum_index" integer, "hash" text, "referendum_id" text, "underlying" text NOT NULL, CONSTRAINT "PK_41b007c982835d4aa3c9b17d423" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "referendum_relation" ("id" character varying NOT NULL, "referendum_index" integer, "proposal_hash" text, "referendum_id" text, "underlying_id" text NOT NULL, "underlying_index" integer NOT NULL, "proposer" text, "underlying_type" character varying(19), CONSTRAINT "PK_41b007c982835d4aa3c9b17d423" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_693e83e7bc4f10c599e2d9953d" ON "referendum_relation" ("referendum_index") `)
     await db.query(`CREATE TABLE "preimage" ("id" character varying NOT NULL, "hash" text NOT NULL, "proposer" text NOT NULL, "deposit" numeric NOT NULL, "proposed_call" jsonb, "status" character varying(7) NOT NULL, "status_history" jsonb NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_dff8526c5d16d71afbefb55b286" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_c6e9bc6f69c924e85a44174d35" ON "preimage" ("hash") `)

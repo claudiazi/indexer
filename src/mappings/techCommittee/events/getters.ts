@@ -1,6 +1,6 @@
 import { UnknownVersionError } from '../../../common/errors'
 import {
-    TechnicalCommitteeClosedEvent,
+    TechnicalCommitteeApprovedEvent,
     TechnicalCommitteeProposedEvent,
 } from '../../../types/events'
 import { EventContext } from '../../../types/support'
@@ -35,10 +35,10 @@ export function getProposedData(ctx: EventContext): ProposedData {
     }
 }
 
-export function getClosedData(ctx: EventContext): Uint8Array {
-    const event = new TechnicalCommitteeClosedEvent(ctx)
-    if (event.isV1050) {
-        return event.asV1050[0]
+export function getApprovedData(ctx: EventContext): Uint8Array {
+    const event = new TechnicalCommitteeApprovedEvent(ctx)
+    if (event.isV1020) {
+        return event.asV1020
     } else if (event.isV9130) {
         return event.asV9130.proposalHash
     } else {

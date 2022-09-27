@@ -3,11 +3,26 @@ import { toHex } from '@subsquid/substrate-processor'
 import { EventHandlerContext } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { TechCommitteeMotion, ReferendumOriginType } from '../../../model'
-import { ss58codec } from '../../../common/tools'
+import { parseProposalCall, ss58codec } from '../../../common/tools'
 import { getProposedData } from './getters'
+import { storage } from '../../../storage'
+import { StorageNotExistsWarn } from '../../../common/errors'
 
 export async function handleProposed(ctx: EventHandlerContext<Store>) {
     const { index, proposer, hash } = getProposedData(ctx)
+
+    const storageData = await storage.techCommittee.getProposalOf(ctx, hash)
+    if (!storageData) {
+        ctx.log.warn(StorageNotExistsWarn(ReferendumOriginType.TechCommitteeMotion, index))
+        return
+    }
+
+    const { section, method, args, description } = parseProposalCall(ctx._chain, storageData)
+
+    let hexHash;
+    if (args['proposalHash']) {
+        hexHash = toHex(args['proposalHash'])
+    }
 
     const techCommitteeMotionId = await getTechCommitteeMotionId(ctx.store)
 
@@ -15,8 +30,9 @@ export async function handleProposed(ctx: EventHandlerContext<Store>) {
         id: techCommitteeMotionId,
         index,
         hash: toHex(hash),
+        proposalHash: hexHash,
         proposer: ss58codec.encode(proposer),
-        type: ReferendumOriginType.TechCommetteeMotion
+        type: ReferendumOriginType.TechCommitteeMotion
     })
 
     await ctx.store.insert(techCommitteeMotion)

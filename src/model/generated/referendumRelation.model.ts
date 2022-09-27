@@ -1,4 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {ReferendumOriginType} from "./_referendumOriginType"
 
 @Entity_()
 export class ReferendumRelation {
@@ -14,11 +15,20 @@ export class ReferendumRelation {
   referendumIndex!: number | undefined | null
 
   @Column_("text", {nullable: true})
-  hash!: string | undefined | null
+  proposalHash!: string | undefined | null
 
   @Column_("text", {nullable: true})
   referendumId!: string | undefined | null
 
   @Column_("text", {nullable: false})
-  underlying!: string
+  underlyingId!: string
+
+  @Column_("int4", {nullable: false})
+  underlyingIndex!: number
+
+  @Column_("text", {nullable: true})
+  proposer!: string | undefined | null
+
+  @Column_("varchar", {length: 19, nullable: true})
+  underlyingType!: ReferendumOriginType | undefined | null
 }

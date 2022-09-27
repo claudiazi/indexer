@@ -1,6 +1,6 @@
-import { UnknownVersionError } from '../common/errors'
-import { BlockContext } from '../types/support'
-import { DemocracyPublicPropsStorage } from '../types/storage'
+import { UnknownVersionError } from '../../common/errors'
+import { BlockContext } from '../../types/support'
+import { DemocracyPublicPropsStorage } from '../../types/storage'
 
 interface DemocracyProposalStorageData {
     index: number

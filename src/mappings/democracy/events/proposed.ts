@@ -4,13 +4,13 @@ import { Store } from '@subsquid/typeorm-store'
 import { DemocracyProposal, ReferendumOriginType } from '../../../model'
 import { ss58codec } from '../../../common/tools'
 import { getProposedData } from './getters'
-import { getProposals } from '../../../storage'
+import { storage } from '../../../storage'
 import { StorageNotExistsWarn } from '../../../common/errors'
 
 export async function handleProposed(ctx: EventHandlerContext<Store>) {
     const { index } = getProposedData(ctx)
 
-    const storageData = await getProposals(ctx)
+    const storageData = await storage.democracy.getProposals(ctx)
     if (!storageData) {
         ctx.log.warn(`Storage doesn't exist for democracy proposals at block ${ctx.block.height}`)
         return
@@ -18,11 +18,10 @@ export async function handleProposed(ctx: EventHandlerContext<Store>) {
 
     const proposalData = storageData.find((prop) => prop.index === index)
     if (!proposalData) {
-        ctx.log.warn(StorageNotExistsWarn("DemocracyProposal", index))
+        ctx.log.warn(StorageNotExistsWarn(ReferendumOriginType.DemocracyProposal, index))
         return
     }
     const { hash, proposer } = proposalData
-    const hexHash = toHex(hash)
 
     const democracyProposalId = await getDemocracyProposalId(ctx.store)
 
@@ -30,6 +29,7 @@ export async function handleProposed(ctx: EventHandlerContext<Store>) {
         id: democracyProposalId,
         index,
         hash: toHex(hash),
+        proposalHash: toHex(hash),
         proposer: ss58codec.encode(proposer),
         type: ReferendumOriginType.DemocracyProposal
     })

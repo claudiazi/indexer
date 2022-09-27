@@ -8,7 +8,7 @@ import * as v9160 from './v9160'
 import * as v9170 from './v9170'
 import * as v9190 from './v9190'
 
-export class CouncilClosedEvent {
+export class CouncilApprovedEvent {
   private readonly _chain: Chain
   private readonly event: Event
 
@@ -16,37 +16,37 @@ export class CouncilClosedEvent {
   constructor(ctx: ChainContext, event: Event)
   constructor(ctx: EventContext, event?: Event) {
     event = event || ctx.event
-    assert(event.name === 'Council.Closed')
+    assert(event.name === 'Council.Approved')
     this._chain = ctx._chain
     this.event = event
   }
 
   /**
-   *  A proposal was closed after its duration was up.
+   *  A motion was approved by the required threshold.
    */
-  get isV1050(): boolean {
-    return this._chain.getEventHash('Council.Closed') === '7d509ca6ee36d401f2d5410aa32038550c256cc3ce4b34cdfe1f8adea0e1679c'
+  get isV1020(): boolean {
+    return this._chain.getEventHash('Council.Approved') === '21ea0c8f2488eafafdea1de92b54cd17d8b1caff525e37616abf0ff93f11531d'
   }
 
   /**
-   *  A proposal was closed after its duration was up.
+   *  A motion was approved by the required threshold.
    */
-  get asV1050(): [Uint8Array, number, number] {
-    assert(this.isV1050)
+  get asV1020(): Uint8Array {
+    assert(this.isV1020)
     return this._chain.decodeEvent(this.event)
   }
 
   /**
-   * A proposal was closed because its threshold was reached or after its duration was up.
+   * A motion was approved by the required threshold.
    */
   get isV9130(): boolean {
-    return this._chain.getEventHash('Council.Closed') === '084e73926c22836c888c17e49053d3b72e2feaa904b8f0175d21fb5b800542f9'
+    return this._chain.getEventHash('Council.Approved') === 'b8668610145a6851ad2d5b7dd4bfc15e29402d9a8558401ab955896007f866a5'
   }
 
   /**
-   * A proposal was closed because its threshold was reached or after its duration was up.
+   * A motion was approved by the required threshold.
    */
-  get asV9130(): {proposalHash: Uint8Array, yes: number, no: number} {
+  get asV9130(): {proposalHash: Uint8Array} {
     assert(this.isV9130)
     return this._chain.decodeEvent(this.event)
   }
@@ -700,50 +700,6 @@ export class TechnicalCommitteeApprovedEvent {
    * A motion was approved by the required threshold.
    */
   get asV9130(): {proposalHash: Uint8Array} {
-    assert(this.isV9130)
-    return this._chain.decodeEvent(this.event)
-  }
-}
-
-export class TechnicalCommitteeClosedEvent {
-  private readonly _chain: Chain
-  private readonly event: Event
-
-  constructor(ctx: EventContext)
-  constructor(ctx: ChainContext, event: Event)
-  constructor(ctx: EventContext, event?: Event) {
-    event = event || ctx.event
-    assert(event.name === 'TechnicalCommittee.Closed')
-    this._chain = ctx._chain
-    this.event = event
-  }
-
-  /**
-   *  A proposal was closed after its duration was up.
-   */
-  get isV1050(): boolean {
-    return this._chain.getEventHash('TechnicalCommittee.Closed') === '7d509ca6ee36d401f2d5410aa32038550c256cc3ce4b34cdfe1f8adea0e1679c'
-  }
-
-  /**
-   *  A proposal was closed after its duration was up.
-   */
-  get asV1050(): [Uint8Array, number, number] {
-    assert(this.isV1050)
-    return this._chain.decodeEvent(this.event)
-  }
-
-  /**
-   * A proposal was closed because its threshold was reached or after its duration was up.
-   */
-  get isV9130(): boolean {
-    return this._chain.getEventHash('TechnicalCommittee.Closed') === '084e73926c22836c888c17e49053d3b72e2feaa904b8f0175d21fb5b800542f9'
-  }
-
-  /**
-   * A proposal was closed because its threshold was reached or after its duration was up.
-   */
-  get asV9130(): {proposalHash: Uint8Array, yes: number, no: number} {
     assert(this.isV9130)
     return this._chain.decodeEvent(this.event)
   }

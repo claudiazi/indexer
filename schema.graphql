@@ -25,7 +25,7 @@ enum PreimageStatus {
 enum ReferendumOriginType {
   CouncilMotion
   DemocracyProposal
-  TechCommetteeMotion
+  TechCommitteeMotion
 }
 
 enum ReferendumThresholdType {
@@ -39,25 +39,28 @@ type ReferendumThreshold {
 }
 
 type CouncilMotion @entity {
-  id: ID!,
+  id: ID!
   index: Int! @index
-  hash: String,
+  hash: String
+  proposalHash: String
   proposer: String
   type: ReferendumOriginType
 }
 
 type TechCommitteeMotion @entity {
-  id: ID!,
+  id: ID!
   index: Int! @index
-  hash: String,
+  hash: String
+  proposalHash: String
   proposer: String
   type: ReferendumOriginType
 }
 
 type DemocracyProposal @entity {
-  id: ID!,
+  id: ID!
   index: Int! @index
-  hash: String,
+  hash: String
+  proposalHash: String
   proposer: String
   type: ReferendumOriginType
 }
@@ -65,9 +68,12 @@ type DemocracyProposal @entity {
 type ReferendumRelation @entity {
   id: ID!,
   referendumIndex: Int @index
-  hash: String
+  proposalHash: String
   referendumId: ID
-  underlying: ID!
+  underlyingId: ID!
+  underlyingIndex: Int!
+  proposer: String
+  underlyingType: ReferendumOriginType
 }
 
 type Referendum @entity {

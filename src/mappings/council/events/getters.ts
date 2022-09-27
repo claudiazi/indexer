@@ -1,5 +1,5 @@
 import { UnknownVersionError } from '../../../common/errors'
-import { CouncilClosedEvent } from '../../../types/events'
+import { CouncilApprovedEvent } from '../../../types/events'
 import {
     CouncilProposedEvent,
 } from '../../../types/events'
@@ -35,10 +35,10 @@ export function getProposedData(ctx: EventContext): ProposedData {
     }
 }
 
-export function getClosedData(ctx: EventContext): Uint8Array {
-    const event = new CouncilClosedEvent(ctx)
-    if (event.isV1050) {
-        return event.asV1050[0]
+export function getApprovedData(ctx: EventContext): Uint8Array {
+    const event = new CouncilApprovedEvent(ctx)
+    if (event.isV1020) {
+        return event.asV1020
     } else if (event.isV9130) {
         return event.asV9130.proposalHash
     } else {

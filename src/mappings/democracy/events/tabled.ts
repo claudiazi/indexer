@@ -5,7 +5,7 @@ import { DemocracyProposal, ReferendumOriginType } from '../../../model'
 import { ss58codec } from '../../../common/tools'
 import { getTabledEventData } from './getters'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
-import { MissingDemocracyProposalWarn } from '../../utils/errors'
+import { NoRecordExistsWarn } from '../../../common/errors'
 
 export async function handleTabled(ctx: EventHandlerContext<Store>) {
     const { index } = getTabledEventData(ctx)
@@ -19,13 +19,16 @@ export async function handleTabled(ctx: EventHandlerContext<Store>) {
     })
 
     if (!democracyProposal) {
-        ctx.log.warn(MissingDemocracyProposalWarn(index))
+        ctx.log.warn(NoRecordExistsWarn(ReferendumOriginType.DemocracyProposal, index))
         return
     }
     const referendumRelation = new ReferendumRelation({
         id: relationId,
-        underlying: democracyProposal.id,
-        hash: democracyProposal.hash
+        underlyingId: democracyProposal.id,
+        underlyingIndex: democracyProposal.index,
+        proposer: democracyProposal.proposer,
+        proposalHash: democracyProposal.proposalHash,
+        underlyingType: ReferendumOriginType.DemocracyProposal
     })
 
     await ctx.store.insert(referendumRelation)
