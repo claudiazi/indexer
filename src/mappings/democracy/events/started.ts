@@ -64,7 +64,7 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
             status: referendum.status,
         })
     )
-    await ctx.store.insert(referendum)
+    
     //update relation
     const referendumRelation = await ctx.store.get(ReferendumRelation, {
         where: {
@@ -122,6 +122,8 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
 
     referendumRelation.referendumIndex = index
     referendumRelation.referendumId = id
+    referendum.proposer = proposer
+    await ctx.store.insert(referendum)
     await ctx.store.save(referendumRelation)
 }
 

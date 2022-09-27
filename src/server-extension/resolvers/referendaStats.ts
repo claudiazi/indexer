@@ -27,8 +27,11 @@ export class ReferendaStats {
     @Field(() => Number, { nullable: false })
     ends_at!: number
 
-    @Field(() => String, { nullable: true })
+    @Field(() => String, { nullable: false })
     proposer!: string
+
+    @Field(() => String, { nullable: true })
+    preimage_proposer!: string
 
     @Field(() => String, { nullable: true })
     method!: string

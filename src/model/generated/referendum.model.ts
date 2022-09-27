@@ -53,6 +53,9 @@ export class Referendum {
   @Column_("timestamp with time zone", {nullable: true})
   updatedAt!: Date | undefined | null
 
+  @Column_("text", {nullable: true})
+  proposer!: string | undefined | null
+
   @Index_()
   @ManyToOne_(() => Preimage, {nullable: true})
   preimage!: Preimage | undefined | null

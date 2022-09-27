@@ -8,6 +8,7 @@ export const referendaStats = `
               , preimage_id
               , index
               , status
+              , proposer
               , created_at::timestamp AS created_at
               , ended_at::timestamp AS ended_at
               , DATE_PART('day', ended_at::timestamp - created_at::timestamp) + 
@@ -297,7 +298,7 @@ export const referendaStats = `
 
               SELECT 
                 id AS preimage_id
-              , proposer
+              , proposer AS preimage_proposer
               , proposed_call ->> 'method' AS method
               , proposed_call ->> 'section' AS section
               FROM preimage
@@ -313,7 +314,8 @@ export const referendaStats = `
               , r.status
               , r.delay
               , r.ends_at
-              , proposer
+              , r.proposer
+              , preimage_proposer
               , method
               , section
               , count_aye

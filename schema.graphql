@@ -89,6 +89,7 @@ type Referendum @entity {
   endedAt: DateTime
   updatedAtBlock: Int
   updatedAt: DateTime
+  proposer: String
   preimage: Preimage
   totalIssuance: BigInt!
   voting: [Vote!] @derivedFrom(field: "referendum")
