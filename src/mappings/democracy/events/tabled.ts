@@ -1,8 +1,6 @@
-import { toHex } from '@subsquid/substrate-processor'
 import { EventHandlerContext } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { DemocracyProposal, ReferendumOriginType } from '../../../model'
-import { ss58codec } from '../../../common/tools'
 import { getTabledEventData } from './getters'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
 import { NoRecordExistsWarn } from '../../../common/errors'
