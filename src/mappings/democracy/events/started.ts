@@ -1,4 +1,4 @@
-import { EventHandlerContext, toHex } from '@subsquid/substrate-processor'
+import { BatchContext, SubstrateBlock, toHex } from '@subsquid/substrate-processor'
 import {
     CouncilMotion,
     DemocracyProposal,
@@ -18,15 +18,18 @@ import { BalancesTotalIssuanceStorage } from '../../../types/storage'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
 import { MissingReferendumRelationWarn } from '../../utils/errors'
 import { NoRecordExistsWarn } from '../../../common/errors'
+import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
-export async function handleStarted(ctx: EventHandlerContext<Store>) {
-    const { index, threshold } = getStartedData(ctx)
+export async function handleStarted(ctx: BatchContext<Store, unknown>,
+    item: EventItem<'Democracy.Started', { event: { args: true; extrinsic: { hash: true } } }>,
+    header: SubstrateBlock): Promise<void> {
+    const { index, threshold } = getStartedData(ctx, item.event)
 
-    const storageData = await getReferendumInfoOf(ctx, index)
+    const storageData = await getReferendumInfoOf(ctx, index, header)
     if (!storageData) return
 
     if (storageData.status === 'Finished') {
-        ctx.log.warn(`Referendum with index ${index} has already finished at block ${ctx.block.height}`)
+        ctx.log.warn(`Referendum with index ${index} has already finished at block ${header.height}`)
         return
     }
 
@@ -49,9 +52,9 @@ export async function handleStarted(ctx: EventHandlerContext<Store>) {
         }),
         status: ReferendumStatus.Started,
         statusHistory: [],
-        createdAtBlock: ctx.block.height,
-        createdAt: new Date(ctx.block.timestamp),
-        totalIssuance: await new BalancesTotalIssuanceStorage(ctx).getAsV1020() || 0n,
+        createdAtBlock: header.height,
+        createdAt: new Date(header.timestamp),
+        totalIssuance: await new BalancesTotalIssuanceStorage(ctx, header).getAsV1020() || 0n,
         preimage,
         delay,
         endsAt: end

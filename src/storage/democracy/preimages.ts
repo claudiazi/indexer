@@ -1,6 +1,7 @@
+import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 import { UnknownVersionError } from '../../common/errors'
 import { DemocracyPreimagesStorage } from '../../types/storage'
-import { BlockContext } from '../../types/support'
 
 interface PreimageStorageData {
     data: Uint8Array
@@ -9,8 +10,8 @@ interface PreimageStorageData {
     block: number
 }
 
-export async function getPreimageData(ctx: BlockContext, hash: Uint8Array): Promise<PreimageStorageData | undefined> {
-    const storage = new DemocracyPreimagesStorage(ctx)
+export async function getPreimageData(ctx: BatchContext<Store, unknown>, hash: Uint8Array, block: SubstrateBlock): Promise<PreimageStorageData | undefined> {
+    const storage = new DemocracyPreimagesStorage(ctx, block)
     if (storage.isV1022) {
         const storageData = await storage.getAsV1022(hash)
         if (!storageData) return undefined

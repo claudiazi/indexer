@@ -1,6 +1,7 @@
+import { BatchContext } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 import { UnknownVersionError } from '../../../common/errors'
 import { DemocracyVoteCall } from '../../../types/calls'
-import { CallContext } from '../../../types/support'
 
 type DemocracyVote =
     | {
@@ -19,8 +20,8 @@ interface DemocracyVoteCallData {
     vote: DemocracyVote
 }
 
-export function getVoteData(ctx: CallContext): DemocracyVoteCallData {
-    const event = new DemocracyVoteCall(ctx)
+export function getVoteData(ctx: BatchContext<Store, unknown>, itemCall: any): DemocracyVoteCallData {
+    const event = new DemocracyVoteCall(ctx, itemCall)
     if (event.isV1020) {
         const { refIndex, vote } = event.asV1020
         return {

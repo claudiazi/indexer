@@ -1,33 +1,37 @@
+import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 import { CouncilProposalOfStorage, Instance1CollectiveProposalOfStorage } from '../../types/storage'
-import { BlockContext } from '../../types/support'
 import { Call } from '../../types/v9170'
 
 type CouncilProposalStorageData = Call
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 async function getInstanceStorageData(
-    ctx: BlockContext,
-    hash: Uint8Array
+    ctx: BatchContext<Store, unknown>,
+    hash: Uint8Array,
+    block: SubstrateBlock
 ): Promise<CouncilProposalStorageData | undefined> {
-    const storage = new Instance1CollectiveProposalOfStorage(ctx)
+    const storage = new Instance1CollectiveProposalOfStorage(ctx, block)
     if (!storage.isExists) return undefined
 
-    return ctx._chain.getStorage(ctx.block.hash, 'Instance1Collective', 'ProposalOf', hash)
+    return ctx._chain.getStorage(block.hash, 'Instance1Collective', 'ProposalOf', hash)
 }
 
 async function getCoucilStorageData(
-    ctx: BlockContext,
-    hash: Uint8Array
+    ctx: BatchContext<Store, unknown>,
+    hash: Uint8Array,
+    block: SubstrateBlock
 ): Promise<CouncilProposalStorageData | undefined> {
-    const storage = new CouncilProposalOfStorage(ctx)
+    const storage = new CouncilProposalOfStorage(ctx, block)
     if (!storage.isExists) return undefined
 
-    return ctx._chain.getStorage(ctx.block.hash, 'Council', 'ProposalOf', hash)
+    return ctx._chain.getStorage(block.hash, 'Council', 'ProposalOf', hash)
 }
 
 export async function getProposalOf(
-    ctx: BlockContext,
-    hash: Uint8Array
+    ctx: BatchContext<Store, unknown>,
+    hash: Uint8Array,
+    block: SubstrateBlock
 ): Promise<CouncilProposalStorageData | undefined> {
-    return (await getCoucilStorageData(ctx, hash)) || (await getInstanceStorageData(ctx, hash))
+    return (await getCoucilStorageData(ctx, hash, block)) || (await getInstanceStorageData(ctx, hash, block))
 }

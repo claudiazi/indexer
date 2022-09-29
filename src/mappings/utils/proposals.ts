@@ -1,4 +1,4 @@
-import { CommonHandlerContext } from '@subsquid/substrate-processor'
+import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import {
     Preimage,
@@ -11,7 +11,7 @@ import {
 import { BalancesTotalIssuanceStorage } from '../../types/storage'
 import { MissingPreimageWarn, MissingReferendumWarn } from './errors'
 
-export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: number, status: ReferendumStatus, totalIssuance?: string) {
+export async function updateReferendum(ctx: BatchContext<Store, unknown>, index: number, status: ReferendumStatus, header: SubstrateBlock, totalIssuance?: string) {
     const referendum = await ctx.store.get(Referendum, {
         where: {
             index,
@@ -26,10 +26,10 @@ export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: 
         return
     }
 
-    referendum.updatedAt = new Date(ctx.block.timestamp)
-    referendum.updatedAtBlock = ctx.block.height
+    referendum.updatedAt = new Date(header.timestamp)
+    referendum.updatedAtBlock = header.height
     referendum.status = status
-    referendum.totalIssuance = await new BalancesTotalIssuanceStorage(ctx).getAsV1020() || 0n
+    referendum.totalIssuance = await new BalancesTotalIssuanceStorage(ctx, header).getAsV1020() || 0n
 
     switch (status) {
         case ReferendumStatus.Passed:
@@ -51,7 +51,7 @@ export async function updateReferendum(ctx: CommonHandlerContext<Store>, index: 
     await ctx.store.save(referendum)
 }
 
-export async function updatePreimage(ctx: CommonHandlerContext<Store>, hash: string, status: PreimageStatus) {
+export async function updatePreimage(ctx: BatchContext<Store, unknown>, hash: string, status: PreimageStatus, block: SubstrateBlock) {
     const preimage = await ctx.store.get(Preimage, {
         where: {
             hash,
@@ -66,8 +66,8 @@ export async function updatePreimage(ctx: CommonHandlerContext<Store>, hash: str
         return
     }
 
-    preimage.updatedAt = new Date(ctx.block.timestamp)
-    preimage.updatedAtBlock = ctx.block.height
+    preimage.updatedAt = new Date(block.timestamp)
+    preimage.updatedAtBlock = block.height
     preimage.status = status
 
     preimage.statusHistory.push(

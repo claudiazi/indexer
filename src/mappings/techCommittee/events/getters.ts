@@ -1,9 +1,11 @@
+import { BatchContext } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 import { UnknownVersionError } from '../../../common/errors'
 import {
     TechnicalCommitteeApprovedEvent,
     TechnicalCommitteeProposedEvent,
 } from '../../../types/events'
-import { EventContext } from '../../../types/support'
+import { Event } from '../../../types/support'
 
 export interface ProposedData {
     proposer: Uint8Array
@@ -12,8 +14,8 @@ export interface ProposedData {
     threshold: number
 }
 
-export function getProposedData(ctx: EventContext): ProposedData {
-    const event = new TechnicalCommitteeProposedEvent(ctx)
+export function getProposedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): ProposedData {
+    const event = new TechnicalCommitteeProposedEvent(ctx, itemEvent)
     if (event.isV1020) {
         const [proposer, index, hash, threshold] = event.asV1020
         return {
@@ -35,8 +37,8 @@ export function getProposedData(ctx: EventContext): ProposedData {
     }
 }
 
-export function getApprovedData(ctx: EventContext): Uint8Array {
-    const event = new TechnicalCommitteeApprovedEvent(ctx)
+export function getApprovedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): Uint8Array {
+    const event = new TechnicalCommitteeApprovedEvent(ctx, itemEvent)
     if (event.isV1020) {
         return event.asV1020
     } else if (event.isV9130) {

@@ -32,6 +32,7 @@
     "TechnicalCommittee.Approved"
   ],
   "calls": [
-    "Democracy.vote"
+    "Democracy.vote",
+    "System.remark"
   ]
 }

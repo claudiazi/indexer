@@ -1,3 +1,5 @@
+import { BatchContext } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 import { UnknownVersionError } from '../../../common/errors'
 import {
     DemocracyCancelledEvent,
@@ -13,10 +15,10 @@ import {
     DemocracyStartedEvent,
     DemocracyTabledEvent,
 } from '../../../types/events'
-import { EventContext } from '../../../types/support'
+import { Event } from '../../../types/support'
 
-export function getCancelledData(ctx: EventContext): number {
-    const event = new DemocracyCancelledEvent(ctx)
+export function getCancelledData(ctx: BatchContext<Store, unknown>, itemEvent: Event): number {
+    const event = new DemocracyCancelledEvent(ctx, itemEvent)
     if (event.isV1020) {
         return event.asV1020
     } else if (event.isV9130) {
@@ -26,8 +28,8 @@ export function getCancelledData(ctx: EventContext): number {
     }
 }
 
-export function getExecutedData(ctx: EventContext): number {
-    const event = new DemocracyExecutedEvent(ctx)
+export function getExecutedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): number {
+    const event = new DemocracyExecutedEvent(ctx, itemEvent)
     if (event.isV1020) {
         return event.asV1020[0]
     } else if (event.isV9090) {
@@ -35,13 +37,13 @@ export function getExecutedData(ctx: EventContext): number {
     } else if (event.isV9111) {
         return event.asV9111[0]
     } else {
-        const data = ctx._chain.decodeEvent(ctx.event)
+        const data = ctx._chain.decodeEvent(itemEvent)
         return data.refIndex
     }
 }
 
-export function getNotPassedData(ctx: EventContext): number {
-    const event = new DemocracyNotPassedEvent(ctx)
+export function getNotPassedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): number {
+    const event = new DemocracyNotPassedEvent(ctx, itemEvent)
     if (event.isV1020) {
         return event.asV1020
     } else if (event.isV9130) {
@@ -51,8 +53,8 @@ export function getNotPassedData(ctx: EventContext): number {
     }
 }
 
-export function getPassedData(ctx: EventContext): number {
-    const event = new DemocracyPassedEvent(ctx)
+export function getPassedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): number {
+    const event = new DemocracyPassedEvent(ctx, itemEvent)
     if (event.isV1020) {
         return event.asV1020
     } else if (event.isV9130) {
@@ -67,8 +69,8 @@ export interface PreimageInvalidData {
     index: number
 }
 
-export function getPreimageInvalidData(ctx: EventContext): PreimageInvalidData {
-    const event = new DemocracyPreimageInvalidEvent(ctx)
+export function getPreimageInvalidData(ctx: BatchContext<Store, unknown>, itemEvent: Event): PreimageInvalidData {
+    const event = new DemocracyPreimageInvalidEvent(ctx, itemEvent)
     if (event.isV1022) {
         const [hash, index] = event.asV1022
         return {
@@ -91,8 +93,8 @@ export interface PreimageMissingData {
     index: number
 }
 
-export function getPreimageMissingData(ctx: EventContext): PreimageMissingData {
-    const event = new DemocracyPreimageMissingEvent(ctx)
+export function getPreimageMissingData(ctx: BatchContext<Store, unknown>, itemEvent: Event): PreimageMissingData {
+    const event = new DemocracyPreimageMissingEvent(ctx, itemEvent)
     if (event.isV1022) {
         const [hash, index] = event.asV1022
         return {
@@ -116,8 +118,8 @@ interface PreimageNotedData {
     deposit: bigint
 }
 
-export function getPreimageNotedData(ctx: EventContext): PreimageNotedData {
-    const event = new DemocracyPreimageNotedEvent(ctx)
+export function getPreimageNotedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): PreimageNotedData {
+    const event = new DemocracyPreimageNotedEvent(ctx, itemEvent)
     if (event.isV1022) {
         const [hash, provider, deposit] = event.asV1022
         return {
@@ -143,8 +145,8 @@ export interface PreimageReapedData {
     deposit: bigint
 }
 
-export function getPreimageReapedData(ctx: EventContext): PreimageReapedData {
-    const event = new DemocracyPreimageReapedEvent(ctx)
+export function getPreimageReapedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): PreimageReapedData {
+    const event = new DemocracyPreimageReapedEvent(ctx, itemEvent)
     if (event.isV1022) {
         const [hash, provider, deposit] = event.asV1022
         return {
@@ -170,8 +172,8 @@ export interface PreimageUsedData {
     deposit: bigint
 }
 
-export function getPreimageUsedData(ctx: EventContext): PreimageUsedData {
-    const event = new DemocracyPreimageUsedEvent(ctx)
+export function getPreimageUsedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): PreimageUsedData {
+    const event = new DemocracyPreimageUsedEvent(ctx, itemEvent)
     if (event.isV1022) {
         const [hash, provider, deposit] = event.asV1022
         return {
@@ -196,8 +198,8 @@ export interface ReferendumEventData {
     threshold: string
 }
 
-export function getStartedData(ctx: EventContext): ReferendumEventData {
-    const event = new DemocracyStartedEvent(ctx)
+export function getStartedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): ReferendumEventData {
+    const event = new DemocracyStartedEvent(ctx, itemEvent)
     if (event.isV1020) {
         const [index, threshold] = event.asV1020
         return {
@@ -219,8 +221,8 @@ export interface ProposedData {
     index: number
 }
 
-export function getProposedData(ctx: EventContext): ProposedData {
-    const event = new DemocracyProposedEvent(ctx)
+export function getProposedData(ctx: BatchContext<Store, unknown>, itemEvent: Event): ProposedData {
+    const event = new DemocracyProposedEvent(ctx, itemEvent)
     if (event.isV1020) {
         const [index, deposit] = event.asV1020
         return {
@@ -242,8 +244,8 @@ interface TabledEventData {
     depositors: Uint8Array[]
 }
 
-export function getTabledEventData(ctx: EventContext): TabledEventData {
-    const event = new DemocracyTabledEvent(ctx)
+export function getTabledEventData(ctx: BatchContext<Store, unknown>, itemEvent: Event): TabledEventData {
+    const event = new DemocracyTabledEvent(ctx, itemEvent)
     if (event.isV1020) {
         const [index, deposit, depositors] = event.asV1020
         return {

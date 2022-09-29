@@ -9,13 +9,16 @@ import {
 import { getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
 import { MissingReferendumWarn } from '../../utils/errors'
-import {CallHandlerContext, CommonHandlerContext} from '@subsquid/substrate-processor'
+import {BatchContext, SubstrateBlock} from '@subsquid/substrate-processor'
 import {Store} from '@subsquid/typeorm-store'
+import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
-export async function handleVote(ctx: CallHandlerContext<Store>) {
-    if (!ctx.call.success) return
-
-    const { index, vote } = getVoteData(ctx)
+export async function handleVote(ctx: BatchContext<Store, unknown>,
+    item: CallItem<'Democracy.vote', { call: { args: true; origin: true; }}>,
+    header: SubstrateBlock): Promise<void> {
+// export async function handleVote(ctx: CallHandlerContext<Store>) {
+    // if (!item.success) return
+    const { index, vote } = getVoteData(ctx, item.call)
 
     const referendum = await ctx.store.get(Referendum, { where: { index } })
     if (!referendum) {
@@ -53,20 +56,20 @@ export async function handleVote(ctx: CallHandlerContext<Store>) {
         new Vote({
             id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
             referendumIndex: index,
-            voter: ctx.call.origin ? getOriginAccountId(ctx.call.origin) : null,
-            blockNumber: ctx.block.height,
+            voter: item.call.origin ? getOriginAccountId(item.call.origin) : null,
+            blockNumber: header.height,
             decision,
             lockPeriod,
             referendum,
             balance,
-            timestamp: new Date(ctx.block.timestamp),
+            timestamp: new Date(header.timestamp),
         })
     )
 }
 
 const proposalsVotes = new Map<string, number>()
 
-async function getVotesCount(ctx: CommonHandlerContext<Store>, referendumId: string) {
+async function getVotesCount(ctx: BatchContext<Store, unknown>, referendumId: string) {
     let count = proposalsVotes.get(referendumId)
     if (count == null) {
         count = await ctx.store.count(Vote, {

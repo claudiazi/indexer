@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { toHex } from '@subsquid/substrate-processor'
-import { EventHandlerContext } from '@subsquid/substrate-processor'
+import { BatchContext, SubstrateBlock, toHex } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { TechCommitteeMotion, ReferendumOriginType } from '../../../model'
 import { parseProposalCall, ss58codec } from '../../../common/tools'
 import { getProposedData } from './getters'
 import { storage } from '../../../storage'
 import { StorageNotExistsWarn } from '../../../common/errors'
+import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
-export async function handleProposed(ctx: EventHandlerContext<Store>) {
-    const { index, proposer, hash } = getProposedData(ctx)
+export async function handleProposed(ctx: BatchContext<Store, unknown>,
+    item: EventItem<'TechnicalCommittee.Proposed', { event: { args: true; extrinsic: { hash: true } } }>,
+    header: SubstrateBlock): Promise<void> {
+    const { index, proposer, hash } = getProposedData(ctx, item.event)
 
-    const storageData = await storage.techCommittee.getProposalOf(ctx, hash)
+    const storageData = await storage.techCommittee.getProposalOf(ctx, hash, header)
     if (!storageData) {
         ctx.log.warn(StorageNotExistsWarn(ReferendumOriginType.TechCommitteeMotion, index))
         return

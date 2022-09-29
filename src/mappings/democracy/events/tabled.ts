@@ -1,12 +1,15 @@
-import { EventHandlerContext } from '@subsquid/substrate-processor'
+import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { DemocracyProposal, ReferendumOriginType } from '../../../model'
 import { getTabledEventData } from './getters'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
 import { NoRecordExistsWarn } from '../../../common/errors'
+import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
-export async function handleTabled(ctx: EventHandlerContext<Store>) {
-    const { index } = getTabledEventData(ctx)
+export async function handleTabled(ctx: BatchContext<Store, unknown>,
+    item: EventItem<'Democracy.Tabled', { event: { args: true; extrinsic: { hash: true } } }>,
+    header: SubstrateBlock): Promise<void> {
+    const { index } = getTabledEventData(ctx, item.event)
 
     const relationId = await getRelationId(ctx.store)
     //save a relation

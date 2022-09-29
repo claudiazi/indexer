@@ -1,0 +1,1 @@
+export { handleRemark } from './remark'

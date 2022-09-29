@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { EventHandlerContext, toHex } from '@subsquid/substrate-processor'
+import { BatchContext, SubstrateBlock, toHex } from '@subsquid/substrate-processor'
 import { parseProposalCall, ss58codec } from '../../../common/tools'
 import { Chain } from '@subsquid/substrate-processor/lib/chain'
 import { getPreimageNotedData } from './getters'
@@ -7,26 +7,29 @@ import { Store } from '@subsquid/typeorm-store'
 import { Preimage, PreimageStatus, PreimageStatusHistory, ProposedCall, Referendum } from '../../../model'
 import { toJSON } from '@subsquid/util-internal-json'
 import { getPreimageData } from '../../../storage/democracy'
+import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
 function decodeProposal(chain: Chain, data: Uint8Array) {
     // @ts-ignore
     return chain.scaleCodec.decodeBinary(chain.description.call, data)
 }
 
-export async function handlePreimageNoted(ctx: EventHandlerContext<Store>) {
-    const { hash, provider, deposit } = getPreimageNotedData(ctx)
+export async function handlePreimageNoted(ctx: BatchContext<Store, unknown>,
+    item: EventItem<'Democracy.PreimageNoted', { event: { args: true; extrinsic: { hash: true } } }>,
+    header: SubstrateBlock): Promise<void> {
+    const { hash, provider, deposit } = getPreimageNotedData(ctx, item.event)
     const hexHash = toHex(hash)
 
-    const storageData = await getPreimageData(ctx, hash)
+    const storageData = await getPreimageData(ctx, hash, header)
     if (!storageData) return
 
     let decodedCall:
         | {
-              section: string
-              method: string
-              description: string
-              args: Record<string, unknown>
-          }
+            section: string
+            method: string
+            description: string
+            args: Record<string, unknown>
+        }
         | undefined
 
     try {
@@ -34,7 +37,7 @@ export async function handlePreimageNoted(ctx: EventHandlerContext<Store>) {
 
         decodedCall = parseProposalCall(ctx._chain, preimage)
     } catch (e) {
-        ctx.log.warn(`Failed to decode ProposedCall of Preimage ${hexHash} at block ${ctx.block.height}:\n ${e}`)
+        ctx.log.warn(`Failed to decode ProposedCall of Preimage ${hexHash} at block ${header.height}:\n ${e}`)
     }
 
     const proposer = ss58codec.encode(provider)
@@ -49,8 +52,8 @@ export async function handlePreimageNoted(ctx: EventHandlerContext<Store>) {
         status: PreimageStatus.Noted,
         statusHistory: [],
         proposedCall: decodedCall ? createProposedCall(decodedCall) : null,
-        createdAtBlock: ctx.block.height,
-        createdAt: new Date(ctx.block.timestamp),
+        createdAtBlock: header.height,
+        createdAt: new Date(header.timestamp),
     })
 
     preimage.statusHistory.push(

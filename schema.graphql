@@ -160,3 +160,113 @@ type Vote @entity {
   balance: VoteBalance!
   lockPeriod: Int
 }
+
+type Config @entity {
+  id: ID!
+  referendumIndex: Int! @index
+  version: Int! @index
+  blockNumber: Int! @index
+  min: String
+  max: String
+  first: String
+  blockCutOff: String
+  directOnly: Boolean
+  createNewCollection: Boolean
+  newCollectionSymbol: String
+  newCollectionPath: String
+  newCollectionFile: String
+  newCollectionName: String
+  newCollectionDescription: String
+  makeEquippable: [String]
+  babyBonus: Int
+  toddlerBonus: Int
+  adolescentBonus: Int
+  adultBonus: Int
+  minAmount: Int
+  seed: String
+  options: [Option!] @derivedFrom(field: "config")
+  timestamp: DateTime
+}
+        
+type Option @entity {
+  id: ID!
+  configId: ID!
+  config: Config!
+  transferable: Int
+  symbol: String
+  text: String
+  artist: String
+  creativeDirector: String
+  rarity: String
+  itemName: String
+  royaltyMin: Int
+  royaltyMax: Int
+  isDefault: Boolean
+  resources: [Resource!] @derivedFrom(field: "option")
+}
+
+type Resource @entity {
+  id: ID!
+  optionId: ID!
+  option: Option!
+  name: String
+  main: String
+  thumb: String
+  text: String
+  artist: String
+  creativeDirector: String
+  rarity: String
+  itemName: String
+  slot: String
+  title: String
+}
+
+type Distribution @entity {
+  id: ID!
+  referendumIndex: Int!
+  blockNumber: Int! @index
+  distributionVersion: Int!
+  wallet: String @index
+  amountConsidered: BigInt! @index
+  indexItemReceived: Int
+  dragonEquipped: String
+  chanceAtItem: Int
+  timestamp: DateTime
+}
+
+type AnswerOption @entity {
+  id: ID!
+  questionId: ID!
+  question: Question
+  text: String
+}
+
+type Question @entity {
+  id: ID!
+  quizId: ID!
+  quiz: Quiz
+  text: String
+  answerOptions: [AnswerOption] @derivedFrom(field: "question")
+  indexCorrectAnswer: Int
+}
+
+type Quiz @entity {
+  id: ID!
+  referendumIndex: Int
+  blockNumber: Int! @index
+  creator: String @index
+  questions: [Question!] @derivedFrom(field: "quiz")
+  version: Int
+  timestamp: DateTime
+}
+
+type QuizSubmission @entity {
+  id: ID!
+  referendumIndex: Int
+  blockNumber: Int! @index
+  wallet: String @index
+  quizVersion: Int
+  version: Int
+  answers: [Int]
+  timestamp: DateTime
+}

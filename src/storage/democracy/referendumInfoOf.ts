@@ -1,8 +1,9 @@
 import { UnknownVersionError } from '../../common/errors'
-import { BlockContext } from '../../types/support'
 import { DemocracyReferendumInfoOfStorage } from '../../types/storage'
 import * as v1055 from '../../types/v1055'
 import * as v9111 from '../../types/v9111'
+import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 
 type Threshold = 'SuperMajorityApprove' | 'SuperMajorityAgainst' | 'SimpleMajority'
 
@@ -22,8 +23,8 @@ type OngoingReferendumData = {
 
 type ReferendumStorageData = FinishedReferendumData | OngoingReferendumData
 
-async function getStorageData(ctx: BlockContext, index: number): Promise<ReferendumStorageData | undefined> {
-    const storage = new DemocracyReferendumInfoOfStorage(ctx)
+async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, block: SubstrateBlock): Promise<ReferendumStorageData | undefined> {
+    const storage = new DemocracyReferendumInfoOfStorage(ctx, block)
     if (storage.isV1020) {
         const storageData = await storage.getAsV1020(index)
         if (!storageData) return undefined
@@ -85,6 +86,6 @@ async function getStorageData(ctx: BlockContext, index: number): Promise<Referen
     }
 }
 
-export async function getReferendumInfoOf(ctx: BlockContext, index: number) {
-    return await getStorageData(ctx, index)
+export async function getReferendumInfoOf(ctx: BatchContext<Store, unknown>, index: number, block: SubstrateBlock) {
+    return await getStorageData(ctx, index, block)
 }

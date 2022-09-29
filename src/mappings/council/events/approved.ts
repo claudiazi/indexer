@@ -1,13 +1,15 @@
-import { toHex } from '@subsquid/substrate-processor'
+import { BatchContext, SubstrateBlock, toHex } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
-import { EventHandlerContext } from '@subsquid/substrate-processor'
 import { CouncilMotion, ReferendumOriginType } from '../../../model'
 import { getApprovedData } from './getters'
 import { ReferendumRelation } from '../../../model/generated/referendumRelation.model'
 import { NoRecordExistsWarn } from '../../../common/errors'
+import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
-export async function handleApproved(ctx: EventHandlerContext<Store>) {
-    const hash = getApprovedData(ctx)
+export async function handleApproved(ctx: BatchContext<Store, unknown>,
+    item: EventItem<'Council.Approved', { event: { args: true; extrinsic: { hash: true } } }>,
+    header: SubstrateBlock): Promise<void> {
+    const hash = getApprovedData(ctx, item.event)
 
     const hexHash = toHex(hash)
 
