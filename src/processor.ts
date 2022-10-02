@@ -1,22 +1,10 @@
 import { lookupArchive } from '@subsquid/archive-registry'
-import { CallHandlerContext, EventHandlerContext, SubstrateBlock, SubstrateProcessor } from '@subsquid/substrate-processor'
-import { BatchContext, BatchProcessorItem, SubstrateBatchProcessor } from '@subsquid/substrate-processor'
-import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { SubstrateBatchProcessor } from '@subsquid/substrate-processor'
+import { TypeormDatabase } from '@subsquid/typeorm-store'
 import * as modules from './mappings'
-// import { handleCancelled, handleExecuted, handleNotPassed, handlePassed, handlePreimageInvalid, handlePreimageMissing, handlePreimageNoted, handlePreimageReaped, handlePreimageUsed, handleProposed, handleStarted, handleTabled } from './mappings/democracy/events'
-// import { handleProposed } from './mappings/council/events'
-import { handleVote } from './mappings/democracy/extrinsics'
-import { handleRemark } from './mappings/system/extrinsics'
-// const db = new TypeormDatabase()
-// const processor = new SubstrateProcessor(db)
 
-// processor.setBatchSize(500)
-// processor.setDataSource({
-//     chain: 'wss://kusama.api.onfinality.io/public-ws',
-//     archive: lookupArchive('kusama', { release: 'FireSquid' }),
-// })
 const processor = new SubstrateBatchProcessor()
-    .setBatchSize(500)
+    .setBatchSize(100)
     .setDataSource({
         chain: 'wss://kusama.api.onfinality.io/public-ws',
         archive: lookupArchive('kusama', { release: 'FireSquid' }),
