@@ -48,6 +48,7 @@ import * as v9220 from './v9220'
 import * as v9230 from './v9230'
 import * as v9250 from './v9250'
 import * as v9271 from './v9271'
+import * as v9291 from './v9291'
 
 export class BalancesTotalIssuanceStorage {
   private readonly _chain: Chain
@@ -368,6 +369,31 @@ export class CouncilProposalOfStorage {
 
   async getAllAsV9271(): Promise<(v9271.Call)[]> {
     assert(this.isV9271)
+    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  get isV9291() {
+    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '15ce1541499aecffbe2bf8eeafc64023633a5d282a468972bd6c44aa77b52ce3'
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  async getAsV9291(key: Uint8Array): Promise<v9291.Call | undefined> {
+    assert(this.isV9291)
+    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
+  }
+
+  async getManyAsV9291(keys: Uint8Array[]): Promise<(v9291.Call | undefined)[]> {
+    assert(this.isV9291)
+    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9291(): Promise<(v9291.Call)[]> {
+    assert(this.isV9291)
     return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
   }
 
@@ -2838,6 +2864,31 @@ export class TechnicalCommitteeProposalOfStorage {
 
   async getAllAsV9271(): Promise<(v9271.Call)[]> {
     assert(this.isV9271)
+    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  get isV9291() {
+    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '15ce1541499aecffbe2bf8eeafc64023633a5d282a468972bd6c44aa77b52ce3'
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  async getAsV9291(key: Uint8Array): Promise<v9291.Call | undefined> {
+    assert(this.isV9291)
+    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
+  }
+
+  async getManyAsV9291(keys: Uint8Array[]): Promise<(v9291.Call | undefined)[]> {
+    assert(this.isV9291)
+    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9291(): Promise<(v9291.Call)[]> {
+    assert(this.isV9291)
     return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
   }
 
