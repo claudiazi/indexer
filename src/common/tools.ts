@@ -36,9 +36,9 @@ export function getOriginAccountId(origin: any): string | undefined {
     if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
         const id = origin.value.value
         if (id.__kind === 'Id') {
-            return id.value
+            return ss58codec.encode(decodeHex(id.value))
         } else {
-            return id
+            return ss58codec.encode(decodeHex(id))
         }
     } else {
         return undefined
