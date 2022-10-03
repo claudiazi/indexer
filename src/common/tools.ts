@@ -32,19 +32,15 @@ export function parseProposalCall(chain: Chain, data: Call) {
     }
 }
 
-export function getOriginAccountId(origin: any) {
-    // eslint-disable-next-line sonarjs/no-small-switch
-    if (!origin) return undefined
-    switch (origin.__kind) {
-        case 'system':
-            // eslint-disable-next-line sonarjs/no-nested-switch, sonarjs/no-small-switch
-            switch (origin.value.__kind) {
-                case 'Signed':
-                    return ss58codec.encode(decodeHex(origin.value.value))
-                default:
-                    return undefined
-            }
-        default:
-            return undefined
+export function getOriginAccountId(origin: any): string | undefined {
+    if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
+        const id = origin.value.value
+        if (id.__kind === 'Id') {
+            return id.value
+        } else {
+            return id
+        }
+    } else {
+        return undefined
     }
 }
