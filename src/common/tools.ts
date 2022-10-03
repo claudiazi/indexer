@@ -32,13 +32,17 @@ export function parseProposalCall(chain: Chain, data: Call) {
     }
 }
 
+export function encodeId(id: string | Uint8Array) {
+    return ss58codec.encode(typeof id === 'string' ? decodeHex(id) : id)
+}
+
 export function getOriginAccountId(origin: any): string | undefined {
     if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
         const id = origin.value.value
         if (id.__kind === 'Id') {
-            return ss58codec.encode(decodeHex(id.value))
+            return encodeId(id.value)
         } else {
-            return ss58codec.encode(decodeHex(id))
+            return encodeId(id)
         }
     } else {
         return undefined
