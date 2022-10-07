@@ -120,9 +120,9 @@ export const referendaStats = `
                      WHEN lock_period = 32 THEN 6
                      ELSE lock_period 
                 END AS conviction
-              , (balance ->> 'value')::bigint AS balance_value
-              , (balance ->> 'aye')::bigint AS balance_aye
-              , (balance ->> 'nay')::bigint AS balance_nay
+              , (balance ->> 'value')::decimal(38,0) AS balance_value
+              , (balance ->> 'aye')::decimal(38,0) AS balance_aye
+              , (balance ->> 'nay')::decimal(38,0) AS balance_nay
               , DATE_PART('day', v.timestamp - r.created_at) + 
                 DATE_PART('hour', v.timestamp - r.created_at) / 24 As voting_time
               , v.timestamp
