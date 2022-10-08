@@ -48,17 +48,17 @@ export class ReferendaStats {
     @Field(() => Number, { nullable: true })
     count_total!: number
 
-    @Field(() => BigInt, { nullable: true })
-    voted_amount_aye!: bigint
+    @Field(() => Number, { nullable: true })
+    voted_amount_aye!: number
 
-    @Field(() => BigInt, { nullable: true })
-    voted_amount_nay!: bigint
+    @Field(() => Number, { nullable: true })
+    voted_amount_nay!: number
 
-    @Field(() => BigInt, { nullable: true })
-    voted_amount_total!: bigint
+    @Field(() => Number, { nullable: true })
+    voted_amount_total!: number
 
-    @Field(() => BigInt, { nullable: true })
-    total_issuance!: bigint
+    @Field(() => Number, { nullable: true })
+    total_issuance!: number
 
     @Field(() => Number, { nullable: true })
     turnout_aye_perc!: number
