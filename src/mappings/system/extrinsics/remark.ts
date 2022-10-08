@@ -6,84 +6,19 @@ import { Resource } from '../../../model/generated/resource.model'
 import { Quiz } from '../../../model/generated/quiz.model'
 import { SystemRemarkCall } from '../../../types/calls'
 import { getOriginAccountId } from '../../../common/tools'
-import { MissingConfigWarn, MissingOptionWarn, MissingQuestionWarn, MissingQuizVersionWarn, MissingQuizWarn, MissingReferendumRelationWarn, MissingReferendumWarn } from '../../utils/errors'
+import { AnswerDataNotComplete, AnswerSubmissionTooLate, InvalidCorrectAnswerIndex, MissingQuizVersionWarn, NotProposerNotProofOfChaos, QuizSubmissionTooLate, WrongAnswerLength, WrongCorrectAnswerLength } from './errors'
+import { MissingConfigWarn, MissingOptionWarn, MissingQuestionWarn, MissingReferendumRelationWarn, MissingQuizWarn, MissingReferendumWarn } from '../../utils/errors'
 import { AnswerOption } from '../../../model/generated/answerOption.model'
 import { CouncilMotion, DemocracyProposal, Referendum, ReferendumOriginType, ReferendumRelation, TechCommitteeMotion } from '../../../model'
 import { QuizSubmission } from '../../../model/generated/quizSubmission.model'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
+import { CorrectAnswer } from '../../../model/generated/correctAnswer.model'
+import { AnswerData, ConfigData, CorrectAnswerData, OptionData, QuizData, UserItem } from './types'
+import { getAnswerCount, getConfigVersion, getCorrectAnswerVersion, getDistributionCount, getDistributionVersion, getOptionCount, getQuestionCount, getQuizVersion, getResourceCount, getSubmissionCount, getSubmissionVersion, isProofOfChaosAddress, isProofOfChaosMessage, isProposer } from './helpers'
 
-interface ResourceData {
-    optionId: string
-    option: OptionData
-    name: string
-    main: string
-    thumb: string
-    text: string
-    artist: string
-    creativeDirector: string
-    rarity: string
-    itemName: string
-    slot: string
-    title: string
-}
 
-interface OptionData {
-    configId: string
-    config: ConfigData
-    transferable: number
-    symbol: string
-    text: string
-    artist: string
-    creativeDirector: string
-    rarity: string
-    itemName: string
-    royalty: number[]
-    resources: ResourceData[]
-}
-
-interface ConfigData {
-    referendumIndex: number
-    min: string
-    max: string
-    first: string
-    blockCutOff: string
-    directOnly: boolean
-    createNewCollection: boolean
-    newCollectionSymbol: string
-    newCollectionPath: string
-    newCollectionFile: string
-    newCollectionName: string
-    newCollectionDescription: string
-    makeEquippable: [string]
-    babyBonus: number
-    toddlerBonus: number
-    adolescentBonus: number
-    adultBonus: number
-    minAmount: string
-    seed: string
-    default: OptionData
-    options: OptionData[]
-}
-
-interface AnswerOptions {
-    text: string
-}
-
-interface QuestionData {
-    text: string
-    answerOptions: AnswerOptions[]
-}
-
-interface QuizData {
-    questions: QuestionData[]
-}
-
-interface AnswerData {
-    quizVersion: number
-    answers: number[]
-}
 
 export async function handleRemark(ctx: BatchContext<Store, unknown>,
     item: CallItem<'System.remark', { call: { args: true; origin: true } }>,
@@ -96,31 +31,9 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
     if (originAccountId == null) return
     const args = message.split('::')
     switch (args[2]) {
-        case 'LUCK':
-            if (isProofOfChaosAddress(originAccountId) && header.height < 14594438) {
-                const distributionData = JSON.parse(args[3])
-                const distributionVersion = await getDistributionVersion(ctx, parseInt(args[1]))
-                for (const dist of distributionData) {
-                    const count = await getDistributionCount(ctx, parseInt(args[1]), distributionVersion)
-                    const distribution = new Distribution({
-                        id: `${args[1]}-${distributionVersion}-${count.toString().padStart(8, '0')}`,
-                        blockNumber: header.height,
-                        distributionVersion,
-                        referendumIndex: parseInt(args[1]),
-                        wallet: dist[3],
-                        amountConsidered: BigInt(dist[0]),
-                        indexItemReceived: parseInt(dist[2]),
-                        chanceAtItem: parseInt(dist[1]),
-                        dragonEquipped: null,
-                        timestamp: new Date(header.timestamp),
-                    })
-                    await ctx.store.insert(distribution)
-                }
-            }
-            break
         case 'DISTRIBUTION':
             if (isProofOfChaosAddress(originAccountId) && header.height >= 14594438) {
-                const distributionData = JSON.parse(args[3])
+                const distributionData: UserItem[] = JSON.parse(args[3])
                 const distributionVersion = await getDistributionVersion(ctx, parseInt(args[1]))
                 for (const dist of distributionData) {
                     const count = await getDistributionCount(ctx, parseInt(args[1]), distributionVersion)
@@ -131,8 +44,8 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         referendumIndex: parseInt(args[1]),
                         wallet: dist.wallet,
                         amountConsidered: BigInt(dist.amountConsidered),
-                        indexItemReceived: parseInt(dist.selectedIndex),
-                        chanceAtItem: parseInt(dist.chance),
+                        indexItemReceived: dist.selectedIndex,
+                        chancesAtItems: dist.chances,
                         dragonEquipped: dist.dragonEquipped,
                         timestamp: new Date(header.timestamp),
                     })
@@ -140,7 +53,6 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                 }
             }
             break
-        case 'SETTINGS':
         case 'CONFIG':
             if (isProofOfChaosAddress(originAccountId)) {
                 //break quiz apart
@@ -209,7 +121,10 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         creativeDirector,
                         rarity,
                         itemName,
-                        royalty } = opt
+                        minRoyalty,
+                        maxRoyalty,
+                        metadataCidDirect,
+                        metadataCidDelegated } = opt
                     const optionCount = await getOptionCount(ctx, configDb.id)
                     const optionId = `${configDb.id}-${optionCount.toString().padStart(8, '0')}`
                     const option = new Option({
@@ -223,8 +138,10 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         creativeDirector,
                         rarity,
                         itemName,
-                        royaltyMin: royalty[0],
-                        royaltyMax: royalty[1],
+                        minRoyalty,
+                        maxRoyalty,
+                        metadataCidDirect,
+                        metadataCidDelegated,
                         isDefault: opt === configData.default
                     })
 
@@ -240,15 +157,17 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     for (const res of opt.resources) {
                         const {
                             name,
-                            main,
-                            thumb,
+                            mainCid,
+                            thumbCid,
                             text,
                             artist,
                             creativeDirector,
                             rarity,
                             itemName,
                             slot,
-                            title } = res
+                            title,
+                            metadataCidDirect,
+                            metadataCidDelegated } = res
 
                         const resourceCount = await getResourceCount(ctx, optionDb.id)
                         const resourceId = `${optionDb.id}-${resourceCount.toString().padStart(8, '0')}`
@@ -258,15 +177,17 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                             optionId: optionDb.id,
                             option: optionDb,
                             name,
-                            main,
-                            thumb,
+                            mainCid,
+                            thumbCid,
                             text,
                             artist,
                             creativeDirector,
                             rarity,
                             itemName,
                             slot,
-                            title
+                            title,
+                            metadataCidDirect,
+                            metadataCidDelegated
                         })
                         await ctx.store.insert(resource)
                     }
@@ -274,8 +195,18 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             }
             break
         case 'QUIZ':
-            //check that quiz author is proposer/ proofofchaos
             if (isProofOfChaosAddress(originAccountId) || await isProposer(ctx, originAccountId, parseInt(args[1]))) {
+                const referendum = await ctx.store.get(Referendum, { where: { index: parseInt(args[1]) } })
+                if (!referendum) {
+                    ctx.log.warn(MissingReferendumWarn(args[1]))
+                    return
+                }
+
+                if (header.height > referendum?.endsAt) {
+                    ctx.log.warn(QuizSubmissionTooLate(referendum.index, referendum?.endsAt, header.height))
+                    return
+                }
+                //check that quiz author is proposer/ proofofchaos
                 const quizData: QuizData = JSON.parse(args[3])
                 const version = await getQuizVersion(ctx, parseInt(args[1]))
                 const quizId = `${args[1]}-${version.toString().padStart(8, '0')}`
@@ -321,6 +252,10 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     }
                 }
             }
+            else {
+                ctx.log.warn(NotProposerNotProofOfChaos(args[1], originAccountId))
+                return
+            }
             break
         case 'ANSWERS':
             //check that answer block is before ref end and after ref start
@@ -329,24 +264,38 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                 ctx.log.warn(MissingReferendumWarn(args[1]))
                 return
             }
-            if (referendum.endsAt && header.height < referendum.endsAt) {
+            if (header.height > referendum?.endsAt) {
+                ctx.log.warn(AnswerSubmissionTooLate(referendum.index, referendum?.endsAt, header.height))
+                return
+            }
+            else {
                 const answerData: AnswerData = JSON.parse(args[3])
                 const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: answerData.quizVersion } })
                 if (!quizDb) {
                     ctx.log.warn(MissingQuizVersionWarn(args[1], answerData.quizVersion))
                     return
                 }
+                const quizDbQuestions = await ctx.store.find(Question, { where: { quizId: quizDb.id } })
+                if (!answerData.answers || !answerData.quizVersion || answerData.answers.length == 0 ){
+                    ctx.log.warn(AnswerDataNotComplete(answerData))
+                    return
+                }
+                if (quizDbQuestions.length != answerData.answers.length) {
+                    ctx.log.warn(WrongAnswerLength(quizDb.id, quizDbQuestions.length, answerData.answers))
+                    return
+                }
                 const submissionVersion = await getSubmissionVersion(ctx, parseInt(args[1]), originAccountId)
                 //getsubmissioncount for version
-                const submissionCount = await getSubmissionCount(ctx, parseInt(args[1]), answerData.quizVersion)
-                const submissionId = `${args[1]}-${answerData.quizVersion}-${submissionVersion.toString().padStart(8, '0')}`
+                const submissionCount = await getSubmissionCount(ctx, quizDb.id)
+                const submissionId = `${quizDb.id}-${submissionCount.toString().padStart(8, '0')}`
 
                 const submission = new QuizSubmission({
                     id: submissionId,
                     referendumIndex: parseInt(args[1]),
                     blockNumber: header.height,
-                    quizVersion: answerData.quizVersion,
-                    version: submissionCount,
+                    quiz: quizDb,
+                    quizId: quizDb.id,
+                    version: submissionVersion,
                     answers: answerData.answers,
                     wallet: originAccountId,
                     timestamp: new Date(header.timestamp)
@@ -356,21 +305,44 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             break
         case 'CORRECTANSWERS':
             if (isProofOfChaosAddress(originAccountId) || await isProposer(ctx, originAccountId, parseInt(args[1]))) {
-                const quizVersion = parseInt(args[3])
-                const correctAnswers = JSON.parse(args[4])
-                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: quizVersion } })
+                const correctAnswerData: CorrectAnswerData = JSON.parse(args[3])
+                // const quizVersion = parseInt(args[3])
+                // const correctAnswers = JSON.parse(args[4])
+                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: correctAnswerData.quizVersion } })
                 if (!quizDb) {
-                    ctx.log.warn(MissingQuizVersionWarn(args[1], quizVersion))
+                    ctx.log.warn(MissingQuizVersionWarn(args[1], correctAnswerData.quizVersion))
                     return
                 }
                 const quizDbQuestions = await ctx.store.find(Question, { where: { quizId: quizDb.id } })
-                if (quizDbQuestions.length != correctAnswers.length) {
+                if (quizDbQuestions.length != correctAnswerData.correctAnswerIndeces.length) {
+                    ctx.log.warn(WrongCorrectAnswerLength(quizDb.id, quizDbQuestions.length, correctAnswerData.correctAnswerIndeces))
                     return
                 }
                 for (var i = 0; i < quizDbQuestions.length; i++) {
-                    quizDbQuestions[i].indexCorrectAnswer = correctAnswers[i]
-                    await ctx.store.save(quizDbQuestions[i])
+                    const quizDbQuestionAnswers = await ctx.store.find(AnswerOption, { where: { questionId: quizDbQuestions[i].id } })
+                    if (correctAnswerData.correctAnswerIndeces[i] < 0 || correctAnswerData.correctAnswerIndeces[i] >= quizDbQuestionAnswers.length) {
+                        ctx.log.warn(InvalidCorrectAnswerIndex(quizDbQuestions[i].id, quizDbQuestionAnswers.length, correctAnswerData.correctAnswerIndeces[i]))
+                        return
+                    }
+                    const correctAnswerVersion = await getCorrectAnswerVersion(ctx, quizDbQuestions[i].id)
+                    const correctAnswerId = `${quizDbQuestions[i].id}-${correctAnswerVersion.toString().padStart(8, '0')}`
+
+                    const correctAnswer = new CorrectAnswer({
+                        id: correctAnswerId,
+                        question: quizDbQuestions[i],
+                        questionId: quizDbQuestions[i].id,
+                        blockNumber: header.height,
+                        version: correctAnswerVersion,
+                        correctIndex: correctAnswerData.correctAnswerIndeces[i],
+                        submitter: originAccountId,
+                        timestamp: new Date(header.timestamp)
+                    })
+                    await ctx.store.insert(correctAnswer)
                 }
+            }
+            else {
+                ctx.log.warn(NotProposerNotProofOfChaos(args[1], originAccountId))
+                return
             }
             break
         default:
@@ -378,173 +350,4 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
     }
 }
 
-function isProofOfChaosMessage(str: string) {
-    return /^PROOFOFCHAOS::\d+::.*$/.test(str)
-}
-
-function isProofOfChaosAddress(address: string) {
-    return address === 'DhvRNnnsyykGpmaa9GMjK9H4DeeQojd5V5qCTWd1GoYwnTc' || address === 'D3iNikJw3cPq6SasyQCy3k4Y77ZeecgdweTWoSegomHznG3'
-}
-
-async function isProposer(ctx: BatchContext<Store, unknown>, address: string, referendumIndex: number): Promise<boolean> {
-    const referendumRelation = await ctx.store.get(ReferendumRelation, { where: { referendumIndex } })
-    if (!referendumRelation) {
-        ctx.log.warn(MissingReferendumRelationWarn(referendumIndex))
-        return false
-    }
-    return referendumRelation.proposer === address
-}
-
-const configVersions = new Map<number, number>()
-
-async function getConfigVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number) {
-    let count = configVersions.get(referendumIndex)
-    if (count == null) {
-        count = await ctx.store.count(Config, {
-            where: {
-                referendumIndex,
-            },
-        })
-    }
-    configVersions.set(referendumIndex, count + 1)
-    return count
-}
-
-const configOptions = new Map<string, number>()
-
-async function getOptionCount(ctx: BatchContext<Store, unknown>, configId: string) {
-    let count = configOptions.get(configId)
-    if (count == null) {
-        count = await ctx.store.count(Option, {
-            where: {
-                configId,
-            },
-        })
-    }
-    configOptions.set(configId, count + 1)
-    return count
-}
-
-const optionResources = new Map<string, number>()
-
-async function getResourceCount(ctx: BatchContext<Store, unknown>, optionId: string) {
-    let count = optionResources.get(optionId)
-    if (count == null) {
-        count = await ctx.store.count(Resource, {
-            where: {
-                optionId,
-            },
-        })
-    }
-    optionResources.set(optionId, count + 1)
-    return count
-}
-
-const distributionVersions = new Map<number, number>()
-
-async function getDistributionVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number) {
-    let count = distributionVersions.get(referendumIndex)
-    if (count == null) {
-        count = await ctx.store.count(Distribution, {
-            where: {
-                referendumIndex,
-            },
-        })
-    }
-    distributionVersions.set(referendumIndex, count + 1)
-    return count
-}
-
-const referendumDistributions = new Map<string, number>()
-
-async function getDistributionCount(ctx: BatchContext<Store, unknown>, referendumIndex: number, distributionVersion: number) {
-    let count = referendumDistributions.get(`${referendumIndex}-${distributionVersion}`)
-    if (count == null) {
-        count = await ctx.store.count(Distribution, {
-            where: {
-                referendumIndex,
-                distributionVersion
-            },
-        })
-    }
-    optionResources.set(`${referendumIndex}-${distributionVersion}`, count + 1)
-    return count
-}
-
-const quizVersions = new Map<number, number>()
-
-async function getQuizVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number) {
-    let count = quizVersions.get(referendumIndex)
-    if (count == null) {
-        count = await ctx.store.count(Quiz, {
-            where: {
-                referendumIndex,
-            },
-        })
-    }
-    quizVersions.set(referendumIndex, count + 1)
-    return count
-}
-
-const quizQuestions = new Map<string, number>()
-
-async function getQuestionCount(ctx: BatchContext<Store, unknown>, quizId: string) {
-    let count = quizQuestions.get(quizId)
-    if (count == null) {
-        count = await ctx.store.count(Question, {
-            where: {
-                quizId,
-            },
-        })
-    }
-    quizQuestions.set(quizId, count + 1)
-    return count
-}
-
-const questionAnswers = new Map<string, number>()
-
-async function getAnswerCount(ctx: BatchContext<Store, unknown>, questionId: string) {
-    let count = questionAnswers.get(questionId)
-    if (count == null) {
-        count = await ctx.store.count(AnswerOption, {
-            where: {
-                questionId,
-            },
-        })
-    }
-    questionAnswers.set(questionId, count + 1)
-    return count
-}
-
-const submissionVersions = new Map<string, number>()
-
-async function getSubmissionVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number, wallet: string) {
-    let count = submissionVersions.get(referendumIndex + "-" + wallet)
-    if (count == null) {
-        count = await ctx.store.count(QuizSubmission, {
-            where: {
-                referendumIndex,
-                wallet
-            },
-        })
-    }
-    submissionVersions.set(referendumIndex + "-" + wallet, count + 1)
-    return count
-}
-
-const submissionCount = new Map<string, number>()
-
-async function getSubmissionCount(ctx: BatchContext<Store, unknown>, referendumIndex: number, quizVersion: number) {
-    let count = submissionCount.get(referendumIndex + "-" + quizVersion)
-    if (count == null) {
-        count = await ctx.store.count(QuizSubmission, {
-            where: {
-                referendumIndex,
-                quizVersion
-            },
-        })
-    }
-    submissionCount.set(referendumIndex + "-" + quizVersion, count + 1)
-    return count
-}
 

@@ -18,10 +18,6 @@ export function MissingQuizWarn(hashOrIndex: string | number) {
     return `Missing quiz with ${hashOrIndex}`
 }
 
-export function MissingQuizVersionWarn(hashOrIndex: string | number, quizVersion: number) {
-    return `Missing quiz version ${quizVersion} for referendum ${hashOrIndex}`
-}
-
 export function MissingQuestionWarn(hashOrIndex: string | number) {
     return `Missing question with ${hashOrIndex}`
 }
@@ -29,3 +25,7 @@ export function MissingQuestionWarn(hashOrIndex: string | number) {
 export function MissingReferendumRelationWarn(hashOrIndex: string | number) {
     return `Missing referendumRelation with ${hashOrIndex}`
 }
+
+
+
+

@@ -40,14 +40,20 @@ export class Option {
   itemName!: string | undefined | null
 
   @Column_("int4", {nullable: true})
-  royaltyMin!: number | undefined | null
+  minRoyalty!: number | undefined | null
 
   @Column_("int4", {nullable: true})
-  royaltyMax!: number | undefined | null
+  maxRoyalty!: number | undefined | null
 
   @Column_("bool", {nullable: true})
   isDefault!: boolean | undefined | null
 
   @OneToMany_(() => Resource, e => e.option)
   resources!: Resource[]
+
+  @Column_("text", {nullable: true})
+  metadataCidDirect!: string | undefined | null
+
+  @Column_("text", {nullable: true})
+  metadataCidDelegated!: string | undefined | null
 }

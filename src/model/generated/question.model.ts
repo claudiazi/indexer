@@ -1,6 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import {Quiz} from "./quiz.model"
 import {AnswerOption} from "./answerOption.model"
+import {CorrectAnswer} from "./correctAnswer.model"
 
 @Entity_()
 export class Question {
@@ -24,6 +25,6 @@ export class Question {
   @OneToMany_(() => AnswerOption, e => e.question)
   answerOptions!: AnswerOption[]
 
-  @Column_("int4", {nullable: true})
-  indexCorrectAnswer!: number | undefined | null
+  @OneToMany_(() => CorrectAnswer, e => e.question)
+  indexCorrectAnswerHistory!: CorrectAnswer[]
 }

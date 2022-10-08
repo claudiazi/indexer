@@ -41,7 +41,7 @@ type ReferendumThreshold {
 type CouncilMotion @entity {
   id: ID!
   index: Int! @index
-  hash: String
+  hash: String!
   proposalHash: String
   proposer: String
   type: ReferendumOriginType
@@ -50,7 +50,7 @@ type CouncilMotion @entity {
 type TechCommitteeMotion @entity {
   id: ID!
   index: Int! @index
-  hash: String
+  hash: String!
   proposalHash: String
   proposer: String
   type: ReferendumOriginType
@@ -59,7 +59,7 @@ type TechCommitteeMotion @entity {
 type DemocracyProposal @entity {
   id: ID!
   index: Int! @index
-  hash: String
+  hash: String!
   proposalHash: String
   proposer: String
   type: ReferendumOriginType
@@ -73,7 +73,7 @@ type ReferendumRelation @entity {
   underlyingId: ID!
   underlyingIndex: Int!
   proposer: String
-  underlyingType: ReferendumOriginType
+  underlyingType: ReferendumOriginType!
 }
 
 type Referendum @entity {
@@ -93,8 +93,8 @@ type Referendum @entity {
   preimage: Preimage
   totalIssuance: BigInt!
   voting: [Vote!] @derivedFrom(field: "referendum")
-  endsAt: Int
-  delay: Int
+  endsAt: Int!
+  delay: Int!
   origin: ReferendumOriginType
 }
 
@@ -199,10 +199,12 @@ type Option @entity {
   creativeDirector: String
   rarity: String
   itemName: String
-  royaltyMin: Int
-  royaltyMax: Int
+  minRoyalty: Int
+  maxRoyalty: Int
   isDefault: Boolean
   resources: [Resource!] @derivedFrom(field: "option")
+  metadataCidDirect: String
+  metadataCidDelegated: String
 }
 
 type Resource @entity {
@@ -210,8 +212,8 @@ type Resource @entity {
   optionId: ID!
   option: Option!
   name: String
-  main: String
-  thumb: String
+  mainCid: String
+  thumbCid: String
   text: String
   artist: String
   creativeDirector: String
@@ -219,6 +221,8 @@ type Resource @entity {
   itemName: String
   slot: String
   title: String
+  metadataCidDirect: String
+  metadataCidDelegated: String
 }
 
 type Distribution @entity {
@@ -230,7 +234,7 @@ type Distribution @entity {
   amountConsidered: BigInt! @index
   indexItemReceived: Int
   dragonEquipped: String
-  chanceAtItem: Int
+  chancesAtItems: [Float]
   timestamp: DateTime
 }
 
@@ -241,13 +245,24 @@ type AnswerOption @entity {
   text: String
 }
 
+type CorrectAnswer @entity {
+  id: ID!
+  question: Question!
+  questionId: ID!
+  version: Int!
+  blockNumber: Int! @index
+  correctIndex: Int!
+  submitter: String!
+  timestamp: DateTime!
+}
+
 type Question @entity {
   id: ID!
   quizId: ID!
   quiz: Quiz
   text: String
   answerOptions: [AnswerOption] @derivedFrom(field: "question")
-  indexCorrectAnswer: Int
+  indexCorrectAnswerHistory: [CorrectAnswer] @derivedFrom(field: "question")
 }
 
 type Quiz @entity {
@@ -256,17 +271,19 @@ type Quiz @entity {
   blockNumber: Int! @index
   creator: String @index
   questions: [Question!] @derivedFrom(field: "quiz")
+  submissions: [QuizSubmission!] @derivedFrom(field: "quiz")
   version: Int
   timestamp: DateTime
 }
 
 type QuizSubmission @entity {
   id: ID!
-  referendumIndex: Int
+  referendumIndex: Int!
   blockNumber: Int! @index
-  wallet: String @index
-  quizVersion: Int
+  wallet: String! @index
+  quiz: Quiz
+  quizId: ID!
   version: Int
-  answers: [Int]
-  timestamp: DateTime
+  answers: [Int!]
+  timestamp: DateTime!
 }

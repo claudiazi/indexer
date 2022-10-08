@@ -21,10 +21,10 @@ export class Resource {
   name!: string | undefined | null
 
   @Column_("text", {nullable: true})
-  main!: string | undefined | null
+  mainCid!: string | undefined | null
 
   @Column_("text", {nullable: true})
-  thumb!: string | undefined | null
+  thumbCid!: string | undefined | null
 
   @Column_("text", {nullable: true})
   text!: string | undefined | null
@@ -46,4 +46,10 @@ export class Resource {
 
   @Column_("text", {nullable: true})
   title!: string | undefined | null
+
+  @Column_("text", {nullable: true})
+  metadataCidDirect!: string | undefined | null
+
+  @Column_("text", {nullable: true})
+  metadataCidDelegated!: string | undefined | null
 }

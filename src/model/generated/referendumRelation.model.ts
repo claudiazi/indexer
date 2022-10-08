@@ -29,6 +29,6 @@ export class ReferendumRelation {
   @Column_("text", {nullable: true})
   proposer!: string | undefined | null
 
-  @Column_("varchar", {length: 19, nullable: true})
-  underlyingType!: ReferendumOriginType | undefined | null
+  @Column_("varchar", {length: 19, nullable: false})
+  underlyingType!: ReferendumOriginType
 }

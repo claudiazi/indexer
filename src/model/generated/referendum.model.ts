@@ -66,11 +66,11 @@ export class Referendum {
   @OneToMany_(() => Vote, e => e.referendum)
   voting!: Vote[]
 
-  @Column_("int4", {nullable: true})
-  endsAt!: number | undefined | null
+  @Column_("int4", {nullable: false})
+  endsAt!: number
 
-  @Column_("int4", {nullable: true})
-  delay!: number | undefined | null
+  @Column_("int4", {nullable: false})
+  delay!: number
 
   @Column_("varchar", {length: 19, nullable: true})
   origin!: ReferendumOriginType | undefined | null

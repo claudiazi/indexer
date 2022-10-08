@@ -17,8 +17,7 @@ const processor = new SubstrateBatchProcessor()
             },
         },
         range: {
-            from: 14638350 //14635080//14375300
-            // 14594430
+            from: 14776200
         }
     } as const)
     .addCall('Democracy.vote', {
@@ -27,7 +26,7 @@ const processor = new SubstrateBatchProcessor()
                 origin: true,
                 args: true,
             },
-        }
+        },
     } as const)
     .addEvent('Democracy.Proposed', {
         data: {

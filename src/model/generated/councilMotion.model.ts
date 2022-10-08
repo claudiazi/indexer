@@ -14,8 +14,8 @@ export class CouncilMotion {
   @Column_("int4", {nullable: false})
   index!: number
 
-  @Column_("text", {nullable: true})
-  hash!: string | undefined | null
+  @Column_("text", {nullable: false})
+  hash!: string
 
   @Column_("text", {nullable: true})
   proposalHash!: string | undefined | null

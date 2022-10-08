@@ -1,5 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import {Question} from "./question.model"
+import {QuizSubmission} from "./quizSubmission.model"
 
 @Entity_()
 export class Quiz {
@@ -23,6 +24,9 @@ export class Quiz {
 
   @OneToMany_(() => Question, e => e.quiz)
   questions!: Question[]
+
+  @OneToMany_(() => QuizSubmission, e => e.quiz)
+  submissions!: QuizSubmission[]
 
   @Column_("int4", {nullable: true})
   version!: number | undefined | null

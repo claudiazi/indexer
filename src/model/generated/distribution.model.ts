@@ -34,8 +34,8 @@ export class Distribution {
   @Column_("text", {nullable: true})
   dragonEquipped!: string | undefined | null
 
-  @Column_("int4", {nullable: true})
-  chanceAtItem!: number | undefined | null
+  @Column_("numeric", {array: true, nullable: true})
+  chancesAtItems!: (number | undefined | null)[] | undefined | null
 
   @Column_("timestamp with time zone", {nullable: true})
   timestamp!: Date | undefined | null
