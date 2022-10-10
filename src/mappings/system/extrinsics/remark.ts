@@ -7,9 +7,9 @@ import { Quiz } from '../../../model/generated/quiz.model'
 import { SystemRemarkCall } from '../../../types/calls'
 import { getOriginAccountId } from '../../../common/tools'
 import { AnswerDataNotComplete, AnswerSubmissionTooLate, InvalidCorrectAnswerIndex, MissingQuizVersionWarn, NotProposerNotProofOfChaos, QuizSubmissionTooLate, WrongAnswerLength, WrongCorrectAnswerLength } from './errors'
-import { MissingConfigWarn, MissingOptionWarn, MissingQuestionWarn, MissingReferendumRelationWarn, MissingQuizWarn, MissingReferendumWarn } from '../../utils/errors'
+import { MissingConfigWarn, MissingOptionWarn, MissingQuestionWarn, MissingQuizWarn, MissingReferendumWarn } from '../../utils/errors'
 import { AnswerOption } from '../../../model/generated/answerOption.model'
-import { CouncilMotion, DemocracyProposal, Referendum, ReferendumOriginType, ReferendumRelation, TechCommitteeMotion } from '../../../model'
+import { Referendum } from '../../../model'
 import { QuizSubmission } from '../../../model/generated/quizSubmission.model'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
@@ -23,6 +23,7 @@ import { getAnswerCount, getConfigVersion, getCorrectAnswerVersion, getDistribut
 export async function handleRemark(ctx: BatchContext<Store, unknown>,
     item: CallItem<'System.remark', { call: { args: true; origin: true } }>,
     header: SubstrateBlock): Promise<void> {
+    if (!(item.call as any).success) return
     const message = new SystemRemarkCall(ctx, item.call).asV1020.remark.toString()
     if (!isProofOfChaosMessage(message)) return
 
@@ -271,15 +272,16 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             else {
                 const answerData: AnswerData = JSON.parse(args[3])
                 const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: answerData.quizVersion } })
+                if (answerData.answers == null || answerData.quizVersion == null || answerData.answers.length == 0) {
+                    ctx.log.warn(AnswerDataNotComplete(answerData))
+                    return
+                }
                 if (!quizDb) {
                     ctx.log.warn(MissingQuizVersionWarn(args[1], answerData.quizVersion))
                     return
                 }
                 const quizDbQuestions = await ctx.store.find(Question, { where: { quizId: quizDb.id } })
-                if (!answerData.answers || !answerData.quizVersion || answerData.answers.length == 0 ){
-                    ctx.log.warn(AnswerDataNotComplete(answerData))
-                    return
-                }
+                
                 if (quizDbQuestions.length != answerData.answers.length) {
                     ctx.log.warn(WrongAnswerLength(quizDb.id, quizDbQuestions.length, answerData.answers))
                     return

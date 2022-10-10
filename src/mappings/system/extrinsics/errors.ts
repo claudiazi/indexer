@@ -29,5 +29,5 @@ export function InvalidCorrectAnswerIndex(questionId: string, answerOptionCount:
 }
 
 export function AnswerDataNotComplete(answerData: AnswerData) {
-    return `AnswerData not complete. Possibly missing quizVersion and/or answer array: ${answerData}.`
+    return `AnswerData not complete. Possibly missing answer array: ${answerData.answers} and/or quizVersion: ${answerData.quizVersion}.`
 }
