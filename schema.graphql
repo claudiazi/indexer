@@ -287,3 +287,14 @@ type QuizSubmission @entity {
   answers: [Int!]
   timestamp: DateTime!
 }
+
+type Delegation @entity {
+  id: ID!
+  blockNumberStart: Int! @index
+  blockNumberEnd: Int
+  wallet: String @index
+  to: String! @index
+  balance: BigInt
+  conviction: String!
+  timestamp: DateTime!
+}

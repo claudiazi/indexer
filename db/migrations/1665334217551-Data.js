@@ -1,5 +1,5 @@
-module.exports = class Data1665252436037 {
-  name = 'Data1665252436037'
+module.exports = class Data1665334217551 {
+  name = 'Data1665334217551'
 
   async up(db) {
     await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -50,6 +50,10 @@ module.exports = class Data1665252436037 {
     await db.query(`CREATE INDEX "IDX_aecfc55f7d8e7bb703193e0311" ON "question" ("quiz_id") `)
     await db.query(`CREATE TABLE "answer_option" ("id" character varying NOT NULL, "question_id" character varying NOT NULL, "text" text, CONSTRAINT "PK_69dad60c2f58e523232f06f5d8d" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_c8ff81963b1cf29c3e4188e5ba" ON "answer_option" ("question_id") `)
+    await db.query(`CREATE TABLE "delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text, "to" text NOT NULL, "balance" numeric, "conviction" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_a2cb6c9b942d68b109131beab44" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE INDEX "IDX_9424bd1981faae099575c84ebc" ON "delegation" ("block_number_start") `)
+    await db.query(`CREATE INDEX "IDX_847a3bbf681c929004c84e3eba" ON "delegation" ("wallet") `)
+    await db.query(`CREATE INDEX "IDX_0e0774ed46340a85f1d43ca808" ON "delegation" ("to") `)
     await db.query(`ALTER TABLE "vote" ADD CONSTRAINT "FK_6c157f7819d8bf5869a9e2ab86a" FOREIGN KEY ("referendum_id") REFERENCES "referendum"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "referendum" ADD CONSTRAINT "FK_c03067ac62c70a40bfd726f91ee" FOREIGN KEY ("preimage_id") REFERENCES "preimage"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "resource" ADD CONSTRAINT "FK_82accf385fc70361a7e371787ca" FOREIGN KEY ("option_id") REFERENCES "option"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -109,6 +113,10 @@ module.exports = class Data1665252436037 {
     await db.query(`DROP INDEX "public"."IDX_aecfc55f7d8e7bb703193e0311"`)
     await db.query(`DROP TABLE "answer_option"`)
     await db.query(`DROP INDEX "public"."IDX_c8ff81963b1cf29c3e4188e5ba"`)
+    await db.query(`DROP TABLE "delegation"`)
+    await db.query(`DROP INDEX "public"."IDX_9424bd1981faae099575c84ebc"`)
+    await db.query(`DROP INDEX "public"."IDX_847a3bbf681c929004c84e3eba"`)
+    await db.query(`DROP INDEX "public"."IDX_0e0774ed46340a85f1d43ca808"`)
     await db.query(`ALTER TABLE "vote" DROP CONSTRAINT "FK_6c157f7819d8bf5869a9e2ab86a"`)
     await db.query(`ALTER TABLE "referendum" DROP CONSTRAINT "FK_c03067ac62c70a40bfd726f91ee"`)
     await db.query(`ALTER TABLE "resource" DROP CONSTRAINT "FK_82accf385fc70361a7e371787ca"`)

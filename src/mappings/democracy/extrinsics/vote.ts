@@ -16,8 +16,7 @@ import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelec
 export async function handleVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.vote', { call: { args: true; origin: true; }}>,
     header: SubstrateBlock): Promise<void> {
-// export async function handleVote(ctx: CallHandlerContext<Store>) {
-    // if (!item.success) return
+    if (!(item.call as any).success) return
     const { index, vote } = getVoteData(ctx, item.call)
 
     const referendum = await ctx.store.get(Referendum, { where: { index } })
