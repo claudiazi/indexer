@@ -22,11 +22,14 @@ export class Config {
   @Column_("int4", {nullable: false})
   blockNumber!: number
 
-  @Column_("text", {nullable: true})
-  min!: string | undefined | null
+  @Column_("numeric", {nullable: true})
+  minValue!: number | undefined | null
 
-  @Column_("text", {nullable: true})
-  max!: string | undefined | null
+  @Column_("numeric", {nullable: true})
+  maxValue!: number | undefined | null
+
+  @Column_("numeric", {nullable: true})
+  median!: number | undefined | null
 
   @Column_("text", {nullable: true})
   first!: string | undefined | null
@@ -44,16 +47,10 @@ export class Config {
   newCollectionSymbol!: string | undefined | null
 
   @Column_("text", {nullable: true})
-  newCollectionPath!: string | undefined | null
-
-  @Column_("text", {nullable: true})
-  newCollectionFile!: string | undefined | null
+  newCollectionMetadataCid!: string | undefined | null
 
   @Column_("text", {nullable: true})
   newCollectionName!: string | undefined | null
-
-  @Column_("text", {nullable: true})
-  newCollectionDescription!: string | undefined | null
 
   @Column_("text", {array: true, nullable: true})
   makeEquippable!: (string | undefined | null)[] | undefined | null

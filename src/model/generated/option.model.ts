@@ -45,6 +45,15 @@ export class Option {
   @Column_("int4", {nullable: true})
   maxRoyalty!: number | undefined | null
 
+  @Column_("int4", {nullable: true})
+  sweetspotProbability!: number | undefined | null
+
+  @Column_("int4", {nullable: true})
+  maxProbability!: number | undefined | null
+
+  @Column_("int4", {nullable: true})
+  minProbability!: number | undefined | null
+
   @Column_("bool", {nullable: true})
   isDefault!: boolean | undefined | null
 

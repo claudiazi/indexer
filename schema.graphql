@@ -166,17 +166,16 @@ type Config @entity {
   referendumIndex: Int! @index
   version: Int! @index
   blockNumber: Int! @index
-  min: String
-  max: String
+  minValue: Float
+  maxValue: Float
+  median: Float
   first: String
   blockCutOff: String
   directOnly: Boolean
   createNewCollection: Boolean
   newCollectionSymbol: String
-  newCollectionPath: String
-  newCollectionFile: String
+  newCollectionMetadataCid: String
   newCollectionName: String
-  newCollectionDescription: String
   makeEquippable: [String]
   babyBonus: Int
   toddlerBonus: Int
@@ -201,6 +200,9 @@ type Option @entity {
   itemName: String
   minRoyalty: Int
   maxRoyalty: Int
+  sweetspotProbability: Int
+  maxProbability: Int
+  minProbability: Int
   isDefault: Boolean
   resources: [Resource!] @derivedFrom(field: "option")
   metadataCidDirect: String

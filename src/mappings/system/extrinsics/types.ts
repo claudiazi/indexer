@@ -29,6 +29,9 @@ export interface OptionData {
     itemName: string
     minRoyalty: number,
     maxRoyalty: number,
+    sweetspotProbability: number,
+    maxProbability: number,
+    minProbability: number,
     resources: ResourceData[],
     metadataCidDirect: string,
     metadataCidDelegated: string
@@ -44,8 +47,9 @@ export interface UserItem {
 
 export interface ConfigData {
     referendumIndex: number
-    min: string
-    max: string
+    minValue: number
+    maxValue: number
+    median: number
     first: string
     blockCutOff: string
     directOnly: boolean
@@ -55,6 +59,7 @@ export interface ConfigData {
     newCollectionFile: string
     newCollectionName: string
     newCollectionDescription: string
+    newCollectionMetadataCid: string
     makeEquippable: [string]
     babyBonus: number
     toddlerBonus: number
