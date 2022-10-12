@@ -2,6 +2,7 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, M
 import {Quiz} from "./quiz.model"
 import {AnswerOption} from "./answerOption.model"
 import {CorrectAnswer} from "./correctAnswer.model"
+import {Answer} from "./answer.model"
 
 @Entity_()
 export class Question {
@@ -27,4 +28,7 @@ export class Question {
 
   @OneToMany_(() => CorrectAnswer, e => e.question)
   indexCorrectAnswerHistory!: CorrectAnswer[]
+
+  @OneToMany_(() => Answer, e => e.question)
+  answers!: Answer[]
 }

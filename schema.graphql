@@ -265,6 +265,7 @@ type Question @entity {
   text: String
   answerOptions: [AnswerOption] @derivedFrom(field: "question")
   indexCorrectAnswerHistory: [CorrectAnswer] @derivedFrom(field: "question")
+  answers: [Answer] @derivedFrom(field: "question")
 }
 
 type Quiz @entity {
@@ -278,6 +279,15 @@ type Quiz @entity {
   timestamp: DateTime
 }
 
+type Answer @entity {
+  id: ID!
+  answerIndex: Int!
+  questionId: ID!
+  question: Question!
+  quizSubmission: QuizSubmission!
+  quizSubmissionId: ID!
+}
+
 type QuizSubmission @entity {
   id: ID!
   referendumIndex: Int!
@@ -286,7 +296,7 @@ type QuizSubmission @entity {
   quiz: Quiz
   quizId: ID!
   version: Int
-  answers: [Int!]
+  answers: [Answer!] @derivedFrom(field: "quizSubmission")
   timestamp: DateTime!
 }
 

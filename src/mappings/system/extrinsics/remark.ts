@@ -16,7 +16,8 @@ import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { CorrectAnswer } from '../../../model/generated/correctAnswer.model'
 import { AnswerData, ConfigData, CorrectAnswerData, OptionData, QuizData, UserItem } from './types'
-import { getAnswerCount, getConfigVersion, getCorrectAnswerVersion, getDistributionCount, getDistributionVersion, getOptionCount, getQuestionCount, getQuizVersion, getResourceCount, getSubmissionCount, getSubmissionVersion, isProofOfChaosAddress, isProofOfChaosMessage, isProposer } from './helpers'
+import { getAnswerCount, getAnswerOptionCount, getConfigVersion, getCorrectAnswerVersion, getDistributionCount, getDistributionVersion, getOptionCount, getQuestionCount, getQuizVersion, getResourceCount, getSubmissionCount, getSubmissionVersion, isProofOfChaosAddress, isProofOfChaosMessage, isProposer } from './helpers'
+import { Answer } from '../../../model/generated/answer.model'
 
 
 
@@ -245,7 +246,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         return
                     }
                     for (const a of q.answerOptions) {
-                        const answerCount = await getAnswerCount(ctx, questionDb.id)
+                        const answerCount = await getAnswerOptionCount(ctx, questionDb.id)
                         const answerId = `${questionDb.id}-${answerCount.toString().padStart(8, '0')}`
                         const answerOption = new AnswerOption({
                             id: answerId,
@@ -285,7 +286,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     return
                 }
                 const quizDbQuestions = await ctx.store.find(Question, { where: { quizId: quizDb.id } })
-                
+
                 if (quizDbQuestions.length != answerData.answers.length) {
                     ctx.log.warn(WrongAnswerLength(quizDb.id, quizDbQuestions.length, answerData.answers))
                     return
@@ -295,18 +296,31 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                 const submissionCount = await getSubmissionCount(ctx, quizDb.id)
                 const submissionId = `${quizDb.id}-${submissionCount.toString().padStart(8, '0')}`
 
-                const submission = new QuizSubmission({
+                const quizSubmission = new QuizSubmission({
                     id: submissionId,
                     referendumIndex: parseInt(args[1]),
                     blockNumber: header.height,
                     quiz: quizDb,
                     quizId: quizDb.id,
                     version: submissionVersion,
-                    answers: answerData.answers,
                     wallet: originAccountId,
                     timestamp: new Date(header.timestamp)
                 })
-                await ctx.store.insert(submission)
+                await ctx.store.insert(quizSubmission)
+                for (let i = 0; i < answerData.answers.length; i++) {
+                    const answerCount = await getAnswerCount(ctx, quizSubmission.id)
+                    const answerId = `${quizSubmission.id}-${answerCount.toString().padStart(8, '0')}`
+                    const answer = new Answer({
+                        id: answerId,
+                        answerIndex: answerData.answers[i],
+                        question: quizDbQuestions[i],
+                        questionId: quizDbQuestions[i].id,
+                        quizSubmission: quizSubmission,
+                        quizSubmissionId: quizSubmission.id
+                    })
+                    await ctx.store.insert(answer)
+                }
+
             }
             break
         case 'CORRECTANSWERS':

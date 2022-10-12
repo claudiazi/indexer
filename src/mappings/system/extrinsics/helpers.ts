@@ -11,6 +11,7 @@ import { QuizSubmission } from '../../../model/generated/quizSubmission.model'
 import { BatchContext } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CorrectAnswer } from '../../../model/generated/correctAnswer.model'
+import { Answer } from '../../../model/generated/answer.model'
 
 export function isProofOfChaosMessage(str: string) {
     return /^PROOFOFCHAOS::\d+::.*$/.test(str)
@@ -135,10 +136,10 @@ export async function getQuestionCount(ctx: BatchContext<Store, unknown>, quizId
     return count
 }
 
-const questionAnswers = new Map<string, number>()
+const questionAnswerOptions = new Map<string, number>()
 
-export async function getAnswerCount(ctx: BatchContext<Store, unknown>, questionId: string) {
-    let count = questionAnswers.get(questionId)
+export async function getAnswerOptionCount(ctx: BatchContext<Store, unknown>, questionId: string) {
+    let count = questionAnswerOptions.get(questionId)
     if (count == null) {
         count = await ctx.store.count(AnswerOption, {
             where: {
@@ -146,7 +147,22 @@ export async function getAnswerCount(ctx: BatchContext<Store, unknown>, question
             },
         })
     }
-    questionAnswers.set(questionId, count + 1)
+    questionAnswerOptions.set(questionId, count + 1)
+    return count
+}
+
+const submissionAnswers = new Map<string, number>()
+
+export async function getAnswerCount(ctx: BatchContext<Store, unknown>, quizSubmissionId: string) {
+    let count = submissionAnswers.get(quizSubmissionId)
+    if (count == null) {
+        count = await ctx.store.count(Answer, {
+            where: {
+                quizSubmissionId,
+            },
+        })
+    }
+    submissionAnswers.set(quizSubmissionId, count + 1)
     return count
 }
 

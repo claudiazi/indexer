@@ -1,5 +1,5 @@
-module.exports = class Data1665506208666 {
-  name = 'Data1665506208666'
+module.exports = class Data1665550699866 {
+  name = 'Data1665550699866'
 
   async up(db) {
     await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -36,7 +36,10 @@ module.exports = class Data1665506208666 {
     await db.query(`CREATE INDEX "IDX_05b5bd1b3ccd5f04425bc675c2" ON "distribution" ("block_number") `)
     await db.query(`CREATE INDEX "IDX_ab637c52f3ddadde29b107808a" ON "distribution" ("wallet") `)
     await db.query(`CREATE INDEX "IDX_32755722a63564b39398df8afb" ON "distribution" ("amount_considered") `)
-    await db.query(`CREATE TABLE "quiz_submission" ("id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number" integer NOT NULL, "wallet" text NOT NULL, "quiz_id" character varying NOT NULL, "version" integer, "answers" integer array, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_af730e984e8f6f25b5667a5d7be" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "answer" ("id" character varying NOT NULL, "answer_index" integer NOT NULL, "question_id" character varying NOT NULL, "quiz_submission_id" character varying NOT NULL, CONSTRAINT "PK_9232db17b63fb1e94f97e5c224f" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE INDEX "IDX_c3d19a89541e4f0813f2fe0919" ON "answer" ("question_id") `)
+    await db.query(`CREATE INDEX "IDX_dc8f8632638f0fe994a8776b2a" ON "answer" ("quiz_submission_id") `)
+    await db.query(`CREATE TABLE "quiz_submission" ("id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number" integer NOT NULL, "wallet" text NOT NULL, "quiz_id" character varying NOT NULL, "version" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_af730e984e8f6f25b5667a5d7be" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_10be9acde6b076ad427876c89b" ON "quiz_submission" ("block_number") `)
     await db.query(`CREATE INDEX "IDX_c8ae5975e0a911790fd9afe166" ON "quiz_submission" ("wallet") `)
     await db.query(`CREATE INDEX "IDX_d2a834af8b7ae35d4f7c3eda9a" ON "quiz_submission" ("quiz_id") `)
@@ -58,6 +61,8 @@ module.exports = class Data1665506208666 {
     await db.query(`ALTER TABLE "referendum" ADD CONSTRAINT "FK_c03067ac62c70a40bfd726f91ee" FOREIGN KEY ("preimage_id") REFERENCES "preimage"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "resource" ADD CONSTRAINT "FK_82accf385fc70361a7e371787ca" FOREIGN KEY ("option_id") REFERENCES "option"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "option" ADD CONSTRAINT "FK_4c401fcc64b86d1319d14146c43" FOREIGN KEY ("config_id") REFERENCES "config"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+    await db.query(`ALTER TABLE "answer" ADD CONSTRAINT "FK_c3d19a89541e4f0813f2fe09194" FOREIGN KEY ("question_id") REFERENCES "question"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+    await db.query(`ALTER TABLE "answer" ADD CONSTRAINT "FK_dc8f8632638f0fe994a8776b2a6" FOREIGN KEY ("quiz_submission_id") REFERENCES "quiz_submission"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "quiz_submission" ADD CONSTRAINT "FK_d2a834af8b7ae35d4f7c3eda9af" FOREIGN KEY ("quiz_id") REFERENCES "quiz"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "correct_answer" ADD CONSTRAINT "FK_28281bc700207955b38caf28b04" FOREIGN KEY ("question_id") REFERENCES "question"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "question" ADD CONSTRAINT "FK_aecfc55f7d8e7bb703193e03118" FOREIGN KEY ("quiz_id") REFERENCES "quiz"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -99,6 +104,9 @@ module.exports = class Data1665506208666 {
     await db.query(`DROP INDEX "public"."IDX_05b5bd1b3ccd5f04425bc675c2"`)
     await db.query(`DROP INDEX "public"."IDX_ab637c52f3ddadde29b107808a"`)
     await db.query(`DROP INDEX "public"."IDX_32755722a63564b39398df8afb"`)
+    await db.query(`DROP TABLE "answer"`)
+    await db.query(`DROP INDEX "public"."IDX_c3d19a89541e4f0813f2fe0919"`)
+    await db.query(`DROP INDEX "public"."IDX_dc8f8632638f0fe994a8776b2a"`)
     await db.query(`DROP TABLE "quiz_submission"`)
     await db.query(`DROP INDEX "public"."IDX_10be9acde6b076ad427876c89b"`)
     await db.query(`DROP INDEX "public"."IDX_c8ae5975e0a911790fd9afe166"`)
@@ -121,6 +129,8 @@ module.exports = class Data1665506208666 {
     await db.query(`ALTER TABLE "referendum" DROP CONSTRAINT "FK_c03067ac62c70a40bfd726f91ee"`)
     await db.query(`ALTER TABLE "resource" DROP CONSTRAINT "FK_82accf385fc70361a7e371787ca"`)
     await db.query(`ALTER TABLE "option" DROP CONSTRAINT "FK_4c401fcc64b86d1319d14146c43"`)
+    await db.query(`ALTER TABLE "answer" DROP CONSTRAINT "FK_c3d19a89541e4f0813f2fe09194"`)
+    await db.query(`ALTER TABLE "answer" DROP CONSTRAINT "FK_dc8f8632638f0fe994a8776b2a6"`)
     await db.query(`ALTER TABLE "quiz_submission" DROP CONSTRAINT "FK_d2a834af8b7ae35d4f7c3eda9af"`)
     await db.query(`ALTER TABLE "correct_answer" DROP CONSTRAINT "FK_28281bc700207955b38caf28b04"`)
     await db.query(`ALTER TABLE "question" DROP CONSTRAINT "FK_aecfc55f7d8e7bb703193e03118"`)
