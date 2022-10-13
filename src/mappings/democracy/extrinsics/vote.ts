@@ -12,12 +12,26 @@ import { MissingReferendumWarn } from '../../utils/errors'
 import {BatchContext, SubstrateBlock} from '@subsquid/substrate-processor'
 import {Store} from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
+import { TooManyOpenVotes } from './errors'
+import { IsNull } from 'typeorm'
 
 export async function handleVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.vote', { call: { args: true; origin: true; }}>,
     header: SubstrateBlock): Promise<void> {
     if (!(item.call as any).success) return
+    
     const { index, vote } = getVoteData(ctx, item.call)
+
+    const voter = getOriginAccountId(item.call.origin)
+    const votes = await ctx.store.find(Vote, { where: { voter, referendumIndex: index, blockNumberRemoved: IsNull()  } })
+    if (votes.length > 1) {
+        ctx.log.warn(TooManyOpenVotes(header.height, voter))
+    }
+    if (votes.length > 0) {
+        const vote = votes[0]
+        vote.blockNumberRemoved = header.height
+        await ctx.store.save(vote)
+    }
 
     const referendum = await ctx.store.get(Referendum, { where: { index } })
     if (!referendum) {
@@ -56,7 +70,7 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
             referendumIndex: index,
             voter: item.call.origin ? getOriginAccountId(item.call.origin) : null,
-            blockNumber: header.height,
+            blockNumberVoted: header.height,
             decision,
             lockPeriod,
             referendum,

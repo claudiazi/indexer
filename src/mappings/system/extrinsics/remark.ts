@@ -76,7 +76,9 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     adolescentBonus,
                     adultBonus,
                     minAmount,
-                    seed } = configData
+                    seed,
+                    min,
+                    max } = configData
 
                 const configId = `${args[1]}-${version.toString().padStart(8, '0')}`
 
@@ -102,6 +104,8 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     adultBonus,
                     minAmount: parseInt(minAmount),
                     seed,
+                    min,
+                    max,
                     timestamp: new Date(header.timestamp),
                 })
                 await ctx.store.insert(config)

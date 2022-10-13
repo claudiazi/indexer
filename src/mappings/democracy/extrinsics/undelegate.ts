@@ -5,7 +5,7 @@ import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Delegation } from '../../../model/generated/delegation.model'
 import { NoDelegationFound, TooManyOpenDelegations } from './errors'
-import { IsNull, Not } from 'typeorm'
+import { IsNull } from 'typeorm'
 
 export async function handleUndelegate(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.undelegate', { call: { args: true; origin: true; } }>,

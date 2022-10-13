@@ -1,20 +1,20 @@
 import { BatchContext } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { UnknownVersionError } from '../../../common/errors'
-import { DemocracyDelegateCall } from '../../../types/calls'
+import { DemocracyDelegateCall, DemocracyRemoveVoteCall } from '../../../types/calls'
 import { DemocracyVoteCall } from '../../../types/calls'
 
 type DemocracyVote =
     | {
-          type: 'Standard'
-          balance?: bigint
-          value: number
-      }
+        type: 'Standard'
+        balance?: bigint
+        value: number
+    }
     | {
-          type: 'Split'
-          aye: bigint
-          nay: bigint
-      }
+        type: 'Split'
+        aye: bigint
+        nay: bigint
+    }
 
 interface DemocracyVoteCallData {
     index: number
@@ -106,6 +106,22 @@ export function getDelegateData(ctx: BatchContext<Store, unknown>, itemCall: any
             to: to.value,
             conviction: conviction.__kind,
             balance
+        }
+    } else {
+        throw new UnknownVersionError(event.constructor.name)
+    }
+}
+
+export interface DemocracyRemoveVoteCallData {
+    index: number
+}
+
+export function getRemoveVoteData(ctx: BatchContext<Store, unknown>, itemCall: any): DemocracyRemoveVoteCallData {
+    const event = new DemocracyRemoveVoteCall(ctx, itemCall)
+    if (event.isV1055) {
+        const { index } = event.asV1055
+        return {
+            index
         }
     } else {
         throw new UnknownVersionError(event.constructor.name)

@@ -148,6 +148,89 @@ export class DemocracyDelegateCall {
   }
 }
 
+export class DemocracyRemoveVoteCall {
+  private readonly _chain: Chain
+  private readonly call: Call
+
+  constructor(ctx: CallContext)
+  constructor(ctx: ChainContext, call: Call)
+  constructor(ctx: CallContext, call?: Call) {
+    call = call || ctx.call
+    assert(call.name === 'Democracy.remove_vote')
+    this._chain = ctx._chain
+    this.call = call
+  }
+
+  /**
+   *  Remove a vote for a referendum.
+   * 
+   *  If:
+   *  - the referendum was cancelled, or
+   *  - the referendum is ongoing, or
+   *  - the referendum has ended such that
+   *    - the vote of the account was in opposition to the result; or
+   *    - there was no conviction to the account's vote; or
+   *    - the account made a split vote
+   *  ...then the vote is removed cleanly and a following call to `unlock` may result in more
+   *  funds being available.
+   * 
+   *  If, however, the referendum has ended and:
+   *  - it finished corresponding to the vote of the account, and
+   *  - the account made a standard vote with conviction, and
+   *  - the lock period of the conviction is not over
+   *  ...then the lock will be aggregated into the overall account's lock, which may involve
+   *  *overlocking* (where the two locks are combined into a single lock that is the maximum
+   *  of both the amount locked and the time is it locked for).
+   * 
+   *  The dispatch origin of this call must be _Signed_, and the signer must have a vote
+   *  registered for referendum `index`.
+   * 
+   *  - `index`: The index of referendum of the vote to be removed.
+   * 
+   *  # <weight>
+   *  - `O(R + log R)` where R is the number of referenda that `target` has voted on.
+   *  # </weight>
+   */
+  get isV1055(): boolean {
+    return this._chain.getCallHash('Democracy.remove_vote') === '25a99cc820e15400356f62165725d9d84847d859e62ca1e5fd6eb340dc5c217e'
+  }
+
+  /**
+   *  Remove a vote for a referendum.
+   * 
+   *  If:
+   *  - the referendum was cancelled, or
+   *  - the referendum is ongoing, or
+   *  - the referendum has ended such that
+   *    - the vote of the account was in opposition to the result; or
+   *    - there was no conviction to the account's vote; or
+   *    - the account made a split vote
+   *  ...then the vote is removed cleanly and a following call to `unlock` may result in more
+   *  funds being available.
+   * 
+   *  If, however, the referendum has ended and:
+   *  - it finished corresponding to the vote of the account, and
+   *  - the account made a standard vote with conviction, and
+   *  - the lock period of the conviction is not over
+   *  ...then the lock will be aggregated into the overall account's lock, which may involve
+   *  *overlocking* (where the two locks are combined into a single lock that is the maximum
+   *  of both the amount locked and the time is it locked for).
+   * 
+   *  The dispatch origin of this call must be _Signed_, and the signer must have a vote
+   *  registered for referendum `index`.
+   * 
+   *  - `index`: The index of referendum of the vote to be removed.
+   * 
+   *  # <weight>
+   *  - `O(R + log R)` where R is the number of referenda that `target` has voted on.
+   *  # </weight>
+   */
+  get asV1055(): {index: number} {
+    assert(this.isV1055)
+    return this._chain.decodeCall(this.call)
+  }
+}
+
 export class DemocracyUndelegateCall {
   private readonly _chain: Chain
   private readonly call: Call

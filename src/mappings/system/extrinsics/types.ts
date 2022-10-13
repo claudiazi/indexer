@@ -69,6 +69,8 @@ export interface ConfigData {
     seed: string
     default: OptionData
     options: OptionData[]
+    min: number
+    max: number
 }
 
 export interface AnswerOptions {

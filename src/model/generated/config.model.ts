@@ -67,8 +67,14 @@ export class Config {
   @Column_("int4", {nullable: true})
   adultBonus!: number | undefined | null
 
-  @Column_("int4", {nullable: true})
+  @Column_("numeric", {nullable: true})
   minAmount!: number | undefined | null
+
+  @Column_("numeric", {nullable: true})
+  min!: number | undefined | null
+
+  @Column_("numeric", {nullable: true})
+  max!: number | undefined | null
 
   @Column_("text", {nullable: true})
   seed!: string | undefined | null

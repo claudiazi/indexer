@@ -154,7 +154,8 @@ type Vote @entity {
   referendumId: ID!
   referendumIndex: Int!
   referendum: Referendum!
-  blockNumber: Int! @index
+  blockNumberVoted: Int! @index
+  blockNumberRemoved: Int @index
   timestamp: DateTime! @index
   decision: VoteDecision!
   balance: VoteBalance!
@@ -181,7 +182,9 @@ type Config @entity {
   toddlerBonus: Int
   adolescentBonus: Int
   adultBonus: Int
-  minAmount: Int
+  minAmount: Float
+  min: Float
+  max: Float
   seed: String
   options: [Option!] @derivedFrom(field: "config")
   timestamp: DateTime

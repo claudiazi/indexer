@@ -33,6 +33,7 @@
   ],
   "calls": [
     "Democracy.vote",
+    "Democracy.remove_vote",
     "System.remark",
     "Democracy.delegate",
     "Democracy.undelegate"

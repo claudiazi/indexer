@@ -28,7 +28,11 @@ export class Vote {
 
   @Index_()
   @Column_("int4", {nullable: false})
-  blockNumber!: number
+  blockNumberVoted!: number
+
+  @Index_()
+  @Column_("int4", {nullable: true})
+  blockNumberRemoved!: number | undefined | null
 
   @Index_()
   @Column_("timestamp with time zone", {nullable: false})

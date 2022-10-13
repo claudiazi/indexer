@@ -15,7 +15,6 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     const delegations = await ctx.store.find(Delegation, { where: { wallet, blockNumberEnd: IsNull() } })
     if (delegations.length > 1) {
         ctx.log.warn(TooManyOpenDelegations(header.height, wallet))
-        console.log("delegations", delegations)
     }
     if (delegations.length > 0) {
         const delegation = delegations[0]
