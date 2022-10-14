@@ -25,7 +25,7 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     const voter = getOriginAccountId(item.call.origin)
     const votes = await ctx.store.find(Vote, { where: { voter, referendumIndex: index, blockNumberRemoved: IsNull()  } })
     if (votes.length > 1) {
-        ctx.log.warn(TooManyOpenVotes(header.height, voter))
+        ctx.log.warn(TooManyOpenVotes(header.height, index, voter))
     }
     if (votes.length > 0) {
         const vote = votes[0]
