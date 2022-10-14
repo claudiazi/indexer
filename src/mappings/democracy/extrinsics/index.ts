@@ -1,4 +1,5 @@
 export { handleVote } from './vote'
 export { handleRemoveVote } from './removeVote'
+export { handleRemoveOtherVote } from './removeOtherVote'
 export { handleDelegate } from './delegate'
 export { handleUndelegate } from './undelegate'

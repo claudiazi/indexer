@@ -37,6 +37,14 @@ const processor = new SubstrateBatchProcessor()
             },
         },
     } as const)
+    .addCall('Democracy.remove_other_vote', {
+        data: {
+            call: {
+                origin: true,
+                args: true,
+            },
+        },
+    } as const)
     .addEvent('Democracy.Proposed', {
         data: {
             event: {
@@ -227,6 +235,9 @@ processor.run(new TypeormDatabase(), async (ctx) => {
                 }
                 if (item.name == 'Democracy.remove_vote') {
                     await modules.democracy.extrinsics.handleRemoveVote(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.remove_other_vote') {
+                    await modules.democracy.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.delegate') {
                     await modules.democracy.extrinsics.handleDelegate(ctx, item, block.header)

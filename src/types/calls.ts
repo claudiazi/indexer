@@ -148,6 +148,108 @@ export class DemocracyDelegateCall {
   }
 }
 
+export class DemocracyRemoveOtherVoteCall {
+  private readonly _chain: Chain
+  private readonly call: Call
+
+  constructor(ctx: CallContext)
+  constructor(ctx: ChainContext, call: Call)
+  constructor(ctx: CallContext, call?: Call) {
+    call = call || ctx.call
+    assert(call.name === 'Democracy.remove_other_vote')
+    this._chain = ctx._chain
+    this.call = call
+  }
+
+  /**
+   *  Remove a vote for a referendum.
+   * 
+   *  If the `target` is equal to the signer, then this function is exactly equivalent to
+   *  `remove_vote`. If not equal to the signer, then the vote must have expired,
+   *  either because the referendum was cancelled, because the voter lost the referendum or
+   *  because the conviction period is over.
+   * 
+   *  The dispatch origin of this call must be _Signed_.
+   * 
+   *  - `target`: The account of the vote to be removed; this account must have voted for
+   *    referendum `index`.
+   *  - `index`: The index of referendum of the vote to be removed.
+   * 
+   *  # <weight>
+   *  - `O(R + log R)` where R is the number of referenda that `target` has voted on.
+   *  # </weight>
+   */
+  get isV1055(): boolean {
+    return this._chain.getCallHash('Democracy.remove_other_vote') === '57db819150acc73e380a9908a05d4f777cd3af825527d7ad88560426e1d0f652'
+  }
+
+  /**
+   *  Remove a vote for a referendum.
+   * 
+   *  If the `target` is equal to the signer, then this function is exactly equivalent to
+   *  `remove_vote`. If not equal to the signer, then the vote must have expired,
+   *  either because the referendum was cancelled, because the voter lost the referendum or
+   *  because the conviction period is over.
+   * 
+   *  The dispatch origin of this call must be _Signed_.
+   * 
+   *  - `target`: The account of the vote to be removed; this account must have voted for
+   *    referendum `index`.
+   *  - `index`: The index of referendum of the vote to be removed.
+   * 
+   *  # <weight>
+   *  - `O(R + log R)` where R is the number of referenda that `target` has voted on.
+   *  # </weight>
+   */
+  get asV1055(): {target: Uint8Array, index: number} {
+    assert(this.isV1055)
+    return this._chain.decodeCall(this.call)
+  }
+
+  /**
+   * Remove a vote for a referendum.
+   * 
+   * If the `target` is equal to the signer, then this function is exactly equivalent to
+   * `remove_vote`. If not equal to the signer, then the vote must have expired,
+   * either because the referendum was cancelled, because the voter lost the referendum or
+   * because the conviction period is over.
+   * 
+   * The dispatch origin of this call must be _Signed_.
+   * 
+   * - `target`: The account of the vote to be removed; this account must have voted for
+   *   referendum `index`.
+   * - `index`: The index of referendum of the vote to be removed.
+   * 
+   * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
+   *   Weight is calculated for the maximum number of vote.
+   */
+  get isV9291(): boolean {
+    return this._chain.getCallHash('Democracy.remove_other_vote') === '43d317508cc3ba04dcadb411eb6499f25532d64ab5a169b27410116c72f40a26'
+  }
+
+  /**
+   * Remove a vote for a referendum.
+   * 
+   * If the `target` is equal to the signer, then this function is exactly equivalent to
+   * `remove_vote`. If not equal to the signer, then the vote must have expired,
+   * either because the referendum was cancelled, because the voter lost the referendum or
+   * because the conviction period is over.
+   * 
+   * The dispatch origin of this call must be _Signed_.
+   * 
+   * - `target`: The account of the vote to be removed; this account must have voted for
+   *   referendum `index`.
+   * - `index`: The index of referendum of the vote to be removed.
+   * 
+   * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
+   *   Weight is calculated for the maximum number of vote.
+   */
+  get asV9291(): {target: v9291.MultiAddress, index: number} {
+    assert(this.isV9291)
+    return this._chain.decodeCall(this.call)
+  }
+}
+
 export class DemocracyRemoveVoteCall {
   private readonly _chain: Chain
   private readonly call: Call
