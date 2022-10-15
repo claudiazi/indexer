@@ -15,7 +15,7 @@ export async function removeDelegatedVotesOngoingReferenda(ctx: BatchContext<Sto
     let nestedDelegations = await getAllNestedDelegations(ctx, wallet)
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const ongoingReferendum = ongoingReferenda[i]
-        removeDelegatedVotesReferendum(ctx, block, ongoingReferendum.index, nestedDelegations)
+        await removeDelegatedVotesReferendum(ctx, block, ongoingReferendum.index, nestedDelegations)
     }
 
 }
@@ -92,8 +92,8 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
 export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>, voter: string | undefined): Promise<any> {
     let delegations = await ctx.store.find(Delegation, { where: { to: voter, blockNumberEnd: IsNull() } })
     if (delegations && delegations.length > 0) {
-        for (const delegation of delegations) {
-            //temp fix
+        for (let i = 0; i < delegations.length; i++) {
+            const delegation = delegations[i]
             if (delegation.to){
                 return [...delegations, ...await getAllNestedDelegations(ctx, delegation.wallet)]
             }
