@@ -1,5 +1,4 @@
 import {
-    Delegation,
     Referendum,
     SplitVoteBalance,
     StandardVoteBalance,
@@ -14,7 +13,7 @@ import { MissingReferendumWarn } from '../../utils/errors'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
-import { TooManyOpenDelegations, TooManyOpenVotes } from './errors'
+import { TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
 import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum,  } from './helpers'
 

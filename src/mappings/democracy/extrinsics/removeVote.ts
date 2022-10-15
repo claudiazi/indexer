@@ -7,7 +7,7 @@ import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelec
 import { IsNull } from 'typeorm'
 import { NoOpenVoteFound, TooManyOpenVotes } from './errors'
 import { MissingReferendumWarn } from '../../utils/errors'
-import { removeDelegatedVotesOngoingReferenda } from './helpers'
+import { removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
 
 export async function handleRemoveVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.remove_vote', { call: { args: true; origin: true; } }>,
@@ -24,17 +24,6 @@ export async function handleRemoveVote(ctx: BatchContext<Store, unknown>,
         return
     }
     const wallet = getOriginAccountId(item.call.origin)
-    const votes = await ctx.store.find(Vote, { where: { voter: wallet, referendumIndex: index, blockNumberRemoved: IsNull() } })
-    if (votes.length > 1) {
-        ctx.log.warn(TooManyOpenVotes(header.height, index, wallet))
-        return
-    }
-    else if (votes.length === 0) {
-        ctx.log.warn(NoOpenVoteFound(header.height, index, wallet))
-        return
-    }
-    const vote = votes[0]
-    vote.blockNumberRemoved = header.height
-    await ctx.store.save(vote)
+    await removeVote(ctx, wallet, index, header.height)
     await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height)
 }

@@ -2,7 +2,7 @@ import { BatchContext } from "@subsquid/substrate-processor"
 import { Store } from "@subsquid/typeorm-store"
 import { IsNull } from "typeorm"
 import { Delegation, Referendum, StandardVoteBalance, Vote, VoteType } from "../../../model"
-import { TooManyOpenVotes } from "./errors"
+import { NoOpenVoteFound, TooManyOpenVotes } from "./errors"
 import { getVotesCount } from "./vote"
 
 export function convictionToLockPeriod(convictionKind: string): number {
@@ -39,6 +39,21 @@ export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, un
         vote.blockNumberRemoved = block
         await ctx.store.save(vote)
     }
+}
+
+export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: string | undefined, referendumIndex: number, block: number): Promise<void> {
+    const votes = await ctx.store.find(Vote, { where: { voter: wallet, referendumIndex, blockNumberRemoved: IsNull() } })
+    if (votes.length > 1) {
+        ctx.log.warn(TooManyOpenVotes(block, referendumIndex, wallet))
+        return
+    }
+    else if (votes.length === 0) {
+        ctx.log.warn(NoOpenVoteFound(block, referendumIndex, wallet))
+        return
+    }
+    const vote = votes[0]
+    vote.blockNumberRemoved = block
+    await ctx.store.save(vote)
 }
 
 export async function addOngoingReferendaDelegatedVotes(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, block: number, blockTime: number): Promise<void> {
