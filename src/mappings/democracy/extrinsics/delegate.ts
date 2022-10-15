@@ -14,7 +14,7 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     if (!(item.call as any).success) return
     const { to, lockPeriod, balance } = getDelegateData(ctx, item.call)
     const toAddress = ss58codec.encode(to)
-    if (toAddress == "Eyd3x5a8KearHpJLw9PFgYVNDCQiTMBHSLr9yCtox2bqMFL" && header.height == 9044201) return
+    if (toAddress === "Eyd3x5a8KearHpJLw9PFgYVNDCQiTMBHSLr9yCtox2bqMFL" && (header.height === 9044201 || header.height === 9044248)) return
     const wallet = getOriginAccountId(item.call.origin)
     const delegations = await ctx.store.find(Delegation, { where: { wallet, blockNumberEnd: IsNull() } })
     if (delegations.length > 1) {
