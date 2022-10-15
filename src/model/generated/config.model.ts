@@ -31,11 +31,11 @@ export class Config {
   @Column_("numeric", {nullable: true})
   median!: number | undefined | null
 
-  @Column_("text", {nullable: true})
-  first!: string | undefined | null
+  @Column_("int4", {nullable: true})
+  first!: number | undefined | null
 
-  @Column_("text", {nullable: true})
-  blockCutOff!: string | undefined | null
+  @Column_("int4", {nullable: true})
+  blockCutOff!: number | undefined | null
 
   @Column_("bool", {nullable: true})
   directOnly!: boolean | undefined | null
@@ -78,6 +78,9 @@ export class Config {
 
   @Column_("text", {nullable: true})
   seed!: string | undefined | null
+
+  @Column_("int4", {nullable: true})
+  defaultRoyalty!: number | undefined | null
 
   @OneToMany_(() => Option, e => e.config)
   options!: Option[]

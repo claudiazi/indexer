@@ -45,9 +45,6 @@ export class Resource {
   slot!: string | undefined | null
 
   @Column_("text", {nullable: true})
-  title!: string | undefined | null
-
-  @Column_("text", {nullable: true})
   metadataCidDirect!: string | undefined | null
 
   @Column_("text", {nullable: true})

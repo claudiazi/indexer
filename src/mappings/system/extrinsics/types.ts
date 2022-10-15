@@ -12,7 +12,6 @@ export interface ResourceData {
     rarity: string
     itemName: string
     slot: string
-    title: string
     metadataCidDirect: string,
     metadataCidDelegated: string
 }
@@ -50,8 +49,8 @@ export interface ConfigData {
     minValue: number
     maxValue: number
     median: number
-    first: string
-    blockCutOff: string
+    first: number
+    blockCutOff: number
     directOnly: boolean
     createNewCollection: boolean
     newCollectionSymbol: string
@@ -67,7 +66,7 @@ export interface ConfigData {
     adultBonus: number
     minAmount: string
     seed: string
-    default: OptionData
+    defaultRoyalty: number
     options: OptionData[]
     min: number
     max: number

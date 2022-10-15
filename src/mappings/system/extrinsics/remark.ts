@@ -34,7 +34,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
     const args = message.split('::')
     switch (args[2]) {
         case 'DISTRIBUTION':
-            if (isProofOfChaosAddress(originAccountId) && header.height >= 14594438) {
+            if (isProofOfChaosAddress(originAccountId) && header.height >= 14865588) {
                 const distributionData: UserItem[] = JSON.parse(args[3])
                 const distributionVersion = await getDistributionVersion(ctx, parseInt(args[1]))
                 for (const dist of distributionData) {
@@ -56,7 +56,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             }
             break
         case 'CONFIG':
-            if (isProofOfChaosAddress(originAccountId)) {
+            if (isProofOfChaosAddress(originAccountId) && header.height >= 14865588) {
                 //break quiz apart
                 const configData: ConfigData = JSON.parse(args[3])
                 const version = await getConfigVersion(ctx, parseInt(args[1]))
@@ -115,8 +115,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     return
                 }
                 //save options
-                const allOptions: OptionData[] = [...configData.options, configData.default]
-                for (const opt of allOptions) {
+                for (const opt of configData.options) {
                     const {
                         transferable,
                         symbol,
@@ -151,8 +150,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         metadataCidDelegated,
                         sweetspotProbability,
                         maxProbability,
-                        minProbability,
-                        isDefault: opt === configData.default
+                        minProbability
                     })
 
                     await ctx.store.insert(option)
@@ -175,7 +173,6 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                             rarity,
                             itemName,
                             slot,
-                            title,
                             metadataCidDirect,
                             metadataCidDelegated } = res
 
@@ -195,7 +192,6 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                             rarity,
                             itemName,
                             slot,
-                            title,
                             metadataCidDirect,
                             metadataCidDelegated
                         })
@@ -342,7 +338,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     ctx.log.warn(WrongCorrectAnswerLength(quizDb.id, quizDbQuestions.length, correctAnswerData.correctAnswerIndeces))
                     return
                 }
-                for (var i = 0; i < quizDbQuestions.length; i++) {
+                for (let i = 0; i < quizDbQuestions.length; i++) {
                     const quizDbQuestionAnswers = await ctx.store.find(AnswerOption, { where: { questionId: quizDbQuestions[i].id } })
                     if (correctAnswerData.correctAnswerIndeces[i] < 0 || correctAnswerData.correctAnswerIndeces[i] >= quizDbQuestionAnswers.length) {
                         ctx.log.warn(InvalidCorrectAnswerIndex(quizDbQuestions[i].id, quizDbQuestionAnswers.length, correctAnswerData.correctAnswerIndeces[i]))

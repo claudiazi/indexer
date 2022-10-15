@@ -54,9 +54,6 @@ export class Option {
   @Column_("int4", {nullable: true})
   minProbability!: number | undefined | null
 
-  @Column_("bool", {nullable: true})
-  isDefault!: boolean | undefined | null
-
   @OneToMany_(() => Resource, e => e.option)
   resources!: Resource[]
 
