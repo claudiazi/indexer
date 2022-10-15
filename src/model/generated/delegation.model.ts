@@ -18,8 +18,8 @@ export class Delegation {
   blockNumberEnd!: number | undefined | null
 
   @Index_()
-  @Column_("text", {nullable: true})
-  wallet!: string | undefined | null
+  @Column_("text", {nullable: false})
+  wallet!: string
 
   @Index_()
   @Column_("text", {nullable: false})
@@ -28,8 +28,8 @@ export class Delegation {
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
   balance!: bigint | undefined | null
 
-  @Column_("text", {nullable: false})
-  conviction!: string
+  @Column_("int4", {nullable: false})
+  lockPeriod!: number
 
   @Column_("timestamp with time zone", {nullable: false})
   timestamp!: Date

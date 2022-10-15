@@ -1,37 +1,43 @@
 import {
+    Delegation,
     Referendum,
     SplitVoteBalance,
     StandardVoteBalance,
     Vote,
     VoteBalance,
     VoteDecision,
+    VoteType,
 } from '../../../model'
 import { getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
 import { MissingReferendumWarn } from '../../utils/errors'
-import {BatchContext, SubstrateBlock} from '@subsquid/substrate-processor'
-import {Store} from '@subsquid/typeorm-store'
+import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
-import { TooManyOpenVotes } from './errors'
+import { TooManyOpenDelegations, TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
+import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum,  } from './helpers'
 
 export async function handleVote(ctx: BatchContext<Store, unknown>,
-    item: CallItem<'Democracy.vote', { call: { args: true; origin: true; }}>,
+    item: CallItem<'Democracy.vote', { call: { args: true; origin: true; } }>,
     header: SubstrateBlock): Promise<void> {
     if (!(item.call as any).success) return
-    
+
     const { index, vote } = getVoteData(ctx, item.call)
 
-    const voter = getOriginAccountId(item.call.origin)
-    const votes = await ctx.store.find(Vote, { where: { voter, referendumIndex: index, blockNumberRemoved: IsNull()  } })
+    const wallet = getOriginAccountId(item.call.origin)
+    const votes = await ctx.store.find(Vote, { where: { voter: wallet, referendumIndex: index, blockNumberRemoved: IsNull() } })
     if (votes.length > 1) {
-        ctx.log.warn(TooManyOpenVotes(header.height, index, voter))
+        //should never be the case
+        ctx.log.warn(TooManyOpenVotes(header.height, index, wallet))
     }
     if (votes.length > 0) {
         const vote = votes[0]
         vote.blockNumberRemoved = header.height
         await ctx.store.save(vote)
     }
+    const nestedDelegations = await getAllNestedDelegations(ctx, wallet)
+    await removeDelegatedVotesReferendum(ctx, header.height, index, nestedDelegations)
 
     const referendum = await ctx.store.get(Referendum, { where: { index } })
     if (!referendum) {
@@ -76,13 +82,15 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             referendum,
             balance,
             timestamp: new Date(header.timestamp),
+            type: VoteType.Direct
         })
     )
+    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations)
 }
 
 const proposalsVotes = new Map<string, number>()
 
-async function getVotesCount(ctx: BatchContext<Store, unknown>, referendumId: string) {
+export async function getVotesCount(ctx: BatchContext<Store, unknown>, referendumId: string) {
     let count = proposalsVotes.get(referendumId)
     if (count == null) {
         count = await ctx.store.count(Vote, {

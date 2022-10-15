@@ -14,6 +14,11 @@ enum ReferendumStatus {
   Executed
 }
 
+enum VoteType {
+  Delegated
+  Direct
+}
+
 enum PreimageStatus {
   Noted
   Used
@@ -160,6 +165,8 @@ type Vote @entity {
   decision: VoteDecision!
   balance: VoteBalance!
   lockPeriod: Int
+  delegatedTo: String
+  type: VoteType!
 }
 
 type Config @entity {
@@ -170,8 +177,8 @@ type Config @entity {
   minValue: Float
   maxValue: Float
   median: Float
-  first: String
-  blockCutOff: String
+  first: Int
+  blockCutOff: Int
   directOnly: Boolean
   createNewCollection: Boolean
   newCollectionSymbol: String
@@ -186,6 +193,7 @@ type Config @entity {
   min: Float
   max: Float
   seed: String
+  defaultRoyalty: Int
   options: [Option!] @derivedFrom(field: "config")
   timestamp: DateTime
 }
@@ -206,7 +214,6 @@ type Option @entity {
   sweetspotProbability: Int
   maxProbability: Int
   minProbability: Int
-  isDefault: Boolean
   resources: [Resource!] @derivedFrom(field: "option")
   metadataCidDirect: String
   metadataCidDelegated: String
@@ -225,7 +232,6 @@ type Resource @entity {
   rarity: String
   itemName: String
   slot: String
-  title: String
   metadataCidDirect: String
   metadataCidDelegated: String
 }
@@ -307,9 +313,9 @@ type Delegation @entity {
   id: ID!
   blockNumberStart: Int! @index
   blockNumberEnd: Int
-  wallet: String @index
+  wallet: String! @index
   to: String! @index
   balance: BigInt
-  conviction: String!
+  lockPeriod: Int!
   timestamp: DateTime!
 }

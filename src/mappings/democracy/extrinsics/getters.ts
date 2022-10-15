@@ -3,6 +3,7 @@ import { Store } from '@subsquid/typeorm-store'
 import { UnknownVersionError } from '../../../common/errors'
 import { DemocracyDelegateCall, DemocracyRemoveOtherVoteCall, DemocracyRemoveVoteCall } from '../../../types/calls'
 import { DemocracyVoteCall } from '../../../types/calls'
+import { convictionToLockPeriod } from './helpers'
 
 type DemocracyVote =
     | {
@@ -81,7 +82,7 @@ export function getVoteData(ctx: BatchContext<Store, unknown>, itemCall: any): D
 
 export interface DemocracyDelegateCallData {
     to: any
-    conviction: string,
+    lockPeriod: number,
     balance?: bigint
 }
 
@@ -91,20 +92,20 @@ export function getDelegateData(ctx: BatchContext<Store, unknown>, itemCall: any
         const { to, conviction } = event.asV1020
         return {
             to,
-            conviction: conviction.__kind
+            lockPeriod: convictionToLockPeriod(conviction.__kind)
         }
     } else if (event.isV1055) {
         const { to, conviction, balance } = event.asV1055
         return {
             to: to,
-            conviction: conviction.__kind,
+            lockPeriod: convictionToLockPeriod(conviction.__kind),
             balance
         }
     } else if (event.isV9291) {
         const { to, conviction, balance } = event.asV9291
         return {
             to: to.value,
-            conviction: conviction.__kind,
+            lockPeriod: convictionToLockPeriod(conviction.__kind),
             balance
         }
     } else {

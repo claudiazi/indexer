@@ -3,6 +3,7 @@ import * as marshal from "./marshal"
 import {Referendum} from "./referendum.model"
 import {VoteDecision} from "./_voteDecision"
 import {VoteBalance, fromJsonVoteBalance} from "./_voteBalance"
+import {VoteType} from "./_voteType"
 
 @Entity_()
 export class Vote {
@@ -46,4 +47,10 @@ export class Vote {
 
   @Column_("int4", {nullable: true})
   lockPeriod!: number | undefined | null
+
+  @Column_("text", {nullable: true})
+  delegatedTo!: string | undefined | null
+
+  @Column_("varchar", {length: 9, nullable: false})
+  type!: VoteType
 }
