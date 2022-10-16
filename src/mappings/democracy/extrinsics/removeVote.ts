@@ -24,6 +24,6 @@ export async function handleRemoveVote(ctx: BatchContext<Store, unknown>,
         return
     }
     const wallet = getOriginAccountId(item.call.origin)
-    await removeVote(ctx, wallet, index, header.height)
+    await removeVote(ctx, wallet, index, header.height, true)
     await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height)
 }

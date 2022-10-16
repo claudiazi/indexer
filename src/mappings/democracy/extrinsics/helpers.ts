@@ -24,7 +24,7 @@ export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, un
     for (let i = 0; i < nestedDelegations.length; i++) {
         //remove active votes
         const delegation = nestedDelegations[i]
-        const votes = await ctx.store.find(Vote, { where: { voter: delegation.wallet, referendumIndex: index, blockNumberRemoved: IsNull(), type: VoteType.Delegated } })
+        const votes = await ctx.store.find(Vote, { where: { voter: delegation.wallet, delegatedTo: delegation.to, referendumIndex: index, blockNumberRemoved: IsNull(), type: VoteType.Delegated } })
         if (votes.length > 1) {
             //should never happen
             ctx.log.warn(TooManyOpenVotes(block, index, delegation.wallet))
@@ -41,14 +41,17 @@ export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, un
     }
 }
 
-export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: string | undefined, referendumIndex: number, block: number): Promise<void> {
-    const votes = await ctx.store.find(Vote, { where: { voter: wallet, referendumIndex, blockNumberRemoved: IsNull() } })
+export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: string | undefined, referendumIndex: number, block: number, shouldHaveVote: boolean, type?: VoteType, delegatedTo?: string): Promise<void> {
+    const votes = await ctx.store.find(Vote, { where: { voter: wallet, referendumIndex, blockNumberRemoved: IsNull(), type, delegatedTo } })
     if (votes.length > 1) {
         ctx.log.warn(TooManyOpenVotes(block, referendumIndex, wallet))
         return
     }
-    else if (votes.length === 0) {
+    else if (votes.length === 0 && shouldHaveVote) {
         ctx.log.warn(NoOpenVoteFound(block, referendumIndex, wallet))
+        return
+    }
+    else if (votes.length === 0 && !shouldHaveVote){
         return
     }
     const vote = votes[0]
@@ -109,12 +112,7 @@ export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>,
     if (delegations && delegations.length > 0) {
         for (let i = 0; i < delegations.length; i++) {
             const delegation = delegations[i]
-            if (delegation.to){
-                return [...delegations, ...await getAllNestedDelegations(ctx, delegation.wallet)]
-            }
-            else {
-                return []
-            }
+            return [...delegations, ...await getAllNestedDelegations(ctx, delegation.wallet)]
         }
     }
     else {

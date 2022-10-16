@@ -32,7 +32,7 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         //remove votes for ongoing referenda
         for (let i = 0; i < ongoingReferenda.length; i++) {
             const referendum = ongoingReferenda[i]
-            await removeVote(ctx, wallet, referendum.index, header.height)
+            await removeVote(ctx, wallet, referendum.index, header.height, false, VoteType.Delegated, delegation.to)
         }
     }
 
@@ -78,6 +78,7 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
                 referendum,
                 balance: voteBalance,
                 timestamp: new Date(header.timestamp),
+                delegatedTo: toWallet,
                 type: VoteType.Delegated
             })
         )
