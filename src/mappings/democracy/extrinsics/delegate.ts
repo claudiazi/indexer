@@ -18,6 +18,10 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     const toWallet = ss58codec.encode(to)
     if (toWallet === "Eyd3x5a8KearHpJLw9PFgYVNDCQiTMBHSLr9yCtox2bqMFL" && (header.height === 9044201 || header.height === 9044248)) return
     const wallet = getOriginAccountId(item.call.origin)
+    if (header.height == 11152788){
+        ctx.log.warn(`toWallet ${toWallet}`)
+        ctx.log.warn(`wallet ${wallet}`)
+    }
     const delegations = await ctx.store.find(Delegation, { where: { wallet, blockNumberEnd: IsNull() } })
 
     if (delegations.length > 1) {
@@ -25,7 +29,7 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         ctx.log.warn(TooManyOpenDelegations(header.height, wallet))
     }
     const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
-    if (header.height === 11152788){
+    if (header.height == 11152788){
         ctx.log.warn(`ongoingReferenda ${ongoingReferenda}`)
         ctx.log.warn(`delegations ${delegations}`)
     }
