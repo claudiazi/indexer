@@ -126,6 +126,7 @@ export const referendaStats = `
               , DATE_PART('day', v.timestamp - r.created_at) + 
                 DATE_PART('hour', v.timestamp - r.created_at) / 24 As voting_time
               , v.timestamp
+              , v.type
               FROM vote_sequence AS v
               LEFT JOIN refined_referendum AS r
                 USING(referendum_index)
@@ -175,6 +176,7 @@ export const referendaStats = `
                      WHEN voting_time >= vote_duration_3_4
                           THEN '3/4 - 4/4 vote duration'    
                 END AS voting_time_group
+              , type
               FROM valid_vote AS v     
               LEFT JOIN new_ref AS n
                 USING (voter)
@@ -224,6 +226,19 @@ export const referendaStats = `
               FROM pre_calculation
               WHERE decision in ('no', 'abstain')
               GROUP BY 1
+
+            ),
+
+            delegation AS (
+
+              SELECT 
+                referendum_index
+              , SUM(CASE WHEN type = 'Direct' THEN 1 else 0 END) AS count_direct
+              , SUM(CASE WHEN type = 'Delegated' THEN 1 else 0 END) AS count_delegated
+              , SUM(CASE WHEN type = 'Direct' THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_direct
+              , SUM(CASE WHEN type = 'Delegated' THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_delegated
+              FROM refined_votes
+              group by 1
 
             ),
 
@@ -453,10 +468,14 @@ export const referendaStats = `
               , threshold_type
               , count_quiz_attended_wallets
               , count_fully_correct
-              , count_fully_correct / count_quiz_attended_wallets * 100 AS quiz_fully_correct_perc
-              , count_1_question_correct / count_quiz_attended_wallets * 100 AS count_1_question_correct_perc
-              , count_2_question_correct / count_quiz_attended_wallets * 100 AS count_2_question_correct_perc
-              , count_3_question_correct / count_quiz_attended_wallets * 100 AS count_3_question_correct_perc
+              , count_fully_correct AS quiz_fully_correct_perc
+              , count_1_question_correct AS count_1_question_correct_perc
+              , count_2_question_correct AS count_2_question_correct_perc
+              , count_3_question_correct AS count_3_question_correct_perc
+              , count_direct
+              , count_delegated
+              , voted_amount_direct
+              , voted_amount_delegated
               FROM calculation AS c
               INNER JOIN refined_referendum AS r
                 ON c.referendum_index = r.referendum_index
@@ -466,6 +485,9 @@ export const referendaStats = `
                 ON p.preimage_id = r.preimage_id
               LEFT JOIN referenda_correct_answers AS ca
                 ON ca.referendum_index = c.referendum_index
+              LEFT JOIN delegation AS d
+                ON r.referendum_index = d.referendum_index
+
               )
 
               select * from final
