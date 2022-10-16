@@ -304,6 +304,107 @@ export const referendaStats = `
               FROM preimage
             ),
 
+            latest_quiz_version AS (
+            
+              SELECT 
+                 id
+               , min(timestamp)  as quizze_created_at
+               , max(version) AS version
+              FROM quiz
+              GROUP BY 1
+
+            ),
+
+            latest_quiz_data AS (
+
+              SELECT 
+                 id as quiz_id
+               , creator as quiz_creator
+               , referendum_index
+               , quizze_created_at
+               , version AS latest_version
+              FROM quiz
+              INNER JOIN latest_quiz_version
+                USING(id, version)
+
+            ),
+
+            quiz_questions AS (
+              
+              SELECT 
+                 quiz_id
+               , q.id as question_id
+               , c.correct_index AS correct_answer_index
+               , COUNT(q.id) OVER (PARTITION BY quiz_id) AS questions_count
+              FROM question AS q
+              INNER JOIN latest_quiz_data AS l
+                USING (quiz_id)
+              INNER JOIN correct_answer AS c
+                ON c.question_id = q.id
+
+            ),
+
+            latest_answers AS (
+
+              SELECT
+                  wallet
+                , quiz_id
+                , max(version) AS version
+              FROM quiz_submission
+              GROUP BY 1,2
+
+            ),
+
+            account_answers AS (
+
+              SELECT 
+                 wallet
+               , referendum_index
+               , timestamp AS answer_submitted_at
+               , s.quiz_id
+               , q.question_id AS question_id
+               , CASE WHEN answer_index = correct_answer_index then 1
+                      ELSE 0 
+                 END AS has_answered_correct
+               , questions_count
+              FROM quiz_submission AS s
+              INNER JOIN latest_answers
+                USING (wallet, quiz_id, version)
+              INNER JOIN quiz_questions AS q
+                ON s.quiz_id = q.quiz_id
+              INNER JOIN answer AS a
+                ON a.quiz_submission_id = s.id
+                AND a.question_id = q.question_id
+                 
+            ),
+
+            account_correct_answers AS (
+
+              SELECT 
+                 wallet
+               , quiz_id
+               , referendum_index
+               , questions_count
+               , SUM(has_answered_correct) AS correct_answers_count
+              FROM account_answers
+              GROUP BY 1,2,3,4
+
+            ),
+
+            referenda_correct_answers AS (
+
+              SELECT 
+                referendum_index
+                , SUM(CASE WHEN correct_answers_count = questions_count THEN 1 ELSE 0 END) AS count_fully_correct
+                , SUM(CASE WHEN correct_answers_count = 1 THEN 1 ELSE 0 END) AS count_1_question_correct
+                , SUM(CASE WHEN correct_answers_count = 2 THEN 1 ELSE 0 END) AS count_2_question_correct
+                , SUM(CASE WHEN correct_answers_count = 3 THEN 1 ELSE 0 END) AS count_3_question_correct
+                , COUNT(distinct wallet) AS count_quiz_attended_wallets
+              FROM account_correct_answers
+              GROUP BY 1
+
+            ), 
+
             final AS (
 
               SELECT 
@@ -325,7 +426,6 @@ export const referendaStats = `
               , voted_amount_nay
               , voted_amount_aye + voted_amount_nay AS voted_amount_total
               , total_issuance::decimal(38,0) AS total_issuance
-              , total_issuance
               , COALESCE(voted_amount_aye / total_issuance * 100, 0) AS turnout_aye_perc
               , COALESCE(voted_amount_nay / total_issuance * 100, 0) AS turnout_nay_perc
               , COALESCE((voted_amount_aye + voted_amount_nay) / total_issuance * 100, 0) AS turnout_total_perc
@@ -351,6 +451,12 @@ export const referendaStats = `
               , not_passed_at
               , cancelled_at
               , threshold_type
+              , count_quiz_attended_wallets
+              , count_fully_correct
+              , count_fully_correct / count_quiz_attended_wallets * 100 AS quiz_fully_correct_perc
+              , count_1_question_correct / count_quiz_attended_wallets * 100 AS count_1_question_correct_perc
+              , count_2_question_correct / count_quiz_attended_wallets * 100 AS count_2_question_correct_perc
+              , count_3_question_correct / count_quiz_attended_wallets * 100 AS count_3_question_correct_perc
               FROM calculation AS c
               INNER JOIN refined_referendum AS r
                 ON c.referendum_index = r.referendum_index
@@ -358,7 +464,8 @@ export const referendaStats = `
                 ON t.referendum_index = c.referendum_index
               LEFT JOIN refined_preimage AS p
                 ON p.preimage_id = r.preimage_id
-              
+              LEFT JOIN referenda_correct_answers AS ca
+                ON ca.referendum_index = c.referendum_index
               )
 
               select * from final
