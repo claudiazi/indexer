@@ -107,29 +107,134 @@ export const accountStats = `
                 LEFT JOIN new_ref as n
                     ON v.voter = n.voter
 
-            ) 
+            ),
 
-            SELECT 
-              referendum_index
-            , voter
-            , first_referendum_index
-            , first_voting_timestamp
-            , conviction
-            , decision
-            , balance_value
-            , conviction * balance_value AS voted_amount_with_conviction
-            , CASE WHEN voting_time < vote_duration_1_4 
-                        THEN '0/4 - 1/4 vote duration'
-                   WHEN voting_time >= vote_duration_1_4 AND voting_time < vote_duration_1_2 
-                        THEN '1/4 - 1/2 vote duration'
-                   WHEN voting_time >= vote_duration_1_2 AND voting_time < vote_duration_3_4 
-                        THEN '1/2 - 3/4 vote duration'       
-                   WHEN voting_time >= vote_duration_3_4
-                        THEN '3/4 - 4/4 vote duration'    
-              END AS voting_time_group
-            , CASE WHEN  decision =  referendum_result THEN 'aligned'
-                   ELSE 'not aligned'
-              END AS voting_result_group
-            FROM refined_votes
+            latest_quiz_version AS (
+                        
+              SELECT 
+                id
+              , min(timestamp)  as quizze_created_at
+              , max(version) AS version
+              FROM quiz
+              GROUP BY 1
+
+            ),
+
+            latest_quiz_data AS (
+
+              SELECT 
+                id as quiz_id
+              , creator as quiz_creator
+              , referendum_index
+              , quizze_created_at
+              , version AS latest_version
+              FROM quiz
+              INNER JOIN latest_quiz_version
+                USING(id, version)
+
+            ),
+
+            quiz_questions AS (
+              
+              SELECT 
+                quiz_id
+              , q.id as question_id
+              , c.correct_index AS correct_answer_index
+              , COUNT(q.id) OVER (PARTITION BY quiz_id) AS questions_count
+              FROM question AS q
+              INNER JOIN latest_quiz_data AS l
+                USING (quiz_id)
+              INNER JOIN correct_answer AS c
+                ON c.question_id = q.id
+
+            ),
+
+            latest_answers AS (
+
+              SELECT
+                  wallet
+                , quiz_id
+                , max(version) AS version
+              FROM quiz_submission
+              GROUP BY 1,2
+
+            ),
+
+            account_answers AS (
+
+              SELECT 
+                wallet
+              , referendum_index
+              , timestamp AS answer_submitted_at
+              , s.quiz_id
+              , q.question_id AS question_id
+              , CASE WHEN answer_index = correct_answer_index then 1
+                      ELSE 0 
+                END AS has_answered_correct
+              , questions_count
+              FROM quiz_submission AS s
+              INNER JOIN latest_answers
+                USING (wallet, quiz_id, version)
+              INNER JOIN quiz_questions AS q
+                ON s.quiz_id = q.quiz_id
+              INNER JOIN answer AS a
+                ON a.quiz_submission_id = s.id
+                AND a.question_id = q.question_id
+                
+            ),
+
+            account_correct_answers AS (
+
+              SELECT 
+                wallet
+              , quiz_id
+              , referendum_index
+              , questions_count
+              , SUM(has_answered_correct) AS correct_answers_count
+              FROM account_answers
+              GROUP BY 1,2,3,4
+
+            ),
+
+            final AS (
+
+              SELECT 
+                v.referendum_index
+              , voter
+              , first_referendum_index
+              , first_voting_timestamp
+              , conviction
+              , decision
+              , balance_value
+              , conviction * balance_value AS voted_amount_with_conviction
+              , CASE WHEN voting_time < vote_duration_1_4 
+                          THEN '0/4 - 1/4 vote duration'
+                    WHEN voting_time >= vote_duration_1_4 AND voting_time < vote_duration_1_2 
+                          THEN '1/4 - 1/2 vote duration'
+                    WHEN voting_time >= vote_duration_1_2 AND voting_time < vote_duration_3_4 
+                          THEN '1/2 - 3/4 vote duration'       
+                    WHEN voting_time >= vote_duration_3_4
+                          THEN '3/4 - 4/4 vote duration'    
+                END AS voting_time_group
+              , CASE WHEN  decision =  referendum_result THEN 'aligned'
+                    ELSE 'not aligned'
+                END AS voting_result_group
+              , questions_count
+              , correct_answers_count
+              , CASE WHEN questions_count is not null THEN
+                     CASE WHEN correct_answers_count = questions_count THEN 1
+                          ELSE 0
+                     END
+                END AS quiz_fully_correct                    
+              FROM refined_votes AS v
+              LEFT JOIN account_correct_answers AS ca
+                ON voter = wallet 
+                AND ca.referendum_index = v.referendum_index
+
+            )
+
+            SELECT * FROM final
 
 `
+
+
