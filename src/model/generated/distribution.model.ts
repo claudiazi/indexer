@@ -37,6 +37,6 @@ export class Distribution {
   @Column_("numeric", {array: true, nullable: true})
   chancesAtItems!: (number | undefined | null)[] | undefined | null
 
-  @Column_("timestamp with time zone", {nullable: true})
-  timestamp!: Date | undefined | null
+  @Column_("timestamp with time zone", {nullable: false})
+  timestamp!: Date
 }

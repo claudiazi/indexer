@@ -85,6 +85,6 @@ export class Config {
   @OneToMany_(() => Option, e => e.config)
   options!: Option[]
 
-  @Column_("timestamp with time zone", {nullable: true})
-  timestamp!: Date | undefined | null
+  @Column_("timestamp with time zone", {nullable: false})
+  timestamp!: Date
 }

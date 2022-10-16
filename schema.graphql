@@ -162,7 +162,7 @@ type Vote @entity {
   blockNumberVoted: Int! @index
   blockNumberRemoved: Int @index
   timestamp: DateTime! @index
-  timestampRemoved: DateTime! @index
+  timestampRemoved: DateTime @index
   decision: VoteDecision!
   balance: VoteBalance!
   lockPeriod: Int
@@ -196,7 +196,7 @@ type Config @entity {
   seed: String
   defaultRoyalty: Int
   options: [Option!] @derivedFrom(field: "config")
-  timestamp: DateTime
+  timestamp: DateTime!
 }
         
 type Option @entity {
@@ -247,7 +247,7 @@ type Distribution @entity {
   indexItemReceived: Int
   dragonEquipped: String
   chancesAtItems: [Float]
-  timestamp: DateTime
+  timestamp: DateTime!
 }
 
 type AnswerOption @entity {
@@ -286,7 +286,7 @@ type Quiz @entity {
   questions: [Question!] @derivedFrom(field: "quiz")
   submissions: [QuizSubmission!] @derivedFrom(field: "quiz")
   version: Int
-  timestamp: DateTime
+  timestamp: DateTime!
 }
 
 type Answer @entity {
@@ -319,5 +319,5 @@ type Delegation @entity {
   balance: BigInt
   lockPeriod: Int!
   timestamp: DateTime!
-  timestampEnd: DateTime!
+  timestampEnd: DateTime
 }

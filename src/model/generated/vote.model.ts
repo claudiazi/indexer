@@ -40,8 +40,8 @@ export class Vote {
   timestamp!: Date
 
   @Index_()
-  @Column_("timestamp with time zone", {nullable: false})
-  timestampRemoved!: Date
+  @Column_("timestamp with time zone", {nullable: true})
+  timestampRemoved!: Date | undefined | null
 
   @Column_("varchar", {length: 7, nullable: false})
   decision!: VoteDecision

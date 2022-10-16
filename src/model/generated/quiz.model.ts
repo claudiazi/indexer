@@ -31,6 +31,6 @@ export class Quiz {
   @Column_("int4", {nullable: true})
   version!: number | undefined | null
 
-  @Column_("timestamp with time zone", {nullable: true})
-  timestamp!: Date | undefined | null
+  @Column_("timestamp with time zone", {nullable: false})
+  timestamp!: Date
 }
