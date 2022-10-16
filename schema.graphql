@@ -162,6 +162,7 @@ type Vote @entity {
   blockNumberVoted: Int! @index
   blockNumberRemoved: Int @index
   timestamp: DateTime! @index
+  timestampRemoved: DateTime! @index
   decision: VoteDecision!
   balance: VoteBalance!
   lockPeriod: Int
@@ -318,4 +319,5 @@ type Delegation @entity {
   balance: BigInt
   lockPeriod: Int!
   timestamp: DateTime!
+  timestampEnd: DateTime!
 }

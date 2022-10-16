@@ -4,8 +4,6 @@ import { getRemoveVoteData } from './getters'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
-import { IsNull } from 'typeorm'
-import { NoOpenVoteFound, TooManyOpenVotes } from './errors'
 import { MissingReferendumWarn } from '../../utils/errors'
 import { removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
 
@@ -24,6 +22,6 @@ export async function handleRemoveVote(ctx: BatchContext<Store, unknown>,
         return
     }
     const wallet = getOriginAccountId(item.call.origin)
-    await removeVote(ctx, wallet, index, header.height, true)
-    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height)
+    await removeVote(ctx, wallet, index, header.height, header.timestamp, true)
+    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height, header.timestamp)
 }

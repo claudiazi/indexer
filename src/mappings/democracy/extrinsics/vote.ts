@@ -33,10 +33,11 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     if (votes.length > 0) {
         const vote = votes[0]
         vote.blockNumberRemoved = header.height
+        vote.timestampRemoved = new Date(header.timestamp)
         await ctx.store.save(vote)
     }
     const nestedDelegations = await getAllNestedDelegations(ctx, wallet)
-    await removeDelegatedVotesReferendum(ctx, header.height, index, nestedDelegations)
+    await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, index, nestedDelegations)
 
     const referendum = await ctx.store.get(Referendum, { where: { index } })
     if (!referendum) {

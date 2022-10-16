@@ -1,5 +1,5 @@
-module.exports = class Data1665821428844 {
-  name = 'Data1665821428844'
+module.exports = class Data1665932210299 {
+  name = 'Data1665932210299'
 
   async up(db) {
     await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -14,11 +14,12 @@ module.exports = class Data1665821428844 {
     await db.query(`CREATE INDEX "IDX_c6e9bc6f69c924e85a44174d35" ON "preimage" ("hash") `)
     await db.query(`CREATE INDEX "IDX_8961b767f111466724025930b0" ON "preimage" ("created_at_block") `)
     await db.query(`CREATE INDEX "IDX_146c48e4f4bf54acb708686897" ON "preimage" ("created_at") `)
-    await db.query(`CREATE TABLE "vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "decision" character varying(7) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, CONSTRAINT "PK_2d5932d46afe39c8176f9d4be72" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_removed" TIMESTAMP WITH TIME ZONE NOT NULL, "decision" character varying(7) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, CONSTRAINT "PK_2d5932d46afe39c8176f9d4be72" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_6c157f7819d8bf5869a9e2ab86" ON "vote" ("referendum_id") `)
     await db.query(`CREATE INDEX "IDX_1fcfd7d5cdea48d39774cd104c" ON "vote" ("block_number_voted") `)
     await db.query(`CREATE INDEX "IDX_e33e238c4a9e89655760c95757" ON "vote" ("block_number_removed") `)
     await db.query(`CREATE INDEX "IDX_8d701dbd422ac5e3e1d7a9a0d1" ON "vote" ("timestamp") `)
+    await db.query(`CREATE INDEX "IDX_956a963a0ebc463e7d57196bd2" ON "vote" ("timestamp_removed") `)
     await db.query(`CREATE TABLE "referendum" ("id" character varying NOT NULL, "hash" text NOT NULL, "index" integer NOT NULL, "threshold" jsonb NOT NULL, "status" character varying(9) NOT NULL, "status_history" jsonb NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "ended_at_block" integer, "ended_at" TIMESTAMP WITH TIME ZONE, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, "proposer" text, "total_issuance" numeric NOT NULL, "ends_at" integer NOT NULL, "delay" integer NOT NULL, "origin" character varying(19), "preimage_id" character varying, CONSTRAINT "PK_772fc260f18c235a6327252ce00" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_d8d1763676047e95e67925b942" ON "referendum" ("hash") `)
     await db.query(`CREATE INDEX "IDX_33436e93497e1ac9ea28eb288e" ON "referendum" ("index") `)
@@ -54,7 +55,7 @@ module.exports = class Data1665821428844 {
     await db.query(`CREATE INDEX "IDX_aecfc55f7d8e7bb703193e0311" ON "question" ("quiz_id") `)
     await db.query(`CREATE TABLE "answer_option" ("id" character varying NOT NULL, "question_id" character varying NOT NULL, "text" text, CONSTRAINT "PK_69dad60c2f58e523232f06f5d8d" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_c8ff81963b1cf29c3e4188e5ba" ON "answer_option" ("question_id") `)
-    await db.query(`CREATE TABLE "delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text NOT NULL, "to" text NOT NULL, "balance" numeric, "lock_period" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_a2cb6c9b942d68b109131beab44" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text NOT NULL, "to" text NOT NULL, "balance" numeric, "lock_period" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_end" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_a2cb6c9b942d68b109131beab44" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_9424bd1981faae099575c84ebc" ON "delegation" ("block_number_start") `)
     await db.query(`CREATE INDEX "IDX_847a3bbf681c929004c84e3eba" ON "delegation" ("wallet") `)
     await db.query(`CREATE INDEX "IDX_0e0774ed46340a85f1d43ca808" ON "delegation" ("to") `)
@@ -88,6 +89,7 @@ module.exports = class Data1665821428844 {
     await db.query(`DROP INDEX "public"."IDX_1fcfd7d5cdea48d39774cd104c"`)
     await db.query(`DROP INDEX "public"."IDX_e33e238c4a9e89655760c95757"`)
     await db.query(`DROP INDEX "public"."IDX_8d701dbd422ac5e3e1d7a9a0d1"`)
+    await db.query(`DROP INDEX "public"."IDX_956a963a0ebc463e7d57196bd2"`)
     await db.query(`DROP TABLE "referendum"`)
     await db.query(`DROP INDEX "public"."IDX_d8d1763676047e95e67925b942"`)
     await db.query(`DROP INDEX "public"."IDX_33436e93497e1ac9ea28eb288e"`)

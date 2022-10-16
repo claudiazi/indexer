@@ -28,15 +28,16 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     if (delegations.length > 0) {
         const delegation = delegations[0]
         delegation.blockNumberEnd = header.height
+        delegation.timestampEnd = new Date(header.timestamp)
         await ctx.store.save(delegation)
         //remove votes for ongoing referenda
         for (let i = 0; i < ongoingReferenda.length; i++) {
             const referendum = ongoingReferenda[i]
-            await removeVote(ctx, wallet, referendum.index, header.height, false, VoteType.Delegated, delegation.to)
+            await removeVote(ctx, wallet, referendum.index, header.height, header.timestamp, false, VoteType.Delegated, delegation.to)
         }
     }
 
-    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height)
+    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height, header.timestamp)
 
     await ctx.store.insert(
         new Delegation({

@@ -34,6 +34,7 @@ export async function handleRemoveOtherVote(ctx: BatchContext<Store, unknown>,
     }
     const vote = votes[0]
     vote.blockNumberRemoved = header.height
+    vote.timestampRemoved = new Date(header.timestamp)
     await ctx.store.save(vote)
-    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height)
+    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height, header.timestamp)
 }

@@ -9,18 +9,18 @@ export function convictionToLockPeriod(convictionKind: string): number {
     return convictionKind === 'None' ? 0 : Number(convictionKind[convictionKind.search(/\d/)])
 }
 
-export async function removeDelegatedVotesOngoingReferenda(ctx: BatchContext<Store, unknown>, wallet: string | undefined, block: number): Promise<void> {
+export async function removeDelegatedVotesOngoingReferenda(ctx: BatchContext<Store, unknown>, wallet: string | undefined, block: number, blockTime: number): Promise<void> {
     //get any ongoing referenda
     const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
     let nestedDelegations = await getAllNestedDelegations(ctx, wallet)
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const ongoingReferendum = ongoingReferenda[i]
-        await removeDelegatedVotesReferendum(ctx, block, ongoingReferendum.index, nestedDelegations)
+        await removeDelegatedVotesReferendum(ctx, block, blockTime, ongoingReferendum.index, nestedDelegations)
     }
 
 }
 
-export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, block: number, index: number, nestedDelegations: Delegation[]): Promise<void> {
+export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, block: number, blockTime: number, index: number, nestedDelegations: Delegation[]): Promise<void> {
     for (let i = 0; i < nestedDelegations.length; i++) {
         //remove active votes
         const delegation = nestedDelegations[i]
@@ -37,11 +37,12 @@ export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, un
         }
         const vote = votes[0]
         vote.blockNumberRemoved = block
+        vote.timestampRemoved = new Date(blockTime)
         await ctx.store.save(vote)
     }
 }
 
-export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: string | undefined, referendumIndex: number, block: number, shouldHaveVote: boolean, type?: VoteType, delegatedTo?: string): Promise<void> {
+export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: string | undefined, referendumIndex: number, block: number, blockTime: number, shouldHaveVote: boolean, type?: VoteType, delegatedTo?: string): Promise<void> {
     const votes = await ctx.store.find(Vote, { where: { voter: wallet, referendumIndex, blockNumberRemoved: IsNull(), type, delegatedTo } })
     if (votes.length > 1) {
         ctx.log.warn(TooManyOpenVotes(block, referendumIndex, wallet))
@@ -56,6 +57,7 @@ export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: stri
     }
     const vote = votes[0]
     vote.blockNumberRemoved = block
+    vote.timestampRemoved = new Date(blockTime)
     await ctx.store.save(vote)
 }
 
