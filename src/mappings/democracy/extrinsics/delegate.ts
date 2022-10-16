@@ -25,6 +25,10 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         ctx.log.warn(TooManyOpenDelegations(header.height, wallet))
     }
     const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
+    if (header.height === 11152788){
+        ctx.log.warn(`ongoingReferenda ${ongoingReferenda}`)
+        ctx.log.warn(`delegations ${delegations}`)
+    }
     if (delegations.length > 0) {
         const delegation = delegations[0]
         delegation.blockNumberEnd = header.height
