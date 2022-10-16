@@ -22,6 +22,9 @@ export class ReferendumStats {
     @Field(() => Number, { nullable: false })
     is_new_account!: number
 
+    @Field(() => String, { nullable: true })
+    delegated_to!: string
+
     @Field(() => Number, { nullable: false })
     voted_amount_with_conviction!: number
 
