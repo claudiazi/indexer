@@ -135,6 +135,24 @@ export class ReferendaStats {
     @Field(() => String, { nullable: false })
     threshold_type!: string
 
+    @Field(() => Number, { nullable: true })
+    count_quiz_attended_wallets!: number
+
+    @Field(() => Number, { nullable: true })
+    count_fully_correct!: number
+
+    @Field(() => Number, { nullable: true })
+    quiz_fully_correct_perc!: number
+
+    @Field(() => Number, { nullable: true })
+    count_1_question_correct_perc!: number
+
+    @Field(() => Number, { nullable: true })
+    count_2_question_correct_perc!: number
+
+    @Field(() => Number, { nullable: true })
+    count_3_question_correct_perc!: number
+
     constructor(props: Partial<ReferendaStats>) {
         Object.assign(this, props);
     }
