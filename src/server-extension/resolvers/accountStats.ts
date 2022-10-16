@@ -37,6 +37,15 @@ export class AccountStats {
     @Field(() => String, { nullable: true })
     voting_result_group!: string
 
+    @Field(() => Number, { nullable: true })
+    questions_count!: Number
+
+    @Field(() => Number, { nullable: true })
+    correct_answers_count!: Number
+
+    @Field(() => Number, { nullable: true })
+    quiz_fully_correct!: Number
+
     constructor(props: Partial<AccountStats>) {
         Object.assign(this, props);
     }
