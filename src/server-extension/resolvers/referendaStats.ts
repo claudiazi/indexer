@@ -153,6 +153,18 @@ export class ReferendaStats {
     @Field(() => Number, { nullable: true })
     count_3_question_correct_perc!: number
 
+    @Field(() => Number, { nullable: false })
+    count_direct!: number
+
+    @Field(() => Number, { nullable: false })
+    count_delegated!: number
+
+    @Field(() => Number, { nullable: true })
+    voted_amount_direct!: number
+
+    @Field(() => Number, { nullable: true })
+    voted_amount_delegated!: number
+
     constructor(props: Partial<ReferendaStats>) {
         Object.assign(this, props);
     }
