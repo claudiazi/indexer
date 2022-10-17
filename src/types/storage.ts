@@ -85,6 +85,41 @@ export class BalancesTotalIssuanceStorage {
   }
 }
 
+export class CouncilMembersStorage {
+  private readonly _chain: Chain
+  private readonly blockHash: string
+
+  constructor(ctx: BlockContext)
+  constructor(ctx: ChainContext, block: Block)
+  constructor(ctx: BlockContext, block?: Block) {
+    block = block || ctx.block
+    this.blockHash = block.hash
+    this._chain = ctx._chain
+  }
+
+  /**
+   *  The current members of the collective. This is stored sorted (just by value).
+   */
+  get isV9111() {
+    return this._chain.getStorageItemTypeHash('Council', 'Members') === 'f5df25eadcdffaa0d2a68b199d671d3921ca36a7b70d22d57506dca52b4b5895'
+  }
+
+  /**
+   *  The current members of the collective. This is stored sorted (just by value).
+   */
+  async getAsV9111(): Promise<Uint8Array[]> {
+    assert(this.isV9111)
+    return this._chain.getStorage(this.blockHash, 'Council', 'Members')
+  }
+
+  /**
+   * Checks whether the storage item is defined for the current chain version.
+   */
+  get isExists(): boolean {
+    return this._chain.getStorageItemTypeHash('Council', 'Members') != null
+  }
+}
+
 export class CouncilProposalOfStorage {
   private readonly _chain: Chain
   private readonly blockHash: string
@@ -2577,6 +2612,41 @@ export class Instance2CollectiveProposalOfStorage {
    */
   get isExists(): boolean {
     return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') != null
+  }
+}
+
+export class SessionValidatorsStorage {
+  private readonly _chain: Chain
+  private readonly blockHash: string
+
+  constructor(ctx: BlockContext)
+  constructor(ctx: ChainContext, block: Block)
+  constructor(ctx: BlockContext, block?: Block) {
+    block = block || ctx.block
+    this.blockHash = block.hash
+    this._chain = ctx._chain
+  }
+
+  /**
+   *  The current set of validators.
+   */
+  get isV1020() {
+    return this._chain.getStorageItemTypeHash('Session', 'Validators') === 'f5df25eadcdffaa0d2a68b199d671d3921ca36a7b70d22d57506dca52b4b5895'
+  }
+
+  /**
+   *  The current set of validators.
+   */
+  async getAsV1020(): Promise<Uint8Array[]> {
+    assert(this.isV1020)
+    return this._chain.getStorage(this.blockHash, 'Session', 'Validators')
+  }
+
+  /**
+   * Checks whether the storage item is defined for the current chain version.
+   */
+  get isExists(): boolean {
+    return this._chain.getStorageItemTypeHash('Session', 'Validators') != null
   }
 }
 

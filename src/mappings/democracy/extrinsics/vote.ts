@@ -7,7 +7,7 @@ import {
     VoteDecision,
     VoteType,
 } from '../../../model'
-import { getOriginAccountId } from '../../../common/tools'
+import { decodeId, encodeId, getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
 import { MissingReferendumWarn } from '../../utils/errors'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
@@ -15,7 +15,8 @@ import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
-import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum,  } from './helpers'
+import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum, } from './helpers'
+import { CouncilMembersStorage, SessionValidatorsStorage } from '../../../types/storage'
 
 export async function handleVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.vote', { call: { args: true; origin: true; } }>,
@@ -70,22 +71,27 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     }
 
     const count = await getVotesCount(ctx, referendum.id)
+    const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
+    const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
+    const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
 
     await ctx.store.insert(
         new Vote({
             id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
             referendumIndex: index,
-            voter: item.call.origin ? getOriginAccountId(item.call.origin) : null,
+            voter,
             blockNumberVoted: header.height,
             decision,
             lockPeriod,
             referendum,
             balance,
             timestamp: new Date(header.timestamp),
-            type: VoteType.Direct
+            type: VoteType.Direct,
+            isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
+            isValidator: voter && validators ? validators.includes(voter) : null
         })
     )
-    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations)
+    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations, councilMembers, validators)
 }
 
 const proposalsVotes = new Map<string, number>()

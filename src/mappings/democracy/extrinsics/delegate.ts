@@ -1,4 +1,4 @@
-import { getOriginAccountId, ss58codec } from '../../../common/tools'
+import { decodeId, encodeId, getOriginAccountId, ss58codec } from '../../../common/tools'
 import { getDelegateData } from './getters'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
@@ -9,6 +9,7 @@ import { IsNull } from 'typeorm'
 import { addOngoingReferendaDelegatedVotes, removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
 import { Referendum, StandardVoteBalance, Vote, VoteType } from '../../../model'
 import { getVotesCount } from './vote'
+import { CouncilMembersStorage, SessionValidatorsStorage } from '../../../types/storage'
 
 export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.delegate', { call: { args: true; origin: true; } }>,
@@ -68,11 +69,14 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         const voteBalance = new StandardVoteBalance({
             value: balance,
         })
+        const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
+        const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
+        const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
         await ctx.store.insert(
             new Vote({
                 id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
                 referendumIndex: referendum.index,
-                voter: item.call.origin ? getOriginAccountId(item.call.origin) : null,
+                voter,
                 blockNumberVoted: header.height,
                 decision: vote.decision,
                 lockPeriod,
@@ -80,9 +84,11 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
                 balance: voteBalance,
                 timestamp: new Date(header.timestamp),
                 delegatedTo: toWallet,
-                type: VoteType.Delegated
+                type: VoteType.Delegated,
+                isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
+                isValidator: voter && validators ? validators.includes(voter) : null
             })
         )
     }
-    await addOngoingReferendaDelegatedVotes(ctx, wallet, header.height, header.timestamp)
+    await addOngoingReferendaDelegatedVotes(ctx, wallet, header)
 }

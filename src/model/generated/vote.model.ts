@@ -57,4 +57,10 @@ export class Vote {
 
   @Column_("varchar", {length: 9, nullable: false})
   type!: VoteType
+
+  @Column_("bool", {nullable: true})
+  isValidator!: boolean | undefined | null
+
+  @Column_("bool", {nullable: true})
+  isCouncillor!: boolean | undefined | null
 }

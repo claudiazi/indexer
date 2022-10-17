@@ -1,7 +1,9 @@
-import { BatchContext } from "@subsquid/substrate-processor"
+import { BatchContext, SubstrateBlock } from "@subsquid/substrate-processor"
 import { Store } from "@subsquid/typeorm-store"
 import { IsNull } from "typeorm"
+import { decodeId, encodeId, getOriginAccountId } from "../../../common/tools"
 import { Delegation, Referendum, StandardVoteBalance, Vote, VoteType } from "../../../model"
+import { CouncilMembersStorage, SessionValidatorsStorage } from "../../../types/storage"
 import { NoOpenVoteFound, TooManyOpenVotes } from "./errors"
 import { getVotesCount } from "./vote"
 
@@ -52,7 +54,7 @@ export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: stri
         ctx.log.warn(NoOpenVoteFound(block, referendumIndex, wallet))
         return
     }
-    else if (votes.length === 0 && !shouldHaveVote){
+    else if (votes.length === 0 && !shouldHaveVote) {
         return
     }
     const vote = votes[0]
@@ -61,16 +63,18 @@ export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: stri
     await ctx.store.save(vote)
 }
 
-export async function addOngoingReferendaDelegatedVotes(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, block: number, blockTime: number): Promise<void> {
+export async function addOngoingReferendaDelegatedVotes(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, header: SubstrateBlock): Promise<void> {
     const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
     const nestedDelegations = await getAllNestedDelegations(ctx, toWallet)
+    const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
+    const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const ongoingReferendum = ongoingReferenda[i]
-        await addDelegatedVotesReferendum(ctx, toWallet, block, blockTime, ongoingReferendum, nestedDelegations)
+        await addDelegatedVotesReferendum(ctx, toWallet, header.height, header.timestamp, ongoingReferendum, nestedDelegations, councilMembers, validators)
     }
 }
 
-export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, block: number, blockTime: number, referendum: Referendum, nestedDelegations: Delegation[]): Promise<void> {
+export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, block: number, blockTime: number, referendum: Referendum, nestedDelegations: Delegation[], councilMembers: string[] | null, validators: string[] | null): Promise<void> {
     //get top toWallet vote
     const votes = await ctx.store.find(Vote, { where: { voter: toWallet, referendumIndex: referendum.index, blockNumberRemoved: IsNull() } })
     if (votes.length > 1) {
@@ -102,7 +106,9 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
                 balance: voteBalance,
                 timestamp: new Date(blockTime),
                 delegatedTo: delegation.to,
-                type: VoteType.Delegated
+                type: VoteType.Delegated,
+                isCouncillor: councilMembers ? councilMembers.includes(delegation.wallet) : null,
+                isValidator: validators ? validators.includes(delegation.wallet) : null
             })
         )
     }

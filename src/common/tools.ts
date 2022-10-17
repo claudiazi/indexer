@@ -36,6 +36,10 @@ export function encodeId(id: string | Uint8Array) {
     return ss58codec.encode(typeof id === 'string' ? decodeHex(id) : id)
 }
 
+export function decodeId(id: string) {
+    return ss58codec.decode(id)
+}
+
 export function getOriginAccountId(origin: any): string | undefined {
     if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
         const id = origin.value.value

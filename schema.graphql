@@ -168,6 +168,8 @@ type Vote @entity {
   lockPeriod: Int
   delegatedTo: String
   type: VoteType!
+  isValidator: Boolean
+  isCouncillor: Boolean
 }
 
 type Config @entity {

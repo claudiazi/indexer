@@ -10,7 +10,9 @@
     "TechnicalCommittee.ProposalOf",
     "Council.ProposalOf",
     "Instance2Collective.ProposalOf",
-    "Instance1Collective.ProposalOf"
+    "Instance1Collective.ProposalOf",
+    "Session.Validators",
+    "Council.Members"
   ],
   "events": [
     "Democracy.Proposed",
