@@ -1,5 +1,5 @@
-module.exports = class Data1665934315303 {
-  name = 'Data1665934315303'
+module.exports = class Data1666029212654 {
+  name = 'Data1666029212654'
 
   async up(db) {
     await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -38,7 +38,7 @@ module.exports = class Data1665934315303 {
     await db.query(`CREATE INDEX "IDX_05b5bd1b3ccd5f04425bc675c2" ON "distribution" ("block_number") `)
     await db.query(`CREATE INDEX "IDX_ab637c52f3ddadde29b107808a" ON "distribution" ("wallet") `)
     await db.query(`CREATE INDEX "IDX_32755722a63564b39398df8afb" ON "distribution" ("amount_considered") `)
-    await db.query(`CREATE TABLE "answer" ("id" character varying NOT NULL, "answer_index" integer NOT NULL, "question_id" character varying NOT NULL, "quiz_submission_id" character varying NOT NULL, CONSTRAINT "PK_9232db17b63fb1e94f97e5c224f" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "answer" ("id" character varying NOT NULL, "answer_index" integer NOT NULL, "question_id" character varying NOT NULL, "quiz_submission_id" character varying NOT NULL, "is_correct" boolean, CONSTRAINT "PK_9232db17b63fb1e94f97e5c224f" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_c3d19a89541e4f0813f2fe0919" ON "answer" ("question_id") `)
     await db.query(`CREATE INDEX "IDX_dc8f8632638f0fe994a8776b2a" ON "answer" ("quiz_submission_id") `)
     await db.query(`CREATE TABLE "quiz_submission" ("id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number" integer NOT NULL, "wallet" text NOT NULL, "quiz_id" character varying NOT NULL, "version" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_af730e984e8f6f25b5667a5d7be" PRIMARY KEY ("id"))`)

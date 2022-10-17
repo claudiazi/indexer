@@ -27,4 +27,7 @@ export class Answer {
 
   @Column_("text", {nullable: false})
   quizSubmissionId!: string
+
+  @Column_("bool", {nullable: true})
+  isCorrect!: boolean | undefined | null
 }

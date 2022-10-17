@@ -358,6 +358,11 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         timestamp: new Date(header.timestamp)
                     })
                     await ctx.store.insert(correctAnswer)
+                    const answers = await ctx.store.find(Answer, { where: { questionId: quizDbQuestions[i].id } })
+                    for (let j = 0; j < answers.length; j++) {
+                        const answer = answers[j]
+                        answer.isCorrect = correctAnswerData.correctAnswerIndeces[i] === answer.answerIndex
+                    }
                 }
             }
             else {
