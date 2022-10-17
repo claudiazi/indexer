@@ -362,6 +362,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     for (let j = 0; j < answers.length; j++) {
                         const answer = answers[j]
                         answer.isCorrect = correctAnswerData.correctAnswerIndeces[i] === answer.answerIndex
+                        await ctx.store.save(answer)
                     }
                 }
             }
