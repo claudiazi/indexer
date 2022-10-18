@@ -46,6 +46,15 @@ export class AccountStats {
     @Field(() => Number, { nullable: true })
     quiz_fully_correct!: Number
 
+    @Field(() => String, { nullable: true })
+    vote_type!: string
+    
+    @Field(() => String, { nullable: true })
+    delegated_to!: string
+    
+    @Field(() => String, { nullable: true })
+    type!: string
+
     constructor(props: Partial<AccountStats>) {
         Object.assign(this, props);
     }
