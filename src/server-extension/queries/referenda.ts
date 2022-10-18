@@ -104,6 +104,7 @@ export const referendaStats = `
               , ROW_NUMBER() OVER (PARTITION BY referendum_index, voter ORDER BY timestamp desc) as seq
               FROM vote
               WHERE NOT (referendum_index::text = ANY ($1) )
+              AND block_number_removed IS NULL
 
             ),
 
@@ -127,6 +128,8 @@ export const referendaStats = `
                 DATE_PART('hour', v.timestamp - r.created_at) / 24 As voting_time
               , v.timestamp
               , v.type
+              , v.is_validator
+              , v.is_councillor
               FROM vote_sequence AS v
               LEFT JOIN refined_referendum AS r
                 USING(referendum_index)
@@ -177,6 +180,8 @@ export const referendaStats = `
                           THEN '3/4 - 4/4 vote duration'    
                 END AS voting_time_group
               , type
+              , is_validator
+              , is_councillor
               FROM valid_vote AS v     
               LEFT JOIN new_ref AS n
                 USING (voter)
@@ -237,6 +242,20 @@ export const referendaStats = `
               , SUM(CASE WHEN type = 'Delegated' THEN 1 else 0 END) AS count_delegated
               , SUM(CASE WHEN type = 'Direct' THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_direct
               , SUM(CASE WHEN type = 'Delegated' THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_delegated
+              FROM refined_votes
+              group by 1
+
+            ),
+
+            vote_type AS (
+              SELECT 
+                referendum_index
+              , SUM(CASE WHEN is_validator = true THEN 1 else 0 END) AS count_validator
+              , SUM(CASE WHEN is_councillor = true THEN 1 else 0 END) AS count_coucillor
+              , SUM(CASE WHEN is_validator = false AND is_councillor = false THEN 1 else 0 END) AS count_normal
+              , SUM(CASE WHEN is_validator = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_validator
+              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_coucillor
+              , SUM(CASE WHEN is_validator = false AND is_councillor = false THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_normal
               FROM refined_votes
               group by 1
 
@@ -348,18 +367,15 @@ export const referendaStats = `
               
               SELECT 
                  quiz_id
-               , q.id as question_id
-               , c.correct_index AS correct_answer_index
-               , COUNT(q.id) OVER (PARTITION BY quiz_id) AS questions_count
+               , COUNT(q.id) AS questions_count
               FROM question AS q
               INNER JOIN latest_quiz_data AS l
                 USING (quiz_id)
-              INNER JOIN correct_answer AS c
-                ON c.question_id = q.id
+              GROUP BY 1
 
             ),
 
-            latest_answers AS (
+            latest_submission AS (
 
               SELECT
                   wallet
@@ -370,40 +386,26 @@ export const referendaStats = `
 
             ),
 
-            account_answers AS (
+            account_correct_answers AS (
 
               SELECT 
                  wallet
                , referendum_index
                , timestamp AS answer_submitted_at
                , s.quiz_id
-               , q.question_id AS question_id
-               , CASE WHEN answer_index = correct_answer_index then 1
-                      ELSE 0 
-                 END AS has_answered_correct
                , questions_count
+               , SUM(CASE WHEN is_correct = true then 1
+                          ELSE 0 
+                     END) AS correct_answers_count
               FROM quiz_submission AS s
-              INNER JOIN latest_answers
+              INNER JOIN latest_submission
                 USING (wallet, quiz_id, version)
               INNER JOIN quiz_questions AS q
                 ON s.quiz_id = q.quiz_id
               INNER JOIN answer AS a
                 ON a.quiz_submission_id = s.id
-                AND a.question_id = q.question_id
+              GROUP BY 1,2,3,4,5
                  
-            ),
-
-            account_correct_answers AS (
-
-              SELECT 
-                 wallet
-               , quiz_id
-               , referendum_index
-               , questions_count
-               , SUM(has_answered_correct) AS correct_answers_count
-              FROM account_answers
-              GROUP BY 1,2,3,4
-
             ),
 
             referenda_correct_answers AS (
@@ -476,10 +478,16 @@ export const referendaStats = `
               , count_delegated
               , voted_amount_direct
               , voted_amount_delegated
+              , count_validator
+              , count_coucillor
+              , count_normal
+              , voted_amount_validator
+              , voted_amount_coucillor
+              , voted_amount_normal
               FROM calculation AS c
               INNER JOIN refined_referendum AS r
                 ON c.referendum_index = r.referendum_index
-              LEFT JOIN  refined_timeline AS t
+              LEFT JOIN refined_timeline AS t
                 ON t.referendum_index = c.referendum_index
               LEFT JOIN refined_preimage AS p
                 ON p.preimage_id = r.preimage_id
@@ -487,9 +495,12 @@ export const referendaStats = `
                 ON ca.referendum_index = c.referendum_index
               LEFT JOIN delegation AS d
                 ON r.referendum_index = d.referendum_index
+              LEFT JOIN vote_type AS vt
+                ON r.referendum_index = vt.referendum_index
 
               )
 
               select * from final
+
             `
           
