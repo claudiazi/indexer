@@ -7,7 +7,7 @@ import {
     VoteDecision,
     VoteType,
 } from '../../../model'
-import { getOriginAccountId } from '../../../common/tools'
+import { encodeId, getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
 import { MissingReferendumWarn } from '../../utils/errors'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
@@ -16,8 +16,9 @@ import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelec
 import { TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
 import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum, } from './helpers'
-import { currentCouncilMembers } from '../../election/events/newTerm'
-import { currentValidators } from '../../session/events/newSession'
+import { currentCouncilMembers, setCouncilMembers } from '../../election/events/newTerm'
+import { currentValidators, setValidators } from '../../session/events/newSession'
+import { CouncilMembersStorage, SessionValidatorsStorage } from '../../../types/storage'
 
 export async function handleVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.vote', { call: { args: true; origin: true; } }>,
@@ -74,6 +75,8 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     const count = await getVotesCount(ctx, referendum.id)
     const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
 
+    const validators = currentValidators || setValidators(ctx, header)
+    const councilMembers = currentCouncilMembers || setCouncilMembers(ctx, header)
     await ctx.store.insert(
         new Vote({
             id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
@@ -86,11 +89,11 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             balance,
             timestamp: new Date(header.timestamp),
             type: VoteType.Direct,
-            isCouncillor: voter && currentCouncilMembers ? currentCouncilMembers.includes(voter) : null,
-            isValidator: voter && currentValidators ? currentValidators.includes(voter) : null
+            isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
+            isValidator: voter && validators ? validators.includes(voter) : null
         })
     )
-    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations)
+    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations, councilMembers, validators)
 }
 
 const proposalsVotes = new Map<string, number>()

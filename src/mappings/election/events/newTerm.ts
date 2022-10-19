@@ -9,5 +9,10 @@ export let currentCouncilMembers: string[]
 export async function handleNewTerm(ctx: BatchContext<Store, unknown>,
     item: EventItem<'PhragmenElection.NewTerm', { event: { args: true; extrinsic: { hash: true } } }>,
     header: SubstrateBlock): Promise<void> {
+    await setCouncilMembers(ctx, header)
+}
+
+export async function setCouncilMembers(ctx: BatchContext<Store, unknown>, header: SubstrateBlock): Promise<string[]> {
     currentCouncilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : []
+    return currentCouncilMembers
 }

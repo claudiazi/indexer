@@ -9,5 +9,10 @@ export let currentValidators: string[]
 export async function handleNewSession(ctx: BatchContext<Store, unknown>,
     item: EventItem<'Session.NewSession', { event: { args: true; extrinsic: { hash: true } } }>,
     header: SubstrateBlock): Promise<void> {
+    await setValidators(ctx, header)
+}
+
+export async function setValidators(ctx: BatchContext<Store, unknown>, header: SubstrateBlock): Promise<string[]> {
     currentValidators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : []
+    return currentValidators
 }

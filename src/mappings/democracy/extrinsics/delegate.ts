@@ -1,4 +1,4 @@
-import { getOriginAccountId, ss58codec } from '../../../common/tools'
+import { encodeId, getOriginAccountId, ss58codec } from '../../../common/tools'
 import { getDelegateData } from './getters'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
@@ -9,8 +9,9 @@ import { IsNull } from 'typeorm'
 import { addOngoingReferendaDelegatedVotes, removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
 import { Referendum, StandardVoteBalance, Vote, VoteType } from '../../../model'
 import { getVotesCount } from './vote'
-import { currentCouncilMembers } from '../../election/events/newTerm'
-import { currentValidators } from '../../session/events/newSession'
+import { currentCouncilMembers, setCouncilMembers } from '../../election/events/newTerm'
+import { currentValidators, setValidators } from '../../session/events/newSession'
+import { CouncilMembersStorage, SessionValidatorsStorage } from '../../../types/storage'
 
 export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.delegate', { call: { args: true; origin: true; } }>,
@@ -71,6 +72,8 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         })
         const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
         const count = await getVotesCount(ctx, referendum.id)
+        const validators = currentValidators || setValidators(ctx, header)
+        const councilMembers = currentCouncilMembers || setCouncilMembers(ctx, header)
         await ctx.store.insert(
             new Vote({
                 id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
@@ -84,8 +87,8 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
                 timestamp: new Date(header.timestamp),
                 delegatedTo: toWallet,
                 type: VoteType.Delegated,
-                isCouncillor: voter && currentCouncilMembers ? currentCouncilMembers.includes(voter) : null,
-                isValidator: voter && currentValidators ? currentValidators.includes(voter) : null
+                isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
+                isValidator: voter && validators ? validators.includes(voter) : null
             })
         )
     }

@@ -4,8 +4,8 @@ import { IsNull } from "typeorm"
 import { encodeId } from "../../../common/tools"
 import { Delegation, Referendum, StandardVoteBalance, Vote, VoteType } from "../../../model"
 import { CouncilMembersStorage, ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage, SessionValidatorsStorage } from "../../../types/storage"
-import { currentCouncilMembers } from "../../election/events/newTerm"
-import { currentValidators } from "../../session/events/newSession"
+import { currentCouncilMembers, setCouncilMembers } from "../../election/events/newTerm"
+import { currentValidators, setValidators } from "../../session/events/newSession"
 import { NoOpenVoteFound, TooManyOpenVotes } from "./errors"
 import { getVotesCount } from "./vote"
 
@@ -68,13 +68,15 @@ export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: stri
 export async function addOngoingReferendaDelegatedVotes(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, header: SubstrateBlock): Promise<void> {
     const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
     const nestedDelegations = await getAllNestedDelegations(ctx, toWallet)
+    const validators = currentValidators || setValidators(ctx, header)
+    const councilMembers = currentCouncilMembers || setCouncilMembers(ctx, header)
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const ongoingReferendum = ongoingReferenda[i]
-        await addDelegatedVotesReferendum(ctx, toWallet, header.height, header.timestamp, ongoingReferendum, nestedDelegations)
+        await addDelegatedVotesReferendum(ctx, toWallet, header.height, header.timestamp, ongoingReferendum, nestedDelegations, councilMembers, validators)
     }
 }
 
-export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, block: number, blockTime: number, referendum: Referendum, nestedDelegations: Delegation[]): Promise<void> {
+export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, block: number, blockTime: number, referendum: Referendum, nestedDelegations: Delegation[], councilMembers: string[], validators: string[]): Promise<void> {
     //get top toWallet vote
     const votes = await ctx.store.find(Vote, { where: { voter: toWallet, referendumIndex: referendum.index, blockNumberRemoved: IsNull() } })
     if (votes.length > 1) {
@@ -107,8 +109,8 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
                 timestamp: new Date(blockTime),
                 delegatedTo: delegation.to,
                 type: VoteType.Delegated,
-                isCouncillor: currentCouncilMembers ? currentCouncilMembers.includes(delegation.wallet) : null,
-                isValidator: currentValidators ? currentValidators.includes(delegation.wallet) : null
+                isCouncillor: councilMembers ? councilMembers.includes(delegation.wallet) : null,
+                isValidator: validators ? validators.includes(delegation.wallet) : null
             })
         )
     }
@@ -128,24 +130,4 @@ export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>,
     }
 }
 
-const councilInCurrentPhase = new Map<number, string[]>()
 
-export async function getCouncilInPhase(ctx: BatchContext<Store, unknown>, header: SubstrateBlock, phase: any): Promise<any> {
-    let councilMembers = councilInCurrentPhase.get(phase)
-    if (councilMembers == null) {
-        councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : []
-    }
-    councilInCurrentPhase.set(phase, councilMembers)
-    return councilMembers   
-}
-
-const validatorsInCurrentSession = new Map<number, string[]>()
-
-export async function getValidatorsInSession(ctx: BatchContext<Store, unknown>, header: SubstrateBlock, sessionIndex: any): Promise<any> {
-    let validators = validatorsInCurrentSession.get(sessionIndex)
-    if (validators == null) {
-        validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : []
-    }
-    validatorsInCurrentSession.set(sessionIndex, validators)
-    return validators   
-}
