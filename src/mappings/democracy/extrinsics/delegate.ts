@@ -54,7 +54,6 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     //add votes for ongoing referenda
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const referendum = ongoingReferenda[i]
-        const count = await getVotesCount(ctx, referendum.id)
         const votes = await ctx.store.find(Vote, { where: { voter: toWallet, referendumIndex: referendum.index, blockNumberRemoved: IsNull() } })
         if (votes.length > 1) {
             ctx.log.warn(TooManyOpenVotes(header.height, referendum.index, toWallet))
@@ -72,6 +71,7 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
         const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
         const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
+        const count = await getVotesCount(ctx, referendum.id)
         await ctx.store.insert(
             new Vote({
                 id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
