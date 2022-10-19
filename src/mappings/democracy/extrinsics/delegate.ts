@@ -1,15 +1,15 @@
-import { decodeId, encodeId, getOriginAccountId, ss58codec } from '../../../common/tools'
+import { getOriginAccountId, ss58codec } from '../../../common/tools'
 import { getDelegateData } from './getters'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Delegation } from '../../../model/generated/delegation.model'
-import { NoOpenVoteFound, TooManyOpenDelegations, TooManyOpenVotes } from './errors'
+import { TooManyOpenDelegations, TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
-import { addOngoingReferendaDelegatedVotes, removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
+import { addOngoingReferendaDelegatedVotes, getCouncilInPhase, getValidatorsInSession, removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
 import { Referendum, StandardVoteBalance, Vote, VoteType } from '../../../model'
 import { getVotesCount } from './vote'
-import { CouncilMembersStorage, SessionValidatorsStorage } from '../../../types/storage'
+import { ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage } from '../../../types/storage'
 
 export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.delegate', { call: { args: true; origin: true; } }>,
@@ -68,8 +68,10 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         const voteBalance = new StandardVoteBalance({
             value: balance,
         })
-        const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
-        const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
+        const phase = new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).isExists ? (await new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).getAsV2029()) : null
+        const councilMembers = await getCouncilInPhase(ctx, header, phase)
+        const session = new SessionCurrentIndexStorage(ctx, header).isExists ? (await new SessionCurrentIndexStorage(ctx, header).getAsV1020()) : null
+        const validators = await getValidatorsInSession(ctx, header, session)
         const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
         const count = await getVotesCount(ctx, referendum.id)
         await ctx.store.insert(

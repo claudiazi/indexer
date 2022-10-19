@@ -725,6 +725,41 @@ export class DemocracyReferendumInfoOfStorage {
   }
 }
 
+export class ElectionProviderMultiPhaseCurrentPhaseStorage {
+  private readonly _chain: Chain
+  private readonly blockHash: string
+
+  constructor(ctx: BlockContext)
+  constructor(ctx: ChainContext, block: Block)
+  constructor(ctx: BlockContext, block?: Block) {
+    block = block || ctx.block
+    this.blockHash = block.hash
+    this._chain = ctx._chain
+  }
+
+  /**
+   *  Current phase.
+   */
+  get isV2029() {
+    return this._chain.getStorageItemTypeHash('ElectionProviderMultiPhase', 'CurrentPhase') === 'd43c46e1fdaabf223f7ddc55f3636b227c163ebca9bccdb6f6aca606816cba64'
+  }
+
+  /**
+   *  Current phase.
+   */
+  async getAsV2029(): Promise<v2029.ElectionPhase> {
+    assert(this.isV2029)
+    return this._chain.getStorage(this.blockHash, 'ElectionProviderMultiPhase', 'CurrentPhase')
+  }
+
+  /**
+   * Checks whether the storage item is defined for the current chain version.
+   */
+  get isExists(): boolean {
+    return this._chain.getStorageItemTypeHash('ElectionProviderMultiPhase', 'CurrentPhase') != null
+  }
+}
+
 export class Instance1CollectiveProposalOfStorage {
   private readonly _chain: Chain
   private readonly blockHash: string
@@ -2612,6 +2647,41 @@ export class Instance2CollectiveProposalOfStorage {
    */
   get isExists(): boolean {
     return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') != null
+  }
+}
+
+export class SessionCurrentIndexStorage {
+  private readonly _chain: Chain
+  private readonly blockHash: string
+
+  constructor(ctx: BlockContext)
+  constructor(ctx: ChainContext, block: Block)
+  constructor(ctx: BlockContext, block?: Block) {
+    block = block || ctx.block
+    this.blockHash = block.hash
+    this._chain = ctx._chain
+  }
+
+  /**
+   *  Current index of the session.
+   */
+  get isV1020() {
+    return this._chain.getStorageItemTypeHash('Session', 'CurrentIndex') === '81bbbe8e62451cbcc227306706c919527aa2538970bd6d67a9969dd52c257d02'
+  }
+
+  /**
+   *  Current index of the session.
+   */
+  async getAsV1020(): Promise<number> {
+    assert(this.isV1020)
+    return this._chain.getStorage(this.blockHash, 'Session', 'CurrentIndex')
+  }
+
+  /**
+   * Checks whether the storage item is defined for the current chain version.
+   */
+  get isExists(): boolean {
+    return this._chain.getStorageItemTypeHash('Session', 'CurrentIndex') != null
   }
 }
 

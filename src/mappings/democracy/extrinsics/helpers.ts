@@ -1,9 +1,9 @@
 import { BatchContext, SubstrateBlock } from "@subsquid/substrate-processor"
 import { Store } from "@subsquid/typeorm-store"
 import { IsNull } from "typeorm"
-import { decodeId, encodeId, getOriginAccountId } from "../../../common/tools"
+import { encodeId } from "../../../common/tools"
 import { Delegation, Referendum, StandardVoteBalance, Vote, VoteType } from "../../../model"
-import { CouncilMembersStorage, SessionValidatorsStorage } from "../../../types/storage"
+import { CouncilMembersStorage, ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage, SessionValidatorsStorage } from "../../../types/storage"
 import { NoOpenVoteFound, TooManyOpenVotes } from "./errors"
 import { getVotesCount } from "./vote"
 
@@ -66,8 +66,10 @@ export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: stri
 export async function addOngoingReferendaDelegatedVotes(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, header: SubstrateBlock): Promise<void> {
     const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
     const nestedDelegations = await getAllNestedDelegations(ctx, toWallet)
-    const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
-    const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
+    const phase = new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).isExists ? (await new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).getAsV2029()) : null
+    const councilMembers = await getCouncilInPhase(ctx, header, phase)
+    const session = new SessionCurrentIndexStorage(ctx, header).isExists ? (await new SessionCurrentIndexStorage(ctx, header).getAsV1020()) : null
+    const validators = await getValidatorsInSession(ctx, header, session)
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const ongoingReferendum = ongoingReferenda[i]
         await addDelegatedVotesReferendum(ctx, toWallet, header.height, header.timestamp, ongoingReferendum, nestedDelegations, councilMembers, validators)
@@ -126,4 +128,26 @@ export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>,
     else {
         return []
     }
+}
+
+const councilInCurrentPhase = new Map<number, string[]>()
+
+export async function getCouncilInPhase(ctx: BatchContext<Store, unknown>, header: SubstrateBlock, phase: any): Promise<any> {
+    let councilMembers = councilInCurrentPhase.get(phase)
+    if (councilMembers == null) {
+        councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : []
+    }
+    councilInCurrentPhase.set(phase, councilMembers)
+    return councilMembers   
+}
+
+const validatorsInCurrentSession = new Map<number, string[]>()
+
+export async function getValidatorsInSession(ctx: BatchContext<Store, unknown>, header: SubstrateBlock, sessionIndex: any): Promise<any> {
+    let validators = validatorsInCurrentSession.get(sessionIndex)
+    if (validators == null) {
+        validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : []
+    }
+    validatorsInCurrentSession.set(sessionIndex, validators)
+    return validators   
 }

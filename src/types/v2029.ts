@@ -1,5 +1,24 @@
 import type {Result} from './support'
 
+export type ElectionPhase = ElectionPhase_Off | ElectionPhase_Signed | ElectionPhase_Unsigned | ElectionPhase_Emergency
+
+export interface ElectionPhase_Off {
+  __kind: 'Off'
+}
+
+export interface ElectionPhase_Signed {
+  __kind: 'Signed'
+}
+
+export interface ElectionPhase_Unsigned {
+  __kind: 'Unsigned'
+  value: [boolean, number]
+}
+
+export interface ElectionPhase_Emergency {
+  __kind: 'Emergency'
+}
+
 export type Proposal = Proposal_System | Proposal_Babe | Proposal_Timestamp | Proposal_Indices | Proposal_Balances | Proposal_Authorship | Proposal_Staking | Proposal_Offences | Proposal_Session | Proposal_Grandpa | Proposal_ImOnline | Proposal_AuthorityDiscovery | Proposal_Democracy | Proposal_Council | Proposal_TechnicalCommittee | Proposal_ElectionsPhragmen | Proposal_TechnicalMembership | Proposal_Treasury | Proposal_Claims | Proposal_Utility | Proposal_Identity | Proposal_Society | Proposal_Recovery | Proposal_Vesting | Proposal_Scheduler | Proposal_Proxy | Proposal_Multisig | Proposal_Bounties | Proposal_Tips | Proposal_ElectionProviderMultiPhase
 
 export interface Proposal_System {

@@ -15,8 +15,8 @@ import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
-import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum, } from './helpers'
-import { CouncilMembersStorage, SessionValidatorsStorage } from '../../../types/storage'
+import { addDelegatedVotesReferendum, getAllNestedDelegations, getCouncilInPhase, getValidatorsInSession, removeDelegatedVotesReferendum, } from './helpers'
+import { ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage } from '../../../types/storage'
 
 export async function handleVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.vote', { call: { args: true; origin: true; } }>,
@@ -71,8 +71,10 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     }
 
     const count = await getVotesCount(ctx, referendum.id)
-    const councilMembers = new CouncilMembersStorage(ctx, header).isExists ? (await new CouncilMembersStorage(ctx, header).getAsV9111()).map(member => encodeId(member)) : null
-    const validators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : null
+    const phase = new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).isExists ? (await new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).getAsV2029()) : null
+    const councilMembers = await getCouncilInPhase(ctx, header, phase)
+    const session = new SessionCurrentIndexStorage(ctx, header).isExists ? (await new SessionCurrentIndexStorage(ctx, header).getAsV1020()) : null
+    const validators = await getValidatorsInSession(ctx, header, session)
     const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
 
     await ctx.store.insert(

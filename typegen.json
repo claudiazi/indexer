@@ -12,7 +12,9 @@
     "Instance2Collective.ProposalOf",
     "Instance1Collective.ProposalOf",
     "Session.Validators",
-    "Council.Members"
+    "Council.Members",
+    "Session.CurrentIndex",
+    "ElectionProviderMultiPhase.CurrentPhase"
   ],
   "events": [
     "Democracy.Proposed",
