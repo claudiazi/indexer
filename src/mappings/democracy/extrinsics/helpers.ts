@@ -109,8 +109,8 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
                 timestamp: new Date(blockTime),
                 delegatedTo: delegation.to,
                 type: VoteType.Delegated,
-                isCouncillor: councilMembers ? councilMembers.includes(delegation.wallet) : null,
-                isValidator: validators ? validators.includes(delegation.wallet) : null
+                isCouncillor: councilMembers.length > 0 ? councilMembers.includes(delegation.wallet) : null,
+                isValidator: validators.length > 0 ? validators.includes(delegation.wallet) : null
             })
         )
     }

@@ -87,8 +87,8 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
                 timestamp: new Date(header.timestamp),
                 delegatedTo: toWallet,
                 type: VoteType.Delegated,
-                isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
-                isValidator: voter && validators ? validators.includes(voter) : null
+                isCouncillor: voter && councilMembers.length > 0 ? councilMembers.includes(voter) : null,
+                isValidator: voter && validators.length > 0 ? validators.includes(voter) : null
             })
         )
     }

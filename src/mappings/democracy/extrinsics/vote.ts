@@ -89,8 +89,8 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             balance,
             timestamp: new Date(header.timestamp),
             type: VoteType.Direct,
-            isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
-            isValidator: voter && validators ? validators.includes(voter) : null
+            isCouncillor: voter && councilMembers.length > 0 ? councilMembers.includes(voter) : null,
+            isValidator: voter && validators.length > 0 ? validators.includes(voter) : null
         })
     )
     await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations, councilMembers, validators)
