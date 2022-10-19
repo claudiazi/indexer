@@ -41,7 +41,9 @@ export interface UserItem {
     amountConsidered: string,
     chances: number[],
     selectedIndex: number,
-    dragonEquipped: string
+    dragonEquipped: string,
+    quizCorrect: number,
+    identity: number
 }
 
 export interface ConfigData {
@@ -64,6 +66,8 @@ export interface ConfigData {
     toddlerBonus: number
     adolescentBonus: number
     adultBonus: number
+    quizBonus: number
+    identityBonus: number
     minAmount: string
     seed: string
     defaultRoyalty: number

@@ -37,6 +37,12 @@ export class Distribution {
   @Column_("numeric", {array: true, nullable: true})
   chancesAtItems!: (number | undefined | null)[] | undefined | null
 
+  @Column_("int4", {nullable: true})
+  quizCorrect!: number | undefined | null
+
+  @Column_("int4", {nullable: true})
+  identity!: number | undefined | null
+
   @Column_("timestamp with time zone", {nullable: false})
   timestamp!: Date
 }

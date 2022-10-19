@@ -34,7 +34,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
     const args = message.split('::')
     switch (args[2]) {
         case 'DISTRIBUTION':
-            if (isProofOfChaosAddress(originAccountId) && header.height >= 14865588) {
+            if (isProofOfChaosAddress(originAccountId) && header.height >= 14936046) {
                 const distributionData: UserItem[] = JSON.parse(args[3])
                 const distributionVersion = await getDistributionVersion(ctx, parseInt(args[1]))
                 for (const dist of distributionData) {
@@ -49,6 +49,8 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         indexItemReceived: dist.selectedIndex,
                         chancesAtItems: dist.chances,
                         dragonEquipped: dist.dragonEquipped,
+                        quizCorrect: dist.quizCorrect,
+                        identity: dist.identity,
                         timestamp: new Date(header.timestamp),
                     })
                     await ctx.store.insert(distribution)
@@ -56,7 +58,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             }
             break
         case 'CONFIG':
-            if (isProofOfChaosAddress(originAccountId) && header.height >= 14865588) {
+            if (isProofOfChaosAddress(originAccountId) && header.height >= 14936046) {
                 //break quiz apart
                 const configData: ConfigData = JSON.parse(args[3])
                 const version = await getConfigVersion(ctx, parseInt(args[1]))
@@ -75,6 +77,8 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     toddlerBonus,
                     adolescentBonus,
                     adultBonus,
+                    quizBonus,
+                    identityBonus,
                     minAmount,
                     seed,
                     min,
@@ -102,6 +106,8 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     toddlerBonus,
                     adolescentBonus,
                     adultBonus,
+                    quizBonus,
+                    identityBonus,
                     minAmount: parseInt(minAmount),
                     seed,
                     min,

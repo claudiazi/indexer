@@ -192,6 +192,8 @@ type Config @entity {
   toddlerBonus: Int
   adolescentBonus: Int
   adultBonus: Int
+  quizBonus: Int
+  identityBonus: Int
   minAmount: Float
   min: Float
   max: Float
@@ -249,6 +251,8 @@ type Distribution @entity {
   indexItemReceived: Int
   dragonEquipped: String
   chancesAtItems: [Float]
+  quizCorrect: Int
+  identity: Int
   timestamp: DateTime!
 }
 

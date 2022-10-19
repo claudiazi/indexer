@@ -67,6 +67,12 @@ export class Config {
   @Column_("int4", {nullable: true})
   adultBonus!: number | undefined | null
 
+  @Column_("int4", {nullable: true})
+  quizBonus!: number | undefined | null
+
+  @Column_("int4", {nullable: true})
+  identityBonus!: number | undefined | null
+
   @Column_("numeric", {nullable: true})
   minAmount!: number | undefined | null
 
