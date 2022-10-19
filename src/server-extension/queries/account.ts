@@ -17,6 +17,7 @@ export const accountStats = `
                 *
               FROM vote_sequence
               WHERE seq = 1
+              AND block_number_removed IS NULL
 
             ),
 
@@ -101,6 +102,17 @@ export const accountStats = `
                 , vote_duration_3_4
                 , vote_duration
                 , referendum_result
+                , v.type
+                , CASE WHEN is_validator = true AND is_councillor = true
+                       THEN 'validator + councillor'
+                       WHEN is_validator = true AND is_councillor = false
+                       THEN 'validator'
+                       WHEN is_validator = false AND is_councillor = true
+                       THEN 'councillor'
+                       WHEN is_validator = false AND is_councillor = false
+                       THEN 'normal'
+                  END AS vote_type
+                , delegated_to
                 FROM valid_vote AS v
                 LEFT JOIN refined_referendum AS r
                     ON v.referendum_index = r.referendum_index         
@@ -109,12 +121,13 @@ export const accountStats = `
 
             ),
 
+        
             latest_quiz_version AS (
-                        
+            
               SELECT 
-                id
-              , min(timestamp)  as quizze_created_at
-              , max(version) AS version
+                 id
+               , min(timestamp)  as quizze_created_at
+               , max(version) AS version
               FROM quiz
               GROUP BY 1
 
@@ -123,11 +136,11 @@ export const accountStats = `
             latest_quiz_data AS (
 
               SELECT 
-                id as quiz_id
-              , creator as quiz_creator
-              , referendum_index
-              , quizze_created_at
-              , version AS latest_version
+                 id as quiz_id
+               , creator as quiz_creator
+               , referendum_index
+               , quizze_created_at
+               , version AS latest_version
               FROM quiz
               INNER JOIN latest_quiz_version
                 USING(id, version)
@@ -137,19 +150,16 @@ export const accountStats = `
             quiz_questions AS (
               
               SELECT 
-                quiz_id
-              , q.id as question_id
-              , c.correct_index AS correct_answer_index
-              , COUNT(q.id) OVER (PARTITION BY quiz_id) AS questions_count
+                 quiz_id
+               , COUNT(q.id) AS questions_count
               FROM question AS q
               INNER JOIN latest_quiz_data AS l
                 USING (quiz_id)
-              INNER JOIN correct_answer AS c
-                ON c.question_id = q.id
+              GROUP BY 1
 
             ),
 
-            latest_answers AS (
+            latest_submission AS (
 
               SELECT
                   wallet
@@ -160,40 +170,26 @@ export const accountStats = `
 
             ),
 
-            account_answers AS (
+            account_correct_answers AS (
 
               SELECT 
-                wallet
-              , referendum_index
-              , timestamp AS answer_submitted_at
-              , s.quiz_id
-              , q.question_id AS question_id
-              , CASE WHEN answer_index = correct_answer_index then 1
-                      ELSE 0 
-                END AS has_answered_correct
-              , questions_count
+                 wallet
+               , referendum_index
+               , timestamp AS answer_submitted_at
+               , s.quiz_id
+               , questions_count
+               , SUM(CASE WHEN is_correct = true then 1
+                          ELSE 0 
+                     END) AS correct_answers_count
               FROM quiz_submission AS s
-              INNER JOIN latest_answers
+              INNER JOIN latest_submission
                 USING (wallet, quiz_id, version)
               INNER JOIN quiz_questions AS q
                 ON s.quiz_id = q.quiz_id
               INNER JOIN answer AS a
                 ON a.quiz_submission_id = s.id
-                AND a.question_id = q.question_id
-                
-            ),
-
-            account_correct_answers AS (
-
-              SELECT 
-                wallet
-              , quiz_id
-              , referendum_index
-              , questions_count
-              , SUM(has_answered_correct) AS correct_answers_count
-              FROM account_answers
-              GROUP BY 1,2,3,4
-
+              GROUP BY 1,2,3,4,5
+                 
             ),
 
             final AS (
@@ -225,7 +221,10 @@ export const accountStats = `
                      CASE WHEN correct_answers_count = questions_count THEN 1
                           ELSE 0
                      END
-                END AS quiz_fully_correct                    
+                END AS quiz_fully_correct
+              , vote_type
+              , delegated_to
+              , v.type                    
               FROM refined_votes AS v
               LEFT JOIN account_correct_answers AS ca
                 ON voter = wallet 
