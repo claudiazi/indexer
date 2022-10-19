@@ -222,6 +222,27 @@ const processor = new SubstrateBatchProcessor()
             },
         }
     } as const)
+    .addEvent('Session.NewSession', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('PhragmenElection.NewTerm', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    
 
 processor.run(new TypeormDatabase(), async (ctx) => {
     for (let block of ctx.blocks) {
@@ -294,6 +315,12 @@ processor.run(new TypeormDatabase(), async (ctx) => {
                 }
                 if (item.name == 'TechnicalCommittee.Approved') {
                     await modules.techComittee.events.handleApproved(ctx, item, block.header)
+                }
+                if (item.name == 'Session.NewSession') {
+                    await modules.session.events.handleNewSession(ctx, item, block.header)
+                }
+                if (item.name == 'PhragmenElection.NewTerm') {
+                    await modules.election.events.handleNewTerm(ctx, item, block.header)
                 }
             }
         }

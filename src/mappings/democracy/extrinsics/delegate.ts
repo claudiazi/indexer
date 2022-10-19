@@ -6,10 +6,11 @@ import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelec
 import { Delegation } from '../../../model/generated/delegation.model'
 import { TooManyOpenDelegations, TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
-import { addOngoingReferendaDelegatedVotes, getCouncilInPhase, getValidatorsInSession, removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
+import { addOngoingReferendaDelegatedVotes, removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
 import { Referendum, StandardVoteBalance, Vote, VoteType } from '../../../model'
 import { getVotesCount } from './vote'
-import { ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage } from '../../../types/storage'
+import { currentCouncilMembers } from '../../election/events/newTerm'
+import { currentValidators } from '../../session/events/newSession'
 
 export async function handleDelegate(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.delegate', { call: { args: true; origin: true; } }>,
@@ -68,10 +69,6 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         const voteBalance = new StandardVoteBalance({
             value: balance,
         })
-        const phase = new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).isExists ? (await new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).getAsV2029()) : null
-        const councilMembers = await getCouncilInPhase(ctx, header, phase)
-        const session = new SessionCurrentIndexStorage(ctx, header).isExists ? (await new SessionCurrentIndexStorage(ctx, header).getAsV1020()) : null
-        const validators = await getValidatorsInSession(ctx, header, session)
         const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
         const count = await getVotesCount(ctx, referendum.id)
         await ctx.store.insert(
@@ -87,8 +84,8 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
                 timestamp: new Date(header.timestamp),
                 delegatedTo: toWallet,
                 type: VoteType.Delegated,
-                isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
-                isValidator: voter && validators ? validators.includes(voter) : null
+                isCouncillor: voter && currentCouncilMembers ? currentCouncilMembers.includes(voter) : null,
+                isValidator: voter && currentValidators ? currentValidators.includes(voter) : null
             })
         )
     }

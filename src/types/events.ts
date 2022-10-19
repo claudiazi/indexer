@@ -661,6 +661,114 @@ export class DemocracyTabledEvent {
   }
 }
 
+export class PhragmenElectionNewTermEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'PhragmenElection.NewTerm')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  A new term with \[new_members\]. This indicates that enough candidates existed to run
+   *  the election, not that enough have has been elected. The inner value must be examined
+   *  for this purpose. A `NewTerm(\[\])` indicates that some candidates got their bond
+   *  slashed and none were elected, whilst `EmptyTerm` means that no candidates existed to
+   *  begin with.
+   */
+  get isV9010(): boolean {
+    return this._chain.getEventHash('PhragmenElection.NewTerm') === 'd7a45cf0fb3b6c39f6db66d04bddff68afaa850200debf915801414eda809fe1'
+  }
+
+  /**
+   *  A new term with \[new_members\]. This indicates that enough candidates existed to run
+   *  the election, not that enough have has been elected. The inner value must be examined
+   *  for this purpose. A `NewTerm(\[\])` indicates that some candidates got their bond
+   *  slashed and none were elected, whilst `EmptyTerm` means that no candidates existed to
+   *  begin with.
+   */
+  get asV9010(): [Uint8Array, bigint][] {
+    assert(this.isV9010)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A new term with new_members. This indicates that enough candidates existed to run
+   * the election, not that enough have has been elected. The inner value must be examined
+   * for this purpose. A `NewTerm(\[\])` indicates that some candidates got their bond
+   * slashed and none were elected, whilst `EmptyTerm` means that no candidates existed to
+   * begin with.
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('PhragmenElection.NewTerm') === 'c26c6ac673ee46db2001722c75880df159f382274469750dc468b868c6f738c8'
+  }
+
+  /**
+   * A new term with new_members. This indicates that enough candidates existed to run
+   * the election, not that enough have has been elected. The inner value must be examined
+   * for this purpose. A `NewTerm(\[\])` indicates that some candidates got their bond
+   * slashed and none were elected, whilst `EmptyTerm` means that no candidates existed to
+   * begin with.
+   */
+  get asV9130(): {newMembers: [Uint8Array, bigint][]} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class SessionNewSessionEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Session.NewSession')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  New session has happened. Note that the argument is the session index, not the block
+   *  number as the type might suggest.
+   */
+  get isV1020(): boolean {
+    return this._chain.getEventHash('Session.NewSession') === '0a0f30b1ade5af5fade6413c605719d59be71340cf4884f65ee9858eb1c38f6c'
+  }
+
+  /**
+   *  New session has happened. Note that the argument is the session index, not the block
+   *  number as the type might suggest.
+   */
+  get asV1020(): number {
+    assert(this.isV1020)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * New session has happened. Note that the argument is the session index, not the
+   * block number as the type might suggest.
+   */
+  get isV9130(): boolean {
+    return this._chain.getEventHash('Session.NewSession') === '75fa09d2d8b5fbcbe4f75feb6c886998092453010ae364a5b06b9bb6319f1086'
+  }
+
+  /**
+   * New session has happened. Note that the argument is the session index, not the
+   * block number as the type might suggest.
+   */
+  get asV9130(): {sessionIndex: number} {
+    assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
 export class TechnicalCommitteeApprovedEvent {
   private readonly _chain: Chain
   private readonly event: Event

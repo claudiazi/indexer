@@ -7,7 +7,7 @@ import {
     VoteDecision,
     VoteType,
 } from '../../../model'
-import { decodeId, encodeId, getOriginAccountId } from '../../../common/tools'
+import { getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
 import { MissingReferendumWarn } from '../../utils/errors'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
@@ -15,8 +15,9 @@ import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
-import { addDelegatedVotesReferendum, getAllNestedDelegations, getCouncilInPhase, getValidatorsInSession, removeDelegatedVotesReferendum, } from './helpers'
-import { ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage } from '../../../types/storage'
+import { addDelegatedVotesReferendum, getAllNestedDelegations, removeDelegatedVotesReferendum, } from './helpers'
+import { currentCouncilMembers } from '../../election/events/newTerm'
+import { currentValidators } from '../../session/events/newSession'
 
 export async function handleVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'Democracy.vote', { call: { args: true; origin: true; } }>,
@@ -71,10 +72,6 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     }
 
     const count = await getVotesCount(ctx, referendum.id)
-    const phase = new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).isExists ? (await new ElectionProviderMultiPhaseCurrentPhaseStorage(ctx, header).getAsV2029()) : null
-    const councilMembers = await getCouncilInPhase(ctx, header, phase)
-    const session = new SessionCurrentIndexStorage(ctx, header).isExists ? (await new SessionCurrentIndexStorage(ctx, header).getAsV1020()) : null
-    const validators = await getValidatorsInSession(ctx, header, session)
     const voter = item.call.origin ? getOriginAccountId(item.call.origin) : null
 
     await ctx.store.insert(
@@ -89,11 +86,11 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             balance,
             timestamp: new Date(header.timestamp),
             type: VoteType.Direct,
-            isCouncillor: voter && councilMembers ? councilMembers.includes(voter) : null,
-            isValidator: voter && validators ? validators.includes(voter) : null
+            isCouncillor: voter && currentCouncilMembers ? currentCouncilMembers.includes(voter) : null,
+            isValidator: voter && currentValidators ? currentValidators.includes(voter) : null
         })
     )
-    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations, councilMembers, validators)
+    await addDelegatedVotesReferendum(ctx, wallet, header.height, header.timestamp, referendum, nestedDelegations)
 }
 
 const proposalsVotes = new Map<string, number>()

@@ -33,7 +33,9 @@
     "TechnicalCommittee.Proposed",
     "TechnicalCommittee.Approved",
     "Council.Approved",
-    "TechnicalCommittee.Approved"
+    "TechnicalCommittee.Approved",
+    "Session.NewSession",
+    "PhragmenElection.NewTerm"
   ],
   "calls": [
     "Democracy.vote",

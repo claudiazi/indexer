@@ -1,0 +1,1 @@
+export { handleNewTerm } from './newTerm'
