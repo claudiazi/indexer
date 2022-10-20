@@ -247,7 +247,7 @@ export const referendaStats = `
 
             ),
 
-            vote_type AS (
+            voter_type AS (
               SELECT 
                 referendum_index
               , SUM(CASE WHEN is_validator = true THEN 1 else 0 END) AS count_validator
@@ -495,7 +495,7 @@ export const referendaStats = `
                 ON ca.referendum_index = c.referendum_index
               LEFT JOIN delegation AS d
                 ON r.referendum_index = d.referendum_index
-              LEFT JOIN vote_type AS vt
+              LEFT JOIN voter_type AS vt
                 ON r.referendum_index = vt.referendum_index
 
               )
