@@ -47,7 +47,7 @@ export class AccountStats {
     quiz_fully_correct!: Number
 
     @Field(() => String, { nullable: true })
-    vote_type!: string
+    voter_type!: string
     
     @Field(() => String, { nullable: true })
     delegated_to!: string
