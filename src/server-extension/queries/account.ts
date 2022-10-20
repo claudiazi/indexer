@@ -111,7 +111,7 @@ export const accountStats = `
                        THEN 'councillor'
                        WHEN is_validator = false AND is_councillor = false
                        THEN 'normal'
-                  END AS vote_type
+                  END AS voter_type
                 , delegated_to
                 FROM valid_vote AS v
                 LEFT JOIN refined_referendum AS r
@@ -222,7 +222,7 @@ export const accountStats = `
                           ELSE 0
                      END
                 END AS quiz_fully_correct
-              , vote_type
+              , voter_type
               , delegated_to
               , v.type                    
               FROM refined_votes AS v
