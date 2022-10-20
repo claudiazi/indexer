@@ -251,10 +251,10 @@ export const referendaStats = `
               SELECT 
                 referendum_index
               , SUM(CASE WHEN is_validator = true THEN 1 else 0 END) AS count_validator
-              , SUM(CASE WHEN is_councillor = true THEN 1 else 0 END) AS count_coucillor
+              , SUM(CASE WHEN is_councillor = true THEN 1 else 0 END) AS count_councillor
               , SUM(CASE WHEN is_validator = false AND is_councillor = false THEN 1 else 0 END) AS count_normal
               , SUM(CASE WHEN is_validator = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_validator
-              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_coucillor
+              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_councillor
               , SUM(CASE WHEN is_validator = false AND is_councillor = false THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_normal
               FROM refined_votes
               group by 1
@@ -479,10 +479,10 @@ export const referendaStats = `
               , voted_amount_direct
               , voted_amount_delegated
               , count_validator
-              , count_coucillor
+              , count_councillor
               , count_normal
               , voted_amount_validator
-              , voted_amount_coucillor
+              , voted_amount_councillor
               , voted_amount_normal
               FROM calculation AS c
               INNER JOIN refined_referendum AS r
