@@ -61,6 +61,7 @@ export const referendumStats = `
                 , CASE WHEN decision = 'abstain' THEN COALESCE((balance ->> 'aye')::decimal(38,0) / 1000000000000, 0) + COALESCE((balance ->> 'nay')::decimal(38,0) / 1000000000000, 0)
                        ELSE COALESCE((balance ->> 'value')::decimal(38,0) / 1000000000000, 0)
                   END AS balance_value
+                , delegated_to
                 FROM valid_vote AS v     
                 LEFT JOIN new_ref as n
                     ON v.voter = n.voter
@@ -78,6 +79,7 @@ export const referendumStats = `
               , (CASE WHEN decision = 'abstain' THEN balance_value / 2
                      ELSE balance_value END) * conviction 
                 AS voted_amount_with_conviction
+              , delegated_to
               FROM refined_votes
               WHERE decision in ('yes', 'abstain')
 
@@ -92,6 +94,7 @@ export const referendumStats = `
               , (CASE WHEN decision = 'abstain' THEN balance_value / 2
                   ELSE balance_value END) * conviction 
               AS voted_amount_with_conviction
+              , delegated_to
               FROM refined_votes
               WHERE decision in ('no', 'abstain')
 
@@ -104,6 +107,7 @@ export const referendumStats = `
             , decision
             , timestamp
             , is_new_account
+            , delegated_to
             , voted_amount_with_conviction
             , SUM(CASE WHEN decision = 'aye' THEN voted_amount_with_conviction
                        ELSE 0 END) OVER (PARTITION BY referendum_index

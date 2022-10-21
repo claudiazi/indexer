@@ -247,14 +247,14 @@ export const referendaStats = `
 
             ),
 
-            vote_type AS (
+            voter_type AS (
               SELECT 
                 referendum_index
               , SUM(CASE WHEN is_validator = true THEN 1 else 0 END) AS count_validator
-              , SUM(CASE WHEN is_councillor = true THEN 1 else 0 END) AS count_coucillor
+              , SUM(CASE WHEN is_councillor = true THEN 1 else 0 END) AS count_councillor
               , SUM(CASE WHEN is_validator = false AND is_councillor = false THEN 1 else 0 END) AS count_normal
               , SUM(CASE WHEN is_validator = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_validator
-              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_coucillor
+              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_councillor
               , SUM(CASE WHEN is_validator = false AND is_councillor = false THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_normal
               FROM refined_votes
               group by 1
@@ -479,10 +479,10 @@ export const referendaStats = `
               , voted_amount_direct
               , voted_amount_delegated
               , count_validator
-              , count_coucillor
+              , count_councillor
               , count_normal
               , voted_amount_validator
-              , voted_amount_coucillor
+              , voted_amount_councillor
               , voted_amount_normal
               FROM calculation AS c
               INNER JOIN refined_referendum AS r
@@ -495,7 +495,7 @@ export const referendaStats = `
                 ON ca.referendum_index = c.referendum_index
               LEFT JOIN delegation AS d
                 ON r.referendum_index = d.referendum_index
-              LEFT JOIN vote_type AS vt
+              LEFT JOIN voter_type AS vt
                 ON r.referendum_index = vt.referendum_index
 
               )

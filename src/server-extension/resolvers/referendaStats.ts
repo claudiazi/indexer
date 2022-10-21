@@ -169,7 +169,7 @@ export class ReferendaStats {
     count_validator!: number
 
     @Field(() => Number, { nullable: true })
-    count_coucillor!: number
+    count_councillor!: number
 
     @Field(() => Number, { nullable: true })
     count_normal!: number
@@ -178,7 +178,7 @@ export class ReferendaStats {
     voted_amount_validator!: number
 
     @Field(() => Number, { nullable: true })
-    voted_amount_coucillor!: number
+    voted_amount_councillor!: number
 
     @Field(() => Number, { nullable: true })
     voted_amount_normal!: number
