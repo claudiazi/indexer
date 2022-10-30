@@ -115,10 +115,6 @@ export const referendaStats = `
               , referendum_index
               , decision
               , CASE WHEN lock_period = 0 THEN 0.1
-                     WHEN lock_period = 4 THEN 3
-                     WHEN lock_period = 8 THEN 4
-                     WHEN lock_period = 16 THEN 5
-                     WHEN lock_period = 32 THEN 6
                      ELSE lock_period 
                 END AS conviction
               , (balance ->> 'value')::decimal(38,0) AS balance_value
