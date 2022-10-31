@@ -191,6 +191,8 @@ export class ReferendaStats {
 
 export let referendaCache = new Map<number, ReferendaStats>()
 
+export let needUpdate = new Array()
+
 @Resolver()
 export class ReferendaStatsResolver {
     // Set by depenency injection
@@ -198,9 +200,13 @@ export class ReferendaStatsResolver {
 
     @Query(() => [ReferendaStats])
     async referendaStats(
-        @Arg("ids", () => [Number], {nullable: false, defaultValue: []})
+        @Arg("ids", () => [Number], { nullable: false, defaultValue: [] })
         ids: Number[]
     ): Promise<ReferendaStats[]> {
+        needUpdate.forEach((referendumIndex: number, index: number) => {
+            referendaCache.delete(referendumIndex)
+            needUpdate.splice(index, 1)
+        })
         const manager = await this.tx()
         const newRefs: ReferendaStats[] = await manager.getRepository(Vote).query(referendaStats, [[...(Array.from(referendaCache.keys())), ...ids]])
         let toSendBack: ReferendaStats[] = []

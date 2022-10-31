@@ -18,6 +18,7 @@ import { CorrectAnswer } from '../../../model/generated/correctAnswer.model'
 import { AnswerData, ConfigData, CorrectAnswerData, OptionData, QuizData, UserItem } from './types'
 import { getAnswerCount, getAnswerOptionCount, getConfigVersion, getCorrectAnswerVersion, getDistributionCount, getDistributionVersion, getOptionCount, getQuestionCount, getQuizVersion, getResourceCount, getSubmissionCount, getSubmissionVersion, isProofOfChaosAddress, isProofOfChaosMessage, isProposer } from './helpers'
 import { Answer } from '../../../model/generated/answer.model'
+import { needUpdate } from '../../../server-extension/resolvers/referendaStats'
 
 
 
@@ -332,11 +333,12 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             }
             break
         case 'CORRECTANSWERS':
-            if (isProofOfChaosAddress(originAccountId) || await isProposer(ctx, originAccountId, parseInt(args[1]))) {
+            const referendumIndex = parseInt(args[1])
+            if (isProofOfChaosAddress(originAccountId) || await isProposer(ctx, originAccountId, referendumIndex)) {
                 const correctAnswerData: CorrectAnswerData = JSON.parse(args[3])
                 // const quizVersion = parseInt(args[3])
                 // const correctAnswers = JSON.parse(args[4])
-                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: correctAnswerData.quizVersion } })
+                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex, version: correctAnswerData.quizVersion } })
                 if (!quizDb) {
                     ctx.log.warn(MissingQuizVersionWarn(args[1], correctAnswerData.quizVersion))
                     return
@@ -373,6 +375,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                         await ctx.store.save(answer)
                     }
                 }
+                needUpdate.push(referendumIndex)
             }
             else {
                 ctx.log.warn(NotProposerNotProofOfChaos(args[1], originAccountId))
