@@ -82,7 +82,8 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     minAmount,
                     seed,
                     min,
-                    max } = configData
+                    max,
+                    defaultRoyalty } = configData
 
                 const configId = `${args[1]}-${version.toString().padStart(8, '0')}`
 
@@ -112,6 +113,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     seed,
                     min,
                     max,
+                    defaultRoyalty,
                     timestamp: new Date(header.timestamp),
                 })
                 await ctx.store.insert(config)
