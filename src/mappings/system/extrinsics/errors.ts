@@ -32,7 +32,7 @@ export function AnswerDataNotComplete(answerData: AnswerData) {
     return `AnswerData not complete. Possibly missing answer array: ${answerData.answers} and/or quizVersion: ${answerData.quizVersion}.`
 }
 
-export function AnswerDataNotJSONParsable(answerDataInput: String) {
-    return `The answerDataString is not parsable to JSON: ${answerDataInput}.`
+export function AnswerDataNotJSONParsable(answerDataString: string, wallet: string, block: number) {
+    return `The answerDataString is not parsable to JSON: ${answerDataString} at Block ${block} by wallet ${wallet}.`
 }
 

@@ -289,7 +289,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                 try {
                     answerData = JSON.parse(answerDataString)
                 } catch (e) {
-                    ctx.log.warn(AnswerDataNotJSONParsable(args[3]))
+                    ctx.log.warn(AnswerDataNotJSONParsable(answerDataString, originAccountId, header.height))
                     return
                 }
 
