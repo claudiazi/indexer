@@ -6,7 +6,7 @@ import { Resource } from '../../../model/generated/resource.model'
 import { Quiz } from '../../../model/generated/quiz.model'
 import { SystemRemarkCall } from '../../../types/calls'
 import { getOriginAccountId } from '../../../common/tools'
-import { AnswerDataNotComplete, AnswerSubmissionTooLate, InvalidCorrectAnswerIndex, MissingQuizVersionWarn, NotProposerNotProofOfChaos, QuizSubmissionTooLate, WrongAnswerLength, WrongCorrectAnswerLength } from './errors'
+import { AnswerDataNotComplete, AnswerDataNotJSONParsable, AnswerSubmissionTooLate, InvalidCorrectAnswerIndex, MissingQuizVersionWarn, NotProposerNotProofOfChaos, QuizSubmissionTooLate, WrongAnswerLength, WrongCorrectAnswerLength } from './errors'
 import { MissingConfigWarn, MissingOptionWarn, MissingQuestionWarn, MissingQuizWarn, MissingReferendumWarn } from '../../utils/errors'
 import { AnswerOption } from '../../../model/generated/answerOption.model'
 import { Referendum } from '../../../model'
@@ -284,7 +284,15 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                 return
             }
             else {
-                const answerData: AnswerData = JSON.parse(args[3])
+                let answerDataString = args[3].replace(/\\"/g, '"');
+                let answerData: AnswerData
+                try {
+                    answerData = JSON.parse(answerDataString)
+                } catch (e) {
+                    ctx.log.warn(AnswerDataNotJSONParsable(args[3]))
+                    return
+                }
+
                 const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: answerData.quizVersion } })
                 if (answerData.answers == null || answerData.quizVersion == null || answerData.answers.length == 0) {
                     ctx.log.warn(AnswerDataNotComplete(answerData))
