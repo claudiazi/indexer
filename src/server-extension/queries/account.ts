@@ -105,8 +105,7 @@ export const accountStats = `
                        THEN 'validator'
                        WHEN is_validator = false AND is_councillor = true
                        THEN 'councillor'
-                       WHEN is_validator = false AND is_councillor = false
-                       THEN 'normal'
+                       ELSE 'normal'
                   END AS voter_type
                 , delegated_to
                 FROM valid_vote AS v
