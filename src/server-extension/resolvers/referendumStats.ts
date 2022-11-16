@@ -27,13 +27,7 @@ export class ReferendumStats {
 
     @Field(() => Number, { nullable: false })
     voted_amount_with_conviction!: number
-
-    @Field(() => Number, { nullable: false })
-    cum_voted_amount_with_conviction_aye!: number
-
-    @Field(() => Number, { nullable: false })
-    cum_voted_amount_with_conviction_nay!: number
-
+    
     @Field(() => Number, { nullable: false })
     cum_new_accounts!: number
 
