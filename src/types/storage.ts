@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Block, Chain, ChainContext, BlockContext, Result} from './support'
+import {Block, Chain, ChainContext, BlockContext, Result, Option} from './support'
 import * as v1020 from './v1020'
 import * as v1022 from './v1022'
 import * as v1024 from './v1024'
@@ -49,6 +49,8 @@ import * as v9230 from './v9230'
 import * as v9250 from './v9250'
 import * as v9271 from './v9271'
 import * as v9291 from './v9291'
+import * as v9300 from './v9300'
+import * as v9320 from './v9320'
 
 export class BalancesTotalIssuanceStorage {
   private readonly _chain: Chain
@@ -433,6 +435,56 @@ export class CouncilProposalOfStorage {
   }
 
   /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  get isV9300() {
+    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '4489558a261f014c524a3fa533244e852a4234f4db9aba95f960d069aa1a2db7'
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  async getAsV9300(key: Uint8Array): Promise<v9300.Call | undefined> {
+    assert(this.isV9300)
+    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
+  }
+
+  async getManyAsV9300(keys: Uint8Array[]): Promise<(v9300.Call | undefined)[]> {
+    assert(this.isV9300)
+    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9300(): Promise<(v9300.Call)[]> {
+    assert(this.isV9300)
+    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  get isV9320() {
+    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === 'e264f3acf17bae2089248c1b5be4b79c3766ff552e8565a925e0bceaa16c973b'
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  async getAsV9320(key: Uint8Array): Promise<v9320.Call | undefined> {
+    assert(this.isV9320)
+    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
+  }
+
+  async getManyAsV9320(keys: Uint8Array[]): Promise<(v9320.Call | undefined)[]> {
+    assert(this.isV9320)
+    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9320(): Promise<(v9320.Call)[]> {
+    assert(this.isV9320)
+    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
+  }
+
+  /**
    * Checks whether the storage item is defined for the current chain version.
    */
   get isExists(): boolean {
@@ -592,7 +644,7 @@ export class DemocracyPublicPropsStorage {
    *  The public proposals. Unsorted.
    */
   get isV1020() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') === '73cb1a7c4424f713001c8416e3f33d8a4cff058377ae880f2cae103ae0ffec18'
+    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') === '0da61e381ba5d7090741171fee74491d6e5f0d3b420709a45911270de6f4da0a'
   }
 
   /**
@@ -615,6 +667,21 @@ export class DemocracyPublicPropsStorage {
    */
   async getAsV1022(): Promise<[number, Uint8Array, Uint8Array][]> {
     assert(this.isV1022)
+    return this._chain.getStorage(this.blockHash, 'Democracy', 'PublicProps')
+  }
+
+  /**
+   *  The public proposals. Unsorted. The second item is the proposal.
+   */
+  get isV9320() {
+    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') === '3472d1c9441381a2b9709395dfc47ee60b049d41fbd71ce557eb1a61ef656bec'
+  }
+
+  /**
+   *  The public proposals. Unsorted. The second item is the proposal.
+   */
+  async getAsV9320(): Promise<[number, v9320.Bounded, Uint8Array][]> {
+    assert(this.isV9320)
     return this._chain.getStorage(this.blockHash, 'Democracy', 'PublicProps')
   }
 
@@ -718,6 +785,35 @@ export class DemocracyReferendumInfoOfStorage {
   }
 
   /**
+   *  Information concerning any given referendum.
+   * 
+   *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+   */
+  get isV9320() {
+    return this._chain.getStorageItemTypeHash('Democracy', 'ReferendumInfoOf') === 'ba926738202889ee118b1f40d70a1edbd71f0893c703c708a73330af6ca468e1'
+  }
+
+  /**
+   *  Information concerning any given referendum.
+   * 
+   *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+   */
+  async getAsV9320(key: number): Promise<v9320.ReferendumInfo | undefined> {
+    assert(this.isV9320)
+    return this._chain.getStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', key)
+  }
+
+  async getManyAsV9320(keys: number[]): Promise<(v9320.ReferendumInfo | undefined)[]> {
+    assert(this.isV9320)
+    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9320(): Promise<(v9320.ReferendumInfo)[]> {
+    assert(this.isV9320)
+    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf')
+  }
+
+  /**
    * Checks whether the storage item is defined for the current chain version.
    */
   get isExists(): boolean {
@@ -776,7 +872,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1020() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '988b54a69200501d1caa21231c09e8d115ce376b26e5cfe53b9efe6d1aa2353f'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ff658fad55af8e9e38fe1bed80067dc6842aefcacc9835f3404ef79a9bfa9a7f'
   }
 
   /**
@@ -801,7 +897,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1022() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'dd07ea6860eb31afbcf979619a9f751f46be77411e9c22ab6d968f1cbb826975'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'cf2bde75ee5bf4aedef305aabd50a859b561d2ea72a3ad32f0253c133c791f40'
   }
 
   /**
@@ -826,7 +922,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1024() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'd1057f90e4da1f4375c8e1942f93abac694f8f1e3eb41ae19b49794a3cd7754c'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'af9a5b7fd3313a46c1c6b41b8b6812f69ff0f2b1edd8d66693a82c0ca49db343'
   }
 
   /**
@@ -851,7 +947,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1027() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '952306cf3b40b722e8a89f97348456e7288504655b1fef8f8848728064e020d6'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'fcb038bcf495bae551346ead7a5d7cb7edff11f26babbbe2fcc9d0fbbfb0ee86'
   }
 
   /**
@@ -876,7 +972,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1029() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'c684ff44da66806df8f7b0311e8b461bcd53a6438c7321d8065c89376d754173'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '1fa524953ff02a11fb7b9dc520b34c836bf4a94b731f96f02d8442061891be9a'
   }
 
   /**
@@ -901,7 +997,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1030() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'a5dece5dab1ee986977b4658ed7c0dcc0ead6936604d3359ae5d56497127c435'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '722c944e5d464430da96eb7afb30cb22dcf97958e77a989b11b76e0a08bc91ae'
   }
 
   /**
@@ -926,7 +1022,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1031() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '491d769f67c8b91e6c1892535c8a0d6726eac1c321ce672b23b722cea1b1ab46'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '04587b1736af13aca0b303f067e8d8ca82708a7c35f7e540deb889b26b16e850'
   }
 
   /**
@@ -951,7 +1047,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1032() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '3cec838f63976aa29bba710d21944d10bd6aaf418ca780e11fe2c2d0e628d629'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '687ab865a15f03a5c5501e45563136c8c7e04087d3f2d252349b1e3afc2bb95b'
   }
 
   /**
@@ -976,7 +1072,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1038() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '6f242fd68c6cf6b13795cb7c87e22bc4d5cb344260c9c4976f712b389f1a72e5'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '4b12bc407721d3d627ff8c350094c66df705befac88991c10ee1900190e41fcd'
   }
 
   /**
@@ -1001,7 +1097,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1039() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '46ed4057a9e44696c823f53a2afcf45ec0e1319fff4b984ff2a78dac066632b7'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '280c2b5e09651099a2df56d3a3b1021971981e68df34b2cc71f846a279441cf7'
   }
 
   /**
@@ -1026,7 +1122,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1040() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '09964938a6344ce4017f443d37b809998da5205b97ba32089dc34e25517d8727'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '7b716afbe6383efdfa96087dbe25666ef1749a83171459d7a417e308370bf5ce'
   }
 
   /**
@@ -1051,7 +1147,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1042() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'c5be77395b90894b0b9d89a8bfd40c3969fd90f48d12a513d31f62f19ba198b2'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ba9ae3f886667e78e6929d4b9f36feb891aad7e94d36a75d3c2835143d849183'
   }
 
   /**
@@ -1076,7 +1172,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1050() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '75a26ba5a11378b5ec0d7e80a5150e53f1723bf825534c48ac8df88d46f8ad11'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'd780ab190a15dcdf4e9424c86844bcd43951578af085195d51e82860b74ea017'
   }
 
   /**
@@ -1101,7 +1197,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1054() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ecb491dab152e949512780951867e171f6a72abd7ec8510103dcec7c8482218c'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '4ee1bcb3e88f1695c390a015a7bb5456bbed70aea3e714981690f4d1e6647d20'
   }
 
   /**
@@ -1126,7 +1222,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1055() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'f76941917fe1c97effc3b54c45775b17c3dd7b8644e859888214965a3d2c1915'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '9b1888d08bbc63ca77fc479899195e8abbc91196043f964ed6ae05f7a6b92ac2'
   }
 
   /**
@@ -1151,7 +1247,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1058() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'a40aebf7430950292287f9ba1ac41514aec633d7ce9c595b51922b2d00f766c4'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '51d22c65a4493fbee384e3c6b5480902226dcb7f07fdae2e09b1ed994581b8a2'
   }
 
   /**
@@ -1176,7 +1272,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1062() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'f1964574c2acdf7657cebbec13992465e146c9c1d70a9ebfe5cb2c849e33a8fb'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '2bebfde2c19829d495b45d6c78ef1337d124232bf319c06661a736c67899c40b'
   }
 
   /**
@@ -1201,7 +1297,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2005() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '59d62f9580ec29b948bb61b54782d0eb894f759082f4cd66b3d721cd51fc6eab'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'b1d8bd7af8a0bdba85190975d77d06e416603175b1c190c6efc22966d2222b42'
   }
 
   /**
@@ -1226,7 +1322,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2007() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '9b8403a58da018e039e7d02e03c58751e5f3966f734c0a805247c8f819ebe6e6'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '961aa31652f228fead4d9c95205bb44df6d3431225fc46ab1b2bb180613401d3'
   }
 
   /**
@@ -1251,7 +1347,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2011() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '72ae96a40c2e115fd196fda8aba62965500743102911195e5db6bffe5c730a89'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '611412d18d1c6341ce497288da6f8d52d113a683fd777fa5d7a6c0ac089326a1'
   }
 
   /**
@@ -1276,7 +1372,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2013() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '646a7b14d2d0c7e0302ab7e697eb7a22ce351bc30f8ed014a36febdee8fd066c'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '1095e28f34062b5a0a31d9abd5578a7aa39d989d65d6cd2c6987346f2cacface'
   }
 
   /**
@@ -1301,7 +1397,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2015() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '49cb7fd61e09b6e09885d9254e3179527de1bb56a3bac4e41806540efa177504'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '633a2c0a40bf70aa7d1a84d140419484144593cd4c1fbd16efca4f71428abd5c'
   }
 
   /**
@@ -1326,7 +1422,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2022() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'e940a02bab509e8f3c662c3743d99681461dc41eb7807d9f724137541d6d6888'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ba39e6f89dc7984a5de5986ba21ea9c7874a17928d35ee22e9f19a6a32b06ed7'
   }
 
   /**
@@ -1351,7 +1447,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2023() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '28ae6082aa3659f3eb665b763906f5f43dfc25a261e76bc3bfaae2bf35809886'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '0eff9f067f650895cebad9eb8f6d2e0b87378eb99f6cfcc9188519b6809e81c7'
   }
 
   /**
@@ -1376,7 +1472,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2024() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '30c3471266df7fa23a52dd4c3eee936e8a38a242733b19606a6d8434b8818044'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'f47e7718dc7af5fdbceb48ad3c23c248921145bbaaefecdaf3c6e766071a0379'
   }
 
   /**
@@ -1401,7 +1497,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2025() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'c6aa8f92b929d74aa84d6bc73ac4de7208eb9ea79b0633b7ece10545e71bc6bc'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '20b9a67d80ebdfbcdbeab6296df5fb3c08e4edd42eb821b0d267a4e6a5639fe3'
   }
 
   /**
@@ -1426,7 +1522,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2026() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '8273b8a7016b06dcb65adf9f34a09480690bdb5cd14cc410c9b0899a03dd8f22'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'b96abbff6a00bf4f4edb47eab52154f403f584ec4ab38b7e4be1af0d215bc2e2'
   }
 
   /**
@@ -1451,7 +1547,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2028() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '90dd79f7117af09c072af285850479432c5a99791d1cb8011e2307aefaf37418'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '399c92d404fea7dc92e323f9384520a1dcaf371691e5db7723306cc5b1246d94'
   }
 
   /**
@@ -1476,7 +1572,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2029() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '9a9b6f49439518cb37672ca52b7e5cdb2843109031f61e24e5cf371f32c697a7'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '468d59d5b40e80c13c2d81c4774d12f145dcf6ba2363aef718241ac2abc28d12'
   }
 
   /**
@@ -1501,7 +1597,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2030() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '25b92df233c91ed77e0904a09051cb0985d8c95cc1fce890170e11c95ab35140'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'd82835c91c052dffa0a14eb20b7a8a134d538d2d60742b962f3fa7823c1657fa'
   }
 
   /**
@@ -1526,7 +1622,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9010() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '5bf6f4d6a582b79d1aee1559e4425bb7d7571ed6552fd0809e0e4b0dbbf14be1'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '198809793338f28c0a822990194fdeaf2dec25e8848048ce7bb835b676396a37'
   }
 
   /**
@@ -1551,7 +1647,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9030() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '267a1fbacfcf39c6f41faa7e15dafc885f811d4264d1b98fd4dedb06864a2336'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '133daac7167756eaebbdcb23c93e2211158671e84e107af848071d3534ed99bd'
   }
 
   /**
@@ -1576,7 +1672,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9040() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '5972aac9112d1be3d00a2d2b08c3514aa87c25a026ecea82cc1e4313f6ab53fd'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '45640f8fa172b75c33ced53cedf23106c06b9a91427a71e706d9d136aed8d3a6'
   }
 
   /**
@@ -1601,7 +1697,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9050() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '13cccf90ea77264605ec33f6f3b06b5c5099212f507d16348a4307e25e0037c8'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '6ffbddf00697f7a651ddd2bd8789384e7dca3980a60aa5a2499d016d43b1ac56'
   }
 
   /**
@@ -1626,7 +1722,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9080() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'a06f31f28526e77b614a3b1ddf8bbed59ba55c22b665429e9747768d6a8dabcb'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '5c95cef639e096f92226c0b752c338b2195817a6e7f6d387b5199e8de3e02bab'
   }
 
   /**
@@ -1651,7 +1747,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9090() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '56cdb3f333767ac0c8f3522af138085a5e74d4faaeea50fddc95031771c85058'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '3060f9c0543c77d2a8f13dd41a665b6e953b60cd682f2cd0a4b9e47ca76c255d'
   }
 
   /**
@@ -1676,7 +1772,7 @@ export class Instance1CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9100() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'eaae83c0de21b5d6a3d1072074b4bb2172d61801a9d623da700c1b0b85c82321'
+    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '4da47ef769f8cd0065a1642d93ed9e4664c7b938642677491109a7b2d9dffc5c'
   }
 
   /**
@@ -1721,7 +1817,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1020() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '988b54a69200501d1caa21231c09e8d115ce376b26e5cfe53b9efe6d1aa2353f'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ff658fad55af8e9e38fe1bed80067dc6842aefcacc9835f3404ef79a9bfa9a7f'
   }
 
   /**
@@ -1746,7 +1842,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1022() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'dd07ea6860eb31afbcf979619a9f751f46be77411e9c22ab6d968f1cbb826975'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'cf2bde75ee5bf4aedef305aabd50a859b561d2ea72a3ad32f0253c133c791f40'
   }
 
   /**
@@ -1771,7 +1867,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1024() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'd1057f90e4da1f4375c8e1942f93abac694f8f1e3eb41ae19b49794a3cd7754c'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'af9a5b7fd3313a46c1c6b41b8b6812f69ff0f2b1edd8d66693a82c0ca49db343'
   }
 
   /**
@@ -1796,7 +1892,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1027() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '952306cf3b40b722e8a89f97348456e7288504655b1fef8f8848728064e020d6'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'fcb038bcf495bae551346ead7a5d7cb7edff11f26babbbe2fcc9d0fbbfb0ee86'
   }
 
   /**
@@ -1821,7 +1917,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1029() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'c684ff44da66806df8f7b0311e8b461bcd53a6438c7321d8065c89376d754173'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '1fa524953ff02a11fb7b9dc520b34c836bf4a94b731f96f02d8442061891be9a'
   }
 
   /**
@@ -1846,7 +1942,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1030() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'a5dece5dab1ee986977b4658ed7c0dcc0ead6936604d3359ae5d56497127c435'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '722c944e5d464430da96eb7afb30cb22dcf97958e77a989b11b76e0a08bc91ae'
   }
 
   /**
@@ -1871,7 +1967,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1031() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '491d769f67c8b91e6c1892535c8a0d6726eac1c321ce672b23b722cea1b1ab46'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '04587b1736af13aca0b303f067e8d8ca82708a7c35f7e540deb889b26b16e850'
   }
 
   /**
@@ -1896,7 +1992,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1032() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '3cec838f63976aa29bba710d21944d10bd6aaf418ca780e11fe2c2d0e628d629'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '687ab865a15f03a5c5501e45563136c8c7e04087d3f2d252349b1e3afc2bb95b'
   }
 
   /**
@@ -1921,7 +2017,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1038() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '6f242fd68c6cf6b13795cb7c87e22bc4d5cb344260c9c4976f712b389f1a72e5'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '4b12bc407721d3d627ff8c350094c66df705befac88991c10ee1900190e41fcd'
   }
 
   /**
@@ -1946,7 +2042,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1039() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '46ed4057a9e44696c823f53a2afcf45ec0e1319fff4b984ff2a78dac066632b7'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '280c2b5e09651099a2df56d3a3b1021971981e68df34b2cc71f846a279441cf7'
   }
 
   /**
@@ -1971,7 +2067,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1040() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '09964938a6344ce4017f443d37b809998da5205b97ba32089dc34e25517d8727'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '7b716afbe6383efdfa96087dbe25666ef1749a83171459d7a417e308370bf5ce'
   }
 
   /**
@@ -1996,7 +2092,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1042() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'c5be77395b90894b0b9d89a8bfd40c3969fd90f48d12a513d31f62f19ba198b2'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ba9ae3f886667e78e6929d4b9f36feb891aad7e94d36a75d3c2835143d849183'
   }
 
   /**
@@ -2021,7 +2117,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1050() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '75a26ba5a11378b5ec0d7e80a5150e53f1723bf825534c48ac8df88d46f8ad11'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'd780ab190a15dcdf4e9424c86844bcd43951578af085195d51e82860b74ea017'
   }
 
   /**
@@ -2046,7 +2142,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1054() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ecb491dab152e949512780951867e171f6a72abd7ec8510103dcec7c8482218c'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '4ee1bcb3e88f1695c390a015a7bb5456bbed70aea3e714981690f4d1e6647d20'
   }
 
   /**
@@ -2071,7 +2167,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1055() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'f76941917fe1c97effc3b54c45775b17c3dd7b8644e859888214965a3d2c1915'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '9b1888d08bbc63ca77fc479899195e8abbc91196043f964ed6ae05f7a6b92ac2'
   }
 
   /**
@@ -2096,7 +2192,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1058() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'a40aebf7430950292287f9ba1ac41514aec633d7ce9c595b51922b2d00f766c4'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '51d22c65a4493fbee384e3c6b5480902226dcb7f07fdae2e09b1ed994581b8a2'
   }
 
   /**
@@ -2121,7 +2217,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV1062() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'f1964574c2acdf7657cebbec13992465e146c9c1d70a9ebfe5cb2c849e33a8fb'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '2bebfde2c19829d495b45d6c78ef1337d124232bf319c06661a736c67899c40b'
   }
 
   /**
@@ -2146,7 +2242,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2005() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '59d62f9580ec29b948bb61b54782d0eb894f759082f4cd66b3d721cd51fc6eab'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'b1d8bd7af8a0bdba85190975d77d06e416603175b1c190c6efc22966d2222b42'
   }
 
   /**
@@ -2171,7 +2267,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2007() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '9b8403a58da018e039e7d02e03c58751e5f3966f734c0a805247c8f819ebe6e6'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '961aa31652f228fead4d9c95205bb44df6d3431225fc46ab1b2bb180613401d3'
   }
 
   /**
@@ -2196,7 +2292,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2011() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '72ae96a40c2e115fd196fda8aba62965500743102911195e5db6bffe5c730a89'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '611412d18d1c6341ce497288da6f8d52d113a683fd777fa5d7a6c0ac089326a1'
   }
 
   /**
@@ -2221,7 +2317,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2013() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '646a7b14d2d0c7e0302ab7e697eb7a22ce351bc30f8ed014a36febdee8fd066c'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '1095e28f34062b5a0a31d9abd5578a7aa39d989d65d6cd2c6987346f2cacface'
   }
 
   /**
@@ -2246,7 +2342,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2015() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '49cb7fd61e09b6e09885d9254e3179527de1bb56a3bac4e41806540efa177504'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '633a2c0a40bf70aa7d1a84d140419484144593cd4c1fbd16efca4f71428abd5c'
   }
 
   /**
@@ -2271,7 +2367,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2022() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'e940a02bab509e8f3c662c3743d99681461dc41eb7807d9f724137541d6d6888'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ba39e6f89dc7984a5de5986ba21ea9c7874a17928d35ee22e9f19a6a32b06ed7'
   }
 
   /**
@@ -2296,7 +2392,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2023() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '28ae6082aa3659f3eb665b763906f5f43dfc25a261e76bc3bfaae2bf35809886'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '0eff9f067f650895cebad9eb8f6d2e0b87378eb99f6cfcc9188519b6809e81c7'
   }
 
   /**
@@ -2321,7 +2417,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2024() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '30c3471266df7fa23a52dd4c3eee936e8a38a242733b19606a6d8434b8818044'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'f47e7718dc7af5fdbceb48ad3c23c248921145bbaaefecdaf3c6e766071a0379'
   }
 
   /**
@@ -2346,7 +2442,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2025() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'c6aa8f92b929d74aa84d6bc73ac4de7208eb9ea79b0633b7ece10545e71bc6bc'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '20b9a67d80ebdfbcdbeab6296df5fb3c08e4edd42eb821b0d267a4e6a5639fe3'
   }
 
   /**
@@ -2371,7 +2467,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2026() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '8273b8a7016b06dcb65adf9f34a09480690bdb5cd14cc410c9b0899a03dd8f22'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'b96abbff6a00bf4f4edb47eab52154f403f584ec4ab38b7e4be1af0d215bc2e2'
   }
 
   /**
@@ -2396,7 +2492,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2028() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '90dd79f7117af09c072af285850479432c5a99791d1cb8011e2307aefaf37418'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '399c92d404fea7dc92e323f9384520a1dcaf371691e5db7723306cc5b1246d94'
   }
 
   /**
@@ -2421,7 +2517,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2029() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '9a9b6f49439518cb37672ca52b7e5cdb2843109031f61e24e5cf371f32c697a7'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '468d59d5b40e80c13c2d81c4774d12f145dcf6ba2363aef718241ac2abc28d12'
   }
 
   /**
@@ -2446,7 +2542,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV2030() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '25b92df233c91ed77e0904a09051cb0985d8c95cc1fce890170e11c95ab35140'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'd82835c91c052dffa0a14eb20b7a8a134d538d2d60742b962f3fa7823c1657fa'
   }
 
   /**
@@ -2471,7 +2567,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9010() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '5bf6f4d6a582b79d1aee1559e4425bb7d7571ed6552fd0809e0e4b0dbbf14be1'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '198809793338f28c0a822990194fdeaf2dec25e8848048ce7bb835b676396a37'
   }
 
   /**
@@ -2496,7 +2592,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9030() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '267a1fbacfcf39c6f41faa7e15dafc885f811d4264d1b98fd4dedb06864a2336'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '133daac7167756eaebbdcb23c93e2211158671e84e107af848071d3534ed99bd'
   }
 
   /**
@@ -2521,7 +2617,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9040() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '5972aac9112d1be3d00a2d2b08c3514aa87c25a026ecea82cc1e4313f6ab53fd'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '45640f8fa172b75c33ced53cedf23106c06b9a91427a71e706d9d136aed8d3a6'
   }
 
   /**
@@ -2546,7 +2642,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9050() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '13cccf90ea77264605ec33f6f3b06b5c5099212f507d16348a4307e25e0037c8'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '6ffbddf00697f7a651ddd2bd8789384e7dca3980a60aa5a2499d016d43b1ac56'
   }
 
   /**
@@ -2571,7 +2667,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9080() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'a06f31f28526e77b614a3b1ddf8bbed59ba55c22b665429e9747768d6a8dabcb'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '5c95cef639e096f92226c0b752c338b2195817a6e7f6d387b5199e8de3e02bab'
   }
 
   /**
@@ -2596,7 +2692,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9090() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '56cdb3f333767ac0c8f3522af138085a5e74d4faaeea50fddc95031771c85058'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '3060f9c0543c77d2a8f13dd41a665b6e953b60cd682f2cd0a4b9e47ca76c255d'
   }
 
   /**
@@ -2621,7 +2717,7 @@ export class Instance2CollectiveProposalOfStorage {
    *  Actual proposal for a given hash, if it's current.
    */
   get isV9100() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'eaae83c0de21b5d6a3d1072074b4bb2172d61801a9d623da700c1b0b85c82321'
+    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '4da47ef769f8cd0065a1642d93ed9e4664c7b938642677491109a7b2d9dffc5c'
   }
 
   /**
@@ -3029,6 +3125,56 @@ export class TechnicalCommitteeProposalOfStorage {
 
   async getAllAsV9291(): Promise<(v9291.Call)[]> {
     assert(this.isV9291)
+    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  get isV9300() {
+    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '4489558a261f014c524a3fa533244e852a4234f4db9aba95f960d069aa1a2db7'
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  async getAsV9300(key: Uint8Array): Promise<v9300.Call | undefined> {
+    assert(this.isV9300)
+    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
+  }
+
+  async getManyAsV9300(keys: Uint8Array[]): Promise<(v9300.Call | undefined)[]> {
+    assert(this.isV9300)
+    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9300(): Promise<(v9300.Call)[]> {
+    assert(this.isV9300)
+    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  get isV9320() {
+    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === 'e264f3acf17bae2089248c1b5be4b79c3766ff552e8565a925e0bceaa16c973b'
+  }
+
+  /**
+   *  Actual proposal for a given hash, if it's current.
+   */
+  async getAsV9320(key: Uint8Array): Promise<v9320.Call | undefined> {
+    assert(this.isV9320)
+    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
+  }
+
+  async getManyAsV9320(keys: Uint8Array[]): Promise<(v9320.Call | undefined)[]> {
+    assert(this.isV9320)
+    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
+  }
+
+  async getAllAsV9320(): Promise<(v9320.Call)[]> {
+    assert(this.isV9320)
     return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
   }
 

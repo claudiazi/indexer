@@ -1,4 +1,4 @@
-import type {Result} from './support'
+import type {Result, Option} from './support'
 
 export type VoteThreshold = VoteThreshold_SuperMajorityApprove | VoteThreshold_SuperMajorityAgainst | VoteThreshold_SimpleMajority
 
@@ -2540,17 +2540,14 @@ export type RewardDestination = RewardDestination_Staked | RewardDestination_Sta
 
 export interface RewardDestination_Staked {
   __kind: 'Staked'
-  value: null
 }
 
 export interface RewardDestination_Stash {
   __kind: 'Stash'
-  value: null
 }
 
 export interface RewardDestination_Controller {
   __kind: 'Controller'
-  value: null
 }
 
 export interface RewardDestination_Account {
@@ -2560,7 +2557,6 @@ export interface RewardDestination_Account {
 
 export interface RewardDestination_None {
   __kind: 'None'
-  value: null
 }
 
 export interface ValidatorPrefs {
@@ -2609,7 +2605,6 @@ export type ValidityAttestation = ValidityAttestation_Never | ValidityAttestatio
 
 export interface ValidityAttestation_Never {
   __kind: 'Never'
-  value: null
 }
 
 export interface ValidityAttestation_Implicit {
@@ -2666,7 +2661,6 @@ export interface DigestItem_ChangesTrieSignal {
 
 export interface DigestItem_RuntimeEnvironmentUpdated {
   __kind: 'RuntimeEnvironmentUpdated'
-  value: null
 }
 
 export interface CandidateCommitments {

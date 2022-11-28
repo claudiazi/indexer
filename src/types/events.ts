@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Chain, ChainContext, EventContext, Event, Result} from './support'
+import {Chain, ChainContext, EventContext, Event, Result, Option} from './support'
 import * as v1020 from './v1020'
 import * as v9090 from './v9090'
 import * as v9111 from './v9111'
@@ -164,13 +164,13 @@ export class DemocracyExecutedEvent {
    *  A proposal has been enacted. \[ref_index, result\]
    */
   get isV9090(): boolean {
-    return this._chain.getEventHash('Democracy.Executed') === '8d7c54bbac5b548a558504b413146fe5bff0b9275a2e7f4c831a148273ee173a'
+    return this._chain.getEventHash('Democracy.Executed') === 'eb9b9aa153af924ae575ee1268a0d7eee3362b24083e39a0c664284fb99e9bf4'
   }
 
   /**
    *  A proposal has been enacted. \[ref_index, result\]
    */
-  get asV9090(): [number, Result<null, v9090.DispatchError>] {
+  get asV9090(): [number, v9090.DispatchResult] {
     assert(this.isV9090)
     return this._chain.decodeEvent(this.event)
   }
@@ -179,13 +179,13 @@ export class DemocracyExecutedEvent {
    * A proposal has been enacted. \[ref_index, result\]
    */
   get isV9111(): boolean {
-    return this._chain.getEventHash('Democracy.Executed') === '4569400573983e7dffe031a303e5028518f139390f47223a097cb35de3005258'
+    return this._chain.getEventHash('Democracy.Executed') === 'c83a84e76e348dd28ec0b3d255b3b6614da57c66bcdca25e179abc516b1d0b15'
   }
 
   /**
    * A proposal has been enacted. \[ref_index, result\]
    */
-  get asV9111(): [number, Result<null, v9111.DispatchError>] {
+  get asV9111(): [number, v9111.Type_52] {
     assert(this.isV9111)
     return this._chain.decodeEvent(this.event)
   }
@@ -194,13 +194,13 @@ export class DemocracyExecutedEvent {
    * A proposal has been enacted.
    */
   get isV9130(): boolean {
-    return this._chain.getEventHash('Democracy.Executed') === '1f0fb32f2f0aaba231b69023c5858e85b8bfd660b5ce8c47d1b99b39602e4963'
+    return this._chain.getEventHash('Democracy.Executed') === '0077901b6de880646efe44eef6ddcdc431a84c0fe153cc9f8e6e66c9354cbb13'
   }
 
   /**
    * A proposal has been enacted.
    */
-  get asV9130(): {refIndex: number, result: Result<null, v9130.DispatchError>} {
+  get asV9130(): {refIndex: number, result: v9130.Type_49} {
     assert(this.isV9130)
     return this._chain.decodeEvent(this.event)
   }
@@ -209,13 +209,13 @@ export class DemocracyExecutedEvent {
    * A proposal has been enacted.
    */
   get isV9160(): boolean {
-    return this._chain.getEventHash('Democracy.Executed') === 'fe9cbb2e8fcebf406053419831a31120f211751f75230bfefe38454cc691c00a'
+    return this._chain.getEventHash('Democracy.Executed') === '1f8afbb40842c0eb231c4c0456dea31d665cbfc12f23138aebe104164e4f18dc'
   }
 
   /**
    * A proposal has been enacted.
    */
-  get asV9160(): {refIndex: number, result: Result<null, v9160.DispatchError>} {
+  get asV9160(): {refIndex: number, result: v9160.Type_49} {
     assert(this.isV9160)
     return this._chain.decodeEvent(this.event)
   }
@@ -224,13 +224,13 @@ export class DemocracyExecutedEvent {
    * A proposal has been enacted.
    */
   get isV9170(): boolean {
-    return this._chain.getEventHash('Democracy.Executed') === '98c3caaef1b84143deea16c761096200c5e0e631c6a3776ed012edc9788cf6e2'
+    return this._chain.getEventHash('Democracy.Executed') === '270512fa9651c9fa2eb584a439cab409bb758634bd42c08ad5fc0e9bbed943b0'
   }
 
   /**
    * A proposal has been enacted.
    */
-  get asV9170(): {refIndex: number, result: Result<null, v9170.DispatchError>} {
+  get asV9170(): {refIndex: number, result: v9170.Type_50} {
     assert(this.isV9170)
     return this._chain.decodeEvent(this.event)
   }
@@ -239,13 +239,13 @@ export class DemocracyExecutedEvent {
    * A proposal has been enacted.
    */
   get isV9190(): boolean {
-    return this._chain.getEventHash('Democracy.Executed') === '2abe2e7ca2af8b119eb4f3a1f669843943049e3f4e2f613fc3b077115902ca2b'
+    return this._chain.getEventHash('Democracy.Executed') === '957b797337eaa1f370b65a94f7685042cc04730ba165349e248cfdde80b53c25'
   }
 
   /**
    * A proposal has been enacted.
    */
-  get asV9190(): {refIndex: number, result: Result<null, v9190.DispatchError>} {
+  get asV9190(): {refIndex: number, result: v9190.Type_51} {
     assert(this.isV9190)
     return this._chain.decodeEvent(this.event)
   }
@@ -657,6 +657,21 @@ export class DemocracyTabledEvent {
    */
   get asV9130(): {proposalIndex: number, deposit: bigint, depositors: Uint8Array[]} {
     assert(this.isV9130)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A public proposal has been tabled for referendum vote.
+   */
+  get isV9320(): boolean {
+    return this._chain.getEventHash('Democracy.Tabled') === '02ae149915d453560f4d12074a380744b3bbb2fe4c235e963f440e2d79243477'
+  }
+
+  /**
+   * A public proposal has been tabled for referendum vote.
+   */
+  get asV9320(): {proposalIndex: number, deposit: bigint} {
+    assert(this.isV9320)
     return this._chain.decodeEvent(this.event)
   }
 }

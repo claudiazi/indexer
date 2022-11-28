@@ -1,4 +1,4 @@
-import type {Result} from './support'
+import type {Result, Option} from './support'
 
 export type Proposal = Proposal_System | Proposal_Babe | Proposal_Timestamp | Proposal_Indices | Proposal_Balances | Proposal_Authorship | Proposal_Staking | Proposal_Offences | Proposal_Session | Proposal_FinalityTracker | Proposal_Grandpa | Proposal_ImOnline | Proposal_AuthorityDiscovery | Proposal_Democracy | Proposal_Council | Proposal_TechnicalCommittee | Proposal_ElectionsPhragmen | Proposal_TechnicalMembership | Proposal_Treasury | Proposal_Claims | Proposal_DummyParachains | Proposal_DummyAttestations | Proposal_DummySlots | Proposal_DummyRegistrar | Proposal_Utility | Proposal_Identity | Proposal_Society | Proposal_Recovery | Proposal_Vesting | Proposal_Scheduler | Proposal_Proxy | Proposal_Multisig
 
@@ -4440,17 +4440,14 @@ export type RewardDestination = RewardDestination_Staked | RewardDestination_Sta
 
 export interface RewardDestination_Staked {
   __kind: 'Staked'
-  value: null
 }
 
 export interface RewardDestination_Stash {
   __kind: 'Stash'
-  value: null
 }
 
 export interface RewardDestination_Controller {
   __kind: 'Controller'
-  value: null
 }
 
 export interface RewardDestination_Account {
@@ -4460,7 +4457,6 @@ export interface RewardDestination_Account {
 
 export interface RewardDestination_None {
   __kind: 'None'
-  value: null
 }
 
 export interface ValidatorPrefs {
@@ -4556,12 +4552,10 @@ export type Renouncing = Renouncing_Member | Renouncing_RunnerUp | Renouncing_Ca
 
 export interface Renouncing_Member {
   __kind: 'Member'
-  value: null
 }
 
 export interface Renouncing_RunnerUp {
   __kind: 'RunnerUp'
-  value: null
 }
 
 export interface Renouncing_Candidate {
@@ -4757,7 +4751,6 @@ export type Data = Data_None | Data_Raw0 | Data_Raw1 | Data_Raw2 | Data_Raw3 | D
 
 export interface Data_None {
   __kind: 'None'
-  value: null
 }
 
 export interface Data_Raw0 {
@@ -4949,7 +4942,6 @@ export type IdentityJudgement = IdentityJudgement_Unknown | IdentityJudgement_Fe
 
 export interface IdentityJudgement_Unknown {
   __kind: 'Unknown'
-  value: null
 }
 
 export interface IdentityJudgement_FeePaid {
@@ -4959,27 +4951,22 @@ export interface IdentityJudgement_FeePaid {
 
 export interface IdentityJudgement_Reasonable {
   __kind: 'Reasonable'
-  value: null
 }
 
 export interface IdentityJudgement_KnownGood {
   __kind: 'KnownGood'
-  value: null
 }
 
 export interface IdentityJudgement_OutOfDate {
   __kind: 'OutOfDate'
-  value: null
 }
 
 export interface IdentityJudgement_LowQuality {
   __kind: 'LowQuality'
-  value: null
 }
 
 export interface IdentityJudgement_Erroneous {
   __kind: 'Erroneous'
-  value: null
 }
 
 export type SocietyJudgement = SocietyJudgement_Rebid | SocietyJudgement_Reject | SocietyJudgement_Approve
@@ -5112,7 +5099,6 @@ export interface DigestItem_ChangesTrieSignal {
 
 export interface DigestItem_RuntimeEnvironmentUpdated {
   __kind: 'RuntimeEnvironmentUpdated'
-  value: null
 }
 
 export interface GrandpaEquivocationValue {

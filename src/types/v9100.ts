@@ -1,4 +1,4 @@
-import type {Result} from './support'
+import type {Result, Option} from './support'
 
 export type Proposal = Proposal_System | Proposal_Babe | Proposal_Timestamp | Proposal_Indices | Proposal_Balances | Proposal_Authorship | Proposal_Staking | Proposal_Session | Proposal_Grandpa | Proposal_ImOnline | Proposal_Democracy | Proposal_Council | Proposal_TechnicalCommittee | Proposal_PhragmenElection | Proposal_TechnicalMembership | Proposal_Treasury | Proposal_Claims | Proposal_Utility | Proposal_Identity | Proposal_Society | Proposal_Recovery | Proposal_Vesting | Proposal_Scheduler | Proposal_Proxy | Proposal_Multisig | Proposal_Bounties | Proposal_Tips | Proposal_ElectionProviderMultiPhase | Proposal_Gilt | Proposal_Configuration | Proposal_ParasShared | Proposal_ParaInclusion | Proposal_ParaInherent | Proposal_Paras | Proposal_Initializer | Proposal_Dmp | Proposal_Ump | Proposal_Hrmp | Proposal_Registrar | Proposal_Slots | Proposal_Auctions | Proposal_Crowdloan | Proposal_XcmPallet
 
@@ -5505,7 +5505,6 @@ export type NextConfigDescriptor = NextConfigDescriptor_V0 | NextConfigDescripto
 
 export interface NextConfigDescriptor_V0 {
   __kind: 'V0'
-  value: null
 }
 
 export interface NextConfigDescriptor_V1 {
@@ -5552,17 +5551,14 @@ export type RewardDestination = RewardDestination_Staked | RewardDestination_Sta
 
 export interface RewardDestination_Staked {
   __kind: 'Staked'
-  value: null
 }
 
 export interface RewardDestination_Stash {
   __kind: 'Stash'
-  value: null
 }
 
 export interface RewardDestination_Controller {
   __kind: 'Controller'
-  value: null
 }
 
 export interface RewardDestination_Account {
@@ -5572,7 +5568,6 @@ export interface RewardDestination_Account {
 
 export interface RewardDestination_None {
   __kind: 'None'
-  value: null
 }
 
 export interface ValidatorPrefs {
@@ -5639,12 +5634,10 @@ export type Renouncing = Renouncing_Member | Renouncing_RunnerUp | Renouncing_Ca
 
 export interface Renouncing_Member {
   __kind: 'Member'
-  value: null
 }
 
 export interface Renouncing_RunnerUp {
   __kind: 'RunnerUp'
-  value: null
 }
 
 export interface Renouncing_Candidate {
@@ -5895,7 +5888,6 @@ export type Data = Data_None | Data_Raw0 | Data_Raw1 | Data_Raw2 | Data_Raw3 | D
 
 export interface Data_None {
   __kind: 'None'
-  value: null
 }
 
 export interface Data_Raw0 {
@@ -6087,7 +6079,6 @@ export type IdentityJudgement = IdentityJudgement_Unknown | IdentityJudgement_Fe
 
 export interface IdentityJudgement_Unknown {
   __kind: 'Unknown'
-  value: null
 }
 
 export interface IdentityJudgement_FeePaid {
@@ -6097,27 +6088,22 @@ export interface IdentityJudgement_FeePaid {
 
 export interface IdentityJudgement_Reasonable {
   __kind: 'Reasonable'
-  value: null
 }
 
 export interface IdentityJudgement_KnownGood {
   __kind: 'KnownGood'
-  value: null
 }
 
 export interface IdentityJudgement_OutOfDate {
   __kind: 'OutOfDate'
-  value: null
 }
 
 export interface IdentityJudgement_LowQuality {
   __kind: 'LowQuality'
-  value: null
 }
 
 export interface IdentityJudgement_Erroneous {
   __kind: 'Erroneous'
-  value: null
 }
 
 export type SocietyJudgement = SocietyJudgement_Rebid | SocietyJudgement_Reject | SocietyJudgement_Approve
@@ -6373,7 +6359,6 @@ export type MultiLocationV0 = MultiLocationV0_Here | MultiLocationV0_X1 | MultiL
 
 export interface MultiLocationV0_Here {
   __kind: 'Here'
-  value: null
 }
 
 export interface MultiLocationV0_X1 {
@@ -6633,7 +6618,6 @@ export interface InstructionV2_HrmpChannelClosing {
 
 export interface InstructionV2_ClearOrigin {
   __kind: 'ClearOrigin'
-  value: null
 }
 
 export interface InstructionV2_DescendOrigin {
@@ -6699,7 +6683,6 @@ export interface InstructionV2_BuyExecution {
 
 export interface InstructionV2_RefundSurplus {
   __kind: 'RefundSurplus'
-  value: null
 }
 
 export interface InstructionV2_SetErrorHandler {
@@ -6714,7 +6697,6 @@ export interface InstructionV2_SetAppendix {
 
 export interface InstructionV2_ClearError {
   __kind: 'ClearError'
-  value: null
 }
 
 export interface InstructionV2_ClaimAsset {
@@ -6732,22 +6714,18 @@ export type MultiAssetV0 = MultiAssetV0_None | MultiAssetV0_All | MultiAssetV0_A
 
 export interface MultiAssetV0_None {
   __kind: 'None'
-  value: null
 }
 
 export interface MultiAssetV0_All {
   __kind: 'All'
-  value: null
 }
 
 export interface MultiAssetV0_AllFungible {
   __kind: 'AllFungible'
-  value: null
 }
 
 export interface MultiAssetV0_AllNonFungible {
   __kind: 'AllNonFungible'
-  value: null
 }
 
 export interface MultiAssetV0_AllAbstractFungible {
@@ -6857,7 +6835,6 @@ export interface DigestItem_ChangesTrieSignal {
 
 export interface DigestItem_RuntimeEnvironmentUpdated {
   __kind: 'RuntimeEnvironmentUpdated'
-  value: null
 }
 
 export interface GrandpaEquivocationValue {
@@ -6876,7 +6853,6 @@ export type ValidityAttestation = ValidityAttestation_Never | ValidityAttestatio
 
 export interface ValidityAttestation_Never {
   __kind: 'Never'
-  value: null
 }
 
 export interface ValidityAttestation_Implicit {
@@ -6905,7 +6881,6 @@ export type JunctionV0 = JunctionV0_Parent | JunctionV0_Parachain | JunctionV0_A
 
 export interface JunctionV0_Parent {
   __kind: 'Parent'
-  value: null
 }
 
 export interface JunctionV0_Parachain {
@@ -6948,7 +6923,6 @@ export interface JunctionV0_GeneralKey {
 
 export interface JunctionV0_OnlyChild {
   __kind: 'OnlyChild'
-  value: null
 }
 
 export interface JunctionV0_Plurality {
@@ -6961,7 +6935,6 @@ export type JunctionsV1 = JunctionsV1_Here | JunctionsV1_X1 | JunctionsV1_X2 | J
 
 export interface JunctionsV1_Here {
   __kind: 'Here'
-  value: null
 }
 
 export interface JunctionsV1_X1 {
@@ -7008,7 +6981,6 @@ export type XcmOrderV0 = XcmOrderV0_Null | XcmOrderV0_DepositAsset | XcmOrderV0_
 
 export interface XcmOrderV0_Null {
   __kind: 'Null'
-  value: null
 }
 
 export interface XcmOrderV0_DepositAsset {
@@ -7093,7 +7065,6 @@ export type XcmOrderV1 = XcmOrderV1_Noop | XcmOrderV1_DepositAsset | XcmOrderV1_
 
 export interface XcmOrderV1_Noop {
   __kind: 'Noop'
-  value: null
 }
 
 export interface XcmOrderV1_DepositAsset {
@@ -7158,7 +7129,6 @@ export type ResponseV2 = ResponseV2_Null | ResponseV2_Assets | ResponseV2_Execut
 
 export interface ResponseV2_Null {
   __kind: 'Null'
-  value: null
 }
 
 export interface ResponseV2_Assets {
@@ -7168,7 +7138,7 @@ export interface ResponseV2_Assets {
 
 export interface ResponseV2_ExecutionResult {
   __kind: 'ExecutionResult'
-  value: Result<null, [number, XcmErrorV2]>
+  value: ResponseV2Result
 }
 
 export type OriginKindV2 = OriginKindV2_Native | OriginKindV2_SovereignAccount | OriginKindV2_Superuser | OriginKindV2_Xcm
@@ -7193,7 +7163,6 @@ export type InteriorMultiLocation = InteriorMultiLocation_Here | InteriorMultiLo
 
 export interface InteriorMultiLocation_Here {
   __kind: 'Here'
-  value: null
 }
 
 export interface InteriorMultiLocation_X1 {
@@ -7257,7 +7226,6 @@ export type WeightLimitV2 = WeightLimitV2_Unlimited | WeightLimitV2_Limited
 
 export interface WeightLimitV2_Unlimited {
   __kind: 'Unlimited'
-  value: null
 }
 
 export interface WeightLimitV2_Limited {
@@ -7269,7 +7237,6 @@ export type AssetInstanceV0 = AssetInstanceV0_Undefined | AssetInstanceV0_Index8
 
 export interface AssetInstanceV0_Undefined {
   __kind: 'Undefined'
-  value: null
 }
 
 export interface AssetInstanceV0_Index8 {
@@ -7383,7 +7350,6 @@ export type ValidDisputeStatementKind = ValidDisputeStatementKind_Explicit | Val
 
 export interface ValidDisputeStatementKind_Explicit {
   __kind: 'Explicit'
-  value: null
 }
 
 export interface ValidDisputeStatementKind_BackingSeconded {
@@ -7398,7 +7364,6 @@ export interface ValidDisputeStatementKind_BackingValid {
 
 export interface ValidDisputeStatementKind_ApprovalChecking {
   __kind: 'ApprovalChecking'
-  value: null
 }
 
 export type InvalidDisputeStatementKind = InvalidDisputeStatementKind_Explicit
@@ -7411,7 +7376,6 @@ export type NetworkId = NetworkId_Any | NetworkId_Named | NetworkId_Polkadot | N
 
 export interface NetworkId_Any {
   __kind: 'Any'
-  value: null
 }
 
 export interface NetworkId_Named {
@@ -7421,19 +7385,16 @@ export interface NetworkId_Named {
 
 export interface NetworkId_Polkadot {
   __kind: 'Polkadot'
-  value: null
 }
 
 export interface NetworkId_Kusama {
   __kind: 'Kusama'
-  value: null
 }
 
 export type BodyId = BodyId_Unit | BodyId_Named | BodyId_Index | BodyId_Executive | BodyId_Technical | BodyId_Legislative | BodyId_Judicial
 
 export interface BodyId_Unit {
   __kind: 'Unit'
-  value: null
 }
 
 export interface BodyId_Named {
@@ -7448,29 +7409,24 @@ export interface BodyId_Index {
 
 export interface BodyId_Executive {
   __kind: 'Executive'
-  value: null
 }
 
 export interface BodyId_Technical {
   __kind: 'Technical'
-  value: null
 }
 
 export interface BodyId_Legislative {
   __kind: 'Legislative'
-  value: null
 }
 
 export interface BodyId_Judicial {
   __kind: 'Judicial'
-  value: null
 }
 
 export type BodyPart = BodyPart_Voice | BodyPart_Members | BodyPart_Fraction | BodyPart_AtLeastProportion | BodyPart_MoreThanProportion
 
 export interface BodyPart_Voice {
   __kind: 'Voice'
-  value: null
 }
 
 export interface BodyPart_Members {
@@ -7538,7 +7494,6 @@ export interface JunctionV1_GeneralKey {
 
 export interface JunctionV1_OnlyChild {
   __kind: 'OnlyChild'
-  value: null
 }
 
 export interface JunctionV1_Plurality {
@@ -7564,183 +7519,21 @@ export interface MultiAssetFilterV1_Wild {
   value: WildMultiAssetV1
 }
 
-export type XcmErrorV2 = XcmErrorV2_Undefined | XcmErrorV2_Overflow | XcmErrorV2_Unimplemented | XcmErrorV2_UnhandledXcmVersion | XcmErrorV2_UnhandledXcmMessage | XcmErrorV2_UnhandledEffect | XcmErrorV2_EscalationOfPrivilege | XcmErrorV2_UntrustedReserveLocation | XcmErrorV2_UntrustedTeleportLocation | XcmErrorV2_DestinationBufferOverflow | XcmErrorV2_MultiLocationFull | XcmErrorV2_MultiLocationNotInvertible | XcmErrorV2_FailedToDecode | XcmErrorV2_BadOrigin | XcmErrorV2_ExceedsMaxMessageSize | XcmErrorV2_FailedToTransactAsset | XcmErrorV2_WeightLimitReached | XcmErrorV2_Wildcard | XcmErrorV2_TooMuchWeightRequired | XcmErrorV2_NotHoldingFees | XcmErrorV2_WeightNotComputable | XcmErrorV2_Barrier | XcmErrorV2_NotWithdrawable | XcmErrorV2_LocationCannotHold | XcmErrorV2_TooExpensive | XcmErrorV2_AssetNotFound | XcmErrorV2_DestinationUnsupported | XcmErrorV2_RecursionLimitReached | XcmErrorV2_Transport | XcmErrorV2_Unroutable | XcmErrorV2_UnknownWeightRequired | XcmErrorV2_Trap | XcmErrorV2_UnknownClaim | XcmErrorV2_InvalidLocation
+export type ResponseV2Result = ResponseV2Result_Ok | ResponseV2Result_Err
 
-export interface XcmErrorV2_Undefined {
-  __kind: 'Undefined'
-  value: null
+export interface ResponseV2Result_Ok {
+  __kind: 'Ok'
 }
 
-export interface XcmErrorV2_Overflow {
-  __kind: 'Overflow'
-  value: null
-}
-
-export interface XcmErrorV2_Unimplemented {
-  __kind: 'Unimplemented'
-  value: null
-}
-
-export interface XcmErrorV2_UnhandledXcmVersion {
-  __kind: 'UnhandledXcmVersion'
-  value: null
-}
-
-export interface XcmErrorV2_UnhandledXcmMessage {
-  __kind: 'UnhandledXcmMessage'
-  value: null
-}
-
-export interface XcmErrorV2_UnhandledEffect {
-  __kind: 'UnhandledEffect'
-  value: null
-}
-
-export interface XcmErrorV2_EscalationOfPrivilege {
-  __kind: 'EscalationOfPrivilege'
-  value: null
-}
-
-export interface XcmErrorV2_UntrustedReserveLocation {
-  __kind: 'UntrustedReserveLocation'
-  value: null
-}
-
-export interface XcmErrorV2_UntrustedTeleportLocation {
-  __kind: 'UntrustedTeleportLocation'
-  value: null
-}
-
-export interface XcmErrorV2_DestinationBufferOverflow {
-  __kind: 'DestinationBufferOverflow'
-  value: null
-}
-
-export interface XcmErrorV2_MultiLocationFull {
-  __kind: 'MultiLocationFull'
-  value: null
-}
-
-export interface XcmErrorV2_MultiLocationNotInvertible {
-  __kind: 'MultiLocationNotInvertible'
-  value: null
-}
-
-export interface XcmErrorV2_FailedToDecode {
-  __kind: 'FailedToDecode'
-  value: null
-}
-
-export interface XcmErrorV2_BadOrigin {
-  __kind: 'BadOrigin'
-  value: null
-}
-
-export interface XcmErrorV2_ExceedsMaxMessageSize {
-  __kind: 'ExceedsMaxMessageSize'
-  value: null
-}
-
-export interface XcmErrorV2_FailedToTransactAsset {
-  __kind: 'FailedToTransactAsset'
-  value: null
-}
-
-export interface XcmErrorV2_WeightLimitReached {
-  __kind: 'WeightLimitReached'
-  value: bigint
-}
-
-export interface XcmErrorV2_Wildcard {
-  __kind: 'Wildcard'
-  value: null
-}
-
-export interface XcmErrorV2_TooMuchWeightRequired {
-  __kind: 'TooMuchWeightRequired'
-  value: null
-}
-
-export interface XcmErrorV2_NotHoldingFees {
-  __kind: 'NotHoldingFees'
-  value: null
-}
-
-export interface XcmErrorV2_WeightNotComputable {
-  __kind: 'WeightNotComputable'
-  value: null
-}
-
-export interface XcmErrorV2_Barrier {
-  __kind: 'Barrier'
-  value: null
-}
-
-export interface XcmErrorV2_NotWithdrawable {
-  __kind: 'NotWithdrawable'
-  value: null
-}
-
-export interface XcmErrorV2_LocationCannotHold {
-  __kind: 'LocationCannotHold'
-  value: null
-}
-
-export interface XcmErrorV2_TooExpensive {
-  __kind: 'TooExpensive'
-  value: null
-}
-
-export interface XcmErrorV2_AssetNotFound {
-  __kind: 'AssetNotFound'
-  value: null
-}
-
-export interface XcmErrorV2_DestinationUnsupported {
-  __kind: 'DestinationUnsupported'
-  value: null
-}
-
-export interface XcmErrorV2_RecursionLimitReached {
-  __kind: 'RecursionLimitReached'
-  value: null
-}
-
-export interface XcmErrorV2_Transport {
-  __kind: 'Transport'
-  value: null
-}
-
-export interface XcmErrorV2_Unroutable {
-  __kind: 'Unroutable'
-  value: null
-}
-
-export interface XcmErrorV2_UnknownWeightRequired {
-  __kind: 'UnknownWeightRequired'
-  value: null
-}
-
-export interface XcmErrorV2_Trap {
-  __kind: 'Trap'
-  value: bigint
-}
-
-export interface XcmErrorV2_UnknownClaim {
-  __kind: 'UnknownClaim'
-  value: null
-}
-
-export interface XcmErrorV2_InvalidLocation {
-  __kind: 'InvalidLocation'
-  value: null
+export interface ResponseV2Result_Err {
+  __kind: 'Err'
+  value: [number, XcmErrorV2]
 }
 
 export type WildMultiAssetV1 = WildMultiAssetV1_All | WildMultiAssetV1_AllOf
 
 export interface WildMultiAssetV1_All {
   __kind: 'All'
-  value: null
 }
 
 export interface WildMultiAssetV1_AllOf {
@@ -7758,7 +7551,6 @@ export type AssetInstanceV1 = AssetInstanceV1_Undefined | AssetInstanceV1_Index 
 
 export interface AssetInstanceV1_Undefined {
   __kind: 'Undefined'
-  value: null
 }
 
 export interface AssetInstanceV1_Index {
@@ -7794,6 +7586,146 @@ export interface AssetInstanceV1_Blob {
 export interface OutboundHrmpMessage {
   recipient: number
   data: Uint8Array
+}
+
+export type XcmErrorV2 = XcmErrorV2_Undefined | XcmErrorV2_Overflow | XcmErrorV2_Unimplemented | XcmErrorV2_UnhandledXcmVersion | XcmErrorV2_UnhandledXcmMessage | XcmErrorV2_UnhandledEffect | XcmErrorV2_EscalationOfPrivilege | XcmErrorV2_UntrustedReserveLocation | XcmErrorV2_UntrustedTeleportLocation | XcmErrorV2_DestinationBufferOverflow | XcmErrorV2_MultiLocationFull | XcmErrorV2_MultiLocationNotInvertible | XcmErrorV2_FailedToDecode | XcmErrorV2_BadOrigin | XcmErrorV2_ExceedsMaxMessageSize | XcmErrorV2_FailedToTransactAsset | XcmErrorV2_WeightLimitReached | XcmErrorV2_Wildcard | XcmErrorV2_TooMuchWeightRequired | XcmErrorV2_NotHoldingFees | XcmErrorV2_WeightNotComputable | XcmErrorV2_Barrier | XcmErrorV2_NotWithdrawable | XcmErrorV2_LocationCannotHold | XcmErrorV2_TooExpensive | XcmErrorV2_AssetNotFound | XcmErrorV2_DestinationUnsupported | XcmErrorV2_RecursionLimitReached | XcmErrorV2_Transport | XcmErrorV2_Unroutable | XcmErrorV2_UnknownWeightRequired | XcmErrorV2_Trap | XcmErrorV2_UnknownClaim | XcmErrorV2_InvalidLocation
+
+export interface XcmErrorV2_Undefined {
+  __kind: 'Undefined'
+}
+
+export interface XcmErrorV2_Overflow {
+  __kind: 'Overflow'
+}
+
+export interface XcmErrorV2_Unimplemented {
+  __kind: 'Unimplemented'
+}
+
+export interface XcmErrorV2_UnhandledXcmVersion {
+  __kind: 'UnhandledXcmVersion'
+}
+
+export interface XcmErrorV2_UnhandledXcmMessage {
+  __kind: 'UnhandledXcmMessage'
+}
+
+export interface XcmErrorV2_UnhandledEffect {
+  __kind: 'UnhandledEffect'
+}
+
+export interface XcmErrorV2_EscalationOfPrivilege {
+  __kind: 'EscalationOfPrivilege'
+}
+
+export interface XcmErrorV2_UntrustedReserveLocation {
+  __kind: 'UntrustedReserveLocation'
+}
+
+export interface XcmErrorV2_UntrustedTeleportLocation {
+  __kind: 'UntrustedTeleportLocation'
+}
+
+export interface XcmErrorV2_DestinationBufferOverflow {
+  __kind: 'DestinationBufferOverflow'
+}
+
+export interface XcmErrorV2_MultiLocationFull {
+  __kind: 'MultiLocationFull'
+}
+
+export interface XcmErrorV2_MultiLocationNotInvertible {
+  __kind: 'MultiLocationNotInvertible'
+}
+
+export interface XcmErrorV2_FailedToDecode {
+  __kind: 'FailedToDecode'
+}
+
+export interface XcmErrorV2_BadOrigin {
+  __kind: 'BadOrigin'
+}
+
+export interface XcmErrorV2_ExceedsMaxMessageSize {
+  __kind: 'ExceedsMaxMessageSize'
+}
+
+export interface XcmErrorV2_FailedToTransactAsset {
+  __kind: 'FailedToTransactAsset'
+}
+
+export interface XcmErrorV2_WeightLimitReached {
+  __kind: 'WeightLimitReached'
+  value: bigint
+}
+
+export interface XcmErrorV2_Wildcard {
+  __kind: 'Wildcard'
+}
+
+export interface XcmErrorV2_TooMuchWeightRequired {
+  __kind: 'TooMuchWeightRequired'
+}
+
+export interface XcmErrorV2_NotHoldingFees {
+  __kind: 'NotHoldingFees'
+}
+
+export interface XcmErrorV2_WeightNotComputable {
+  __kind: 'WeightNotComputable'
+}
+
+export interface XcmErrorV2_Barrier {
+  __kind: 'Barrier'
+}
+
+export interface XcmErrorV2_NotWithdrawable {
+  __kind: 'NotWithdrawable'
+}
+
+export interface XcmErrorV2_LocationCannotHold {
+  __kind: 'LocationCannotHold'
+}
+
+export interface XcmErrorV2_TooExpensive {
+  __kind: 'TooExpensive'
+}
+
+export interface XcmErrorV2_AssetNotFound {
+  __kind: 'AssetNotFound'
+}
+
+export interface XcmErrorV2_DestinationUnsupported {
+  __kind: 'DestinationUnsupported'
+}
+
+export interface XcmErrorV2_RecursionLimitReached {
+  __kind: 'RecursionLimitReached'
+}
+
+export interface XcmErrorV2_Transport {
+  __kind: 'Transport'
+}
+
+export interface XcmErrorV2_Unroutable {
+  __kind: 'Unroutable'
+}
+
+export interface XcmErrorV2_UnknownWeightRequired {
+  __kind: 'UnknownWeightRequired'
+}
+
+export interface XcmErrorV2_Trap {
+  __kind: 'Trap'
+  value: bigint
+}
+
+export interface XcmErrorV2_UnknownClaim {
+  __kind: 'UnknownClaim'
+}
+
+export interface XcmErrorV2_InvalidLocation {
+  __kind: 'InvalidLocation'
 }
 
 export type WildFungibilityV1 = WildFungibilityV1_Fungible | WildFungibilityV1_NonFungible

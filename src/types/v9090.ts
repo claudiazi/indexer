@@ -1,45 +1,14 @@
-import type {Result} from './support'
+import type {Result, Option} from './support'
 
-export type DispatchError = DispatchError_Other | DispatchError_CannotLookup | DispatchError_BadOrigin | DispatchError_Module | DispatchError_ConsumerRemaining | DispatchError_NoProviders | DispatchError_Token | DispatchError_Arithmetic
+export type DispatchResult = DispatchResult_Ok | DispatchResult_Err
 
-export interface DispatchError_Other {
-  __kind: 'Other'
-  value: null
+export interface DispatchResult_Ok {
+  __kind: 'Ok'
 }
 
-export interface DispatchError_CannotLookup {
-  __kind: 'CannotLookup'
-  value: null
-}
-
-export interface DispatchError_BadOrigin {
-  __kind: 'BadOrigin'
-  value: null
-}
-
-export interface DispatchError_Module {
-  __kind: 'Module'
-  value: DispatchErrorModule
-}
-
-export interface DispatchError_ConsumerRemaining {
-  __kind: 'ConsumerRemaining'
-  value: null
-}
-
-export interface DispatchError_NoProviders {
-  __kind: 'NoProviders'
-  value: null
-}
-
-export interface DispatchError_Token {
-  __kind: 'Token'
-  value: TokenError
-}
-
-export interface DispatchError_Arithmetic {
-  __kind: 'Arithmetic'
-  value: ArithmeticError
+export interface DispatchResult_Err {
+  __kind: 'Err'
+  value: DispatchError
 }
 
 export type Proposal = Proposal_System | Proposal_Babe | Proposal_Timestamp | Proposal_Indices | Proposal_Balances | Proposal_Authorship | Proposal_Staking | Proposal_Session | Proposal_Grandpa | Proposal_ImOnline | Proposal_Democracy | Proposal_Council | Proposal_TechnicalCommittee | Proposal_PhragmenElection | Proposal_TechnicalMembership | Proposal_Treasury | Proposal_Claims | Proposal_Utility | Proposal_Identity | Proposal_Society | Proposal_Recovery | Proposal_Vesting | Proposal_Scheduler | Proposal_Proxy | Proposal_Multisig | Proposal_Bounties | Proposal_Tips | Proposal_ElectionProviderMultiPhase | Proposal_Gilt | Proposal_Configuration | Proposal_ParasShared | Proposal_ParaInclusion | Proposal_ParaInherent | Proposal_Paras | Proposal_Initializer | Proposal_Dmp | Proposal_Ump | Proposal_Hrmp | Proposal_Registrar | Proposal_Slots | Proposal_Auctions | Proposal_Crowdloan | Proposal_XcmPallet
@@ -259,57 +228,41 @@ export interface Proposal_XcmPallet {
   value: XcmPalletCall
 }
 
-export interface DispatchErrorModule {
-  index: number
-  error: number
+export type DispatchError = DispatchError_Other | DispatchError_CannotLookup | DispatchError_BadOrigin | DispatchError_Module | DispatchError_ConsumerRemaining | DispatchError_NoProviders | DispatchError_Token | DispatchError_Arithmetic
+
+export interface DispatchError_Other {
+  __kind: 'Other'
 }
 
-export type TokenError = TokenError_NoFunds | TokenError_WouldDie | TokenError_BelowMinimum | TokenError_CannotCreate | TokenError_UnknownAsset | TokenError_Frozen | TokenError_Underflow | TokenError_Overflow
-
-export interface TokenError_NoFunds {
-  __kind: 'NoFunds'
+export interface DispatchError_CannotLookup {
+  __kind: 'CannotLookup'
 }
 
-export interface TokenError_WouldDie {
-  __kind: 'WouldDie'
+export interface DispatchError_BadOrigin {
+  __kind: 'BadOrigin'
 }
 
-export interface TokenError_BelowMinimum {
-  __kind: 'BelowMinimum'
+export interface DispatchError_Module {
+  __kind: 'Module'
+  value: DispatchErrorModule
 }
 
-export interface TokenError_CannotCreate {
-  __kind: 'CannotCreate'
+export interface DispatchError_ConsumerRemaining {
+  __kind: 'ConsumerRemaining'
 }
 
-export interface TokenError_UnknownAsset {
-  __kind: 'UnknownAsset'
+export interface DispatchError_NoProviders {
+  __kind: 'NoProviders'
 }
 
-export interface TokenError_Frozen {
-  __kind: 'Frozen'
+export interface DispatchError_Token {
+  __kind: 'Token'
+  value: TokenError
 }
 
-export interface TokenError_Underflow {
-  __kind: 'Underflow'
-}
-
-export interface TokenError_Overflow {
-  __kind: 'Overflow'
-}
-
-export type ArithmeticError = ArithmeticError_Underflow | ArithmeticError_Overflow | ArithmeticError_DivisionByZero
-
-export interface ArithmeticError_Underflow {
-  __kind: 'Underflow'
-}
-
-export interface ArithmeticError_Overflow {
-  __kind: 'Overflow'
-}
-
-export interface ArithmeticError_DivisionByZero {
-  __kind: 'DivisionByZero'
+export interface DispatchError_Arithmetic {
+  __kind: 'Arithmetic'
+  value: ArithmeticError
 }
 
 export type SystemCall = SystemCall_fill_block | SystemCall_remark | SystemCall_set_heap_pages | SystemCall_set_code | SystemCall_set_code_without_checks | SystemCall_set_changes_trie_config | SystemCall_set_storage | SystemCall_kill_storage | SystemCall_kill_prefix | SystemCall_remark_with_event
@@ -5536,6 +5489,59 @@ export interface XcmPalletCall_execute {
   maxWeight: bigint
 }
 
+export interface DispatchErrorModule {
+  index: number
+  error: number
+}
+
+export type TokenError = TokenError_NoFunds | TokenError_WouldDie | TokenError_BelowMinimum | TokenError_CannotCreate | TokenError_UnknownAsset | TokenError_Frozen | TokenError_Underflow | TokenError_Overflow
+
+export interface TokenError_NoFunds {
+  __kind: 'NoFunds'
+}
+
+export interface TokenError_WouldDie {
+  __kind: 'WouldDie'
+}
+
+export interface TokenError_BelowMinimum {
+  __kind: 'BelowMinimum'
+}
+
+export interface TokenError_CannotCreate {
+  __kind: 'CannotCreate'
+}
+
+export interface TokenError_UnknownAsset {
+  __kind: 'UnknownAsset'
+}
+
+export interface TokenError_Frozen {
+  __kind: 'Frozen'
+}
+
+export interface TokenError_Underflow {
+  __kind: 'Underflow'
+}
+
+export interface TokenError_Overflow {
+  __kind: 'Overflow'
+}
+
+export type ArithmeticError = ArithmeticError_Underflow | ArithmeticError_Overflow | ArithmeticError_DivisionByZero
+
+export interface ArithmeticError_Underflow {
+  __kind: 'Underflow'
+}
+
+export interface ArithmeticError_Overflow {
+  __kind: 'Overflow'
+}
+
+export interface ArithmeticError_DivisionByZero {
+  __kind: 'DivisionByZero'
+}
+
 export interface ChangesTrieConfiguration {
   digestInterval: number
   digestLevels: number
@@ -5558,7 +5564,6 @@ export type NextConfigDescriptor = NextConfigDescriptor_V0 | NextConfigDescripto
 
 export interface NextConfigDescriptor_V0 {
   __kind: 'V0'
-  value: null
 }
 
 export interface NextConfigDescriptor_V1 {
@@ -5605,17 +5610,14 @@ export type RewardDestination = RewardDestination_Staked | RewardDestination_Sta
 
 export interface RewardDestination_Staked {
   __kind: 'Staked'
-  value: null
 }
 
 export interface RewardDestination_Stash {
   __kind: 'Stash'
-  value: null
 }
 
 export interface RewardDestination_Controller {
   __kind: 'Controller'
-  value: null
 }
 
 export interface RewardDestination_Account {
@@ -5625,7 +5627,6 @@ export interface RewardDestination_Account {
 
 export interface RewardDestination_None {
   __kind: 'None'
-  value: null
 }
 
 export interface ValidatorPrefs {
@@ -5692,12 +5693,10 @@ export type Renouncing = Renouncing_Member | Renouncing_RunnerUp | Renouncing_Ca
 
 export interface Renouncing_Member {
   __kind: 'Member'
-  value: null
 }
 
 export interface Renouncing_RunnerUp {
   __kind: 'RunnerUp'
-  value: null
 }
 
 export interface Renouncing_Candidate {
@@ -5948,7 +5947,6 @@ export type Data = Data_None | Data_Raw0 | Data_Raw1 | Data_Raw2 | Data_Raw3 | D
 
 export interface Data_None {
   __kind: 'None'
-  value: null
 }
 
 export interface Data_Raw0 {
@@ -6140,7 +6138,6 @@ export type IdentityJudgement = IdentityJudgement_Unknown | IdentityJudgement_Fe
 
 export interface IdentityJudgement_Unknown {
   __kind: 'Unknown'
-  value: null
 }
 
 export interface IdentityJudgement_FeePaid {
@@ -6150,27 +6147,22 @@ export interface IdentityJudgement_FeePaid {
 
 export interface IdentityJudgement_Reasonable {
   __kind: 'Reasonable'
-  value: null
 }
 
 export interface IdentityJudgement_KnownGood {
   __kind: 'KnownGood'
-  value: null
 }
 
 export interface IdentityJudgement_OutOfDate {
   __kind: 'OutOfDate'
-  value: null
 }
 
 export interface IdentityJudgement_LowQuality {
   __kind: 'LowQuality'
-  value: null
 }
 
 export interface IdentityJudgement_Erroneous {
   __kind: 'Erroneous'
-  value: null
 }
 
 export type SocietyJudgement = SocietyJudgement_Rebid | SocietyJudgement_Reject | SocietyJudgement_Approve
@@ -6294,7 +6286,6 @@ export type MultiLocation = MultiLocation_Here | MultiLocation_X1 | MultiLocatio
 
 export interface MultiLocation_Here {
   __kind: 'Here'
-  value: null
 }
 
 export interface MultiLocation_X1 {
@@ -6412,22 +6403,18 @@ export type MultiAsset = MultiAsset_None | MultiAsset_All | MultiAsset_AllFungib
 
 export interface MultiAsset_None {
   __kind: 'None'
-  value: null
 }
 
 export interface MultiAsset_All {
   __kind: 'All'
-  value: null
 }
 
 export interface MultiAsset_AllFungible {
   __kind: 'AllFungible'
-  value: null
 }
 
 export interface MultiAsset_AllNonFungible {
   __kind: 'AllNonFungible'
-  value: null
 }
 
 export interface MultiAsset_AllAbstractFungible {
@@ -6559,7 +6546,6 @@ export type JunctionV0 = JunctionV0_Parent | JunctionV0_Parachain | JunctionV0_A
 
 export interface JunctionV0_Parent {
   __kind: 'Parent'
-  value: null
 }
 
 export interface JunctionV0_Parachain {
@@ -6602,7 +6588,6 @@ export interface JunctionV0_GeneralKey {
 
 export interface JunctionV0_OnlyChild {
   __kind: 'OnlyChild'
-  value: null
 }
 
 export interface JunctionV0_Plurality {
@@ -6615,22 +6600,18 @@ export type MultiAssetV0 = MultiAssetV0_None | MultiAssetV0_All | MultiAssetV0_A
 
 export interface MultiAssetV0_None {
   __kind: 'None'
-  value: null
 }
 
 export interface MultiAssetV0_All {
   __kind: 'All'
-  value: null
 }
 
 export interface MultiAssetV0_AllFungible {
   __kind: 'AllFungible'
-  value: null
 }
 
 export interface MultiAssetV0_AllNonFungible {
   __kind: 'AllNonFungible'
-  value: null
 }
 
 export interface MultiAssetV0_AllAbstractFungible {
@@ -6681,7 +6662,6 @@ export type XcmOrderV0 = XcmOrderV0_Null | XcmOrderV0_DepositAsset | XcmOrderV0_
 
 export interface XcmOrderV0_Null {
   __kind: 'Null'
-  value: null
 }
 
 export interface XcmOrderV0_DepositAsset {
@@ -6744,7 +6724,6 @@ export type MultiLocationV0 = MultiLocationV0_Here | MultiLocationV0_X1 | MultiL
 
 export interface MultiLocationV0_Here {
   __kind: 'Here'
-  value: null
 }
 
 export interface MultiLocationV0_X1 {
@@ -6884,7 +6863,6 @@ export type AssetInstanceV0 = AssetInstanceV0_Undefined | AssetInstanceV0_Index8
 
 export interface AssetInstanceV0_Undefined {
   __kind: 'Undefined'
-  value: null
 }
 
 export interface AssetInstanceV0_Index8 {
@@ -6995,7 +6973,6 @@ export interface DigestItem_ChangesTrieSignal {
 
 export interface DigestItem_RuntimeEnvironmentUpdated {
   __kind: 'RuntimeEnvironmentUpdated'
-  value: null
 }
 
 export interface GrandpaEquivocationValue {
@@ -7014,7 +6991,6 @@ export type ValidityAttestation = ValidityAttestation_Never | ValidityAttestatio
 
 export interface ValidityAttestation_Never {
   __kind: 'Never'
-  value: null
 }
 
 export interface ValidityAttestation_Implicit {
@@ -7043,7 +7019,6 @@ export type NetworkId = NetworkId_Any | NetworkId_Named | NetworkId_Polkadot | N
 
 export interface NetworkId_Any {
   __kind: 'Any'
-  value: null
 }
 
 export interface NetworkId_Named {
@@ -7053,19 +7028,16 @@ export interface NetworkId_Named {
 
 export interface NetworkId_Polkadot {
   __kind: 'Polkadot'
-  value: null
 }
 
 export interface NetworkId_Kusama {
   __kind: 'Kusama'
-  value: null
 }
 
 export type BodyId = BodyId_Unit | BodyId_Named | BodyId_Index | BodyId_Executive | BodyId_Technical | BodyId_Legislative | BodyId_Judicial
 
 export interface BodyId_Unit {
   __kind: 'Unit'
-  value: null
 }
 
 export interface BodyId_Named {
@@ -7080,29 +7052,24 @@ export interface BodyId_Index {
 
 export interface BodyId_Executive {
   __kind: 'Executive'
-  value: null
 }
 
 export interface BodyId_Technical {
   __kind: 'Technical'
-  value: null
 }
 
 export interface BodyId_Legislative {
   __kind: 'Legislative'
-  value: null
 }
 
 export interface BodyId_Judicial {
   __kind: 'Judicial'
-  value: null
 }
 
 export type BodyPart = BodyPart_Voice | BodyPart_Members | BodyPart_Fraction | BodyPart_AtLeastProportion | BodyPart_MoreThanProportion
 
 export interface BodyPart_Voice {
   __kind: 'Voice'
-  value: null
 }
 
 export interface BodyPart_Members {
@@ -7165,7 +7132,6 @@ export type ValidDisputeStatementKind = ValidDisputeStatementKind_Explicit | Val
 
 export interface ValidDisputeStatementKind_Explicit {
   __kind: 'Explicit'
-  value: null
 }
 
 export interface ValidDisputeStatementKind_BackingSeconded {
@@ -7180,7 +7146,6 @@ export interface ValidDisputeStatementKind_BackingValid {
 
 export interface ValidDisputeStatementKind_ApprovalChecking {
   __kind: 'ApprovalChecking'
-  value: null
 }
 
 export type InvalidDisputeStatementKind = InvalidDisputeStatementKind_Explicit
