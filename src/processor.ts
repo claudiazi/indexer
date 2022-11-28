@@ -4,7 +4,6 @@ import { TypeormDatabase } from '@subsquid/typeorm-store'
 import * as modules from './mappings'
 
 const processor = new SubstrateBatchProcessor()
-    .setBatchSize(100)
     .setDataSource({
         chain: 'wss://kusama.api.onfinality.io/public-ws',
         archive: lookupArchive('kusama', { release: 'FireSquid' }),
