@@ -37,18 +37,29 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, block: Substrat
         })
     }
     else if (storage.isV9320) {
-        return
-        // const storageData = await storage.getAsV9320()
-        // if (!storageData) return undefined
+        const storageData = await storage.getAsV9320()
+        if (!storageData) return undefined
 
-        // return storageData.map((proposal): DemocracyProposalStorageData => {
-        //     const [index, hash, proposer] = proposal
-        //     return {
-        //         index,
-        //         hash,
-        //         proposer,
-        //     }
-        // })
+        return storageData.map((proposal): DemocracyProposalStorageData => {
+            const [index, proposalData, proposer] = proposal
+            let hash
+            switch (proposalData.__kind) {
+                case "Legacy":
+                    hash = proposalData.hash
+                    break;
+                case "Inline":
+                    hash = proposalData.value
+                    break;
+                case "Lookup":
+                    hash = proposalData.hash
+                    break;
+            }
+            return {
+                index,
+                hash,
+                proposer,
+            }
+        })
     }
     else {
         throw new UnknownVersionError(storage.constructor.name)

@@ -2,6 +2,7 @@ import { UnknownVersionError } from '../../common/errors'
 import { DemocracyReferendumInfoOfStorage } from '../../types/storage'
 import * as v1055 from '../../types/v1055'
 import * as v9111 from '../../types/v9111'
+import * as v9320 from '../../types/v9320'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 
@@ -83,29 +84,40 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, 
         }
     }
     else if (storage.isV9320) {
-        return
-        // const storageData = await storage.getAsV9320(index)
-        // if (!storageData) return undefined
+        const storageData = await storage.getAsV9320(index)
+        if (!storageData) return undefined
 
-        // const { __kind: status } = storageData
-        // if (status === 'Ongoing') {
-        //     const { proposalHash: hash, end, delay, threshold } = (storageData as v9111.ReferendumInfo_Ongoing).value
-        //     return {
-        //         status,
-        //         hash,
-        //         end,
-        //         delay,
-        //         threshold: threshold.__kind,
-        //     }
-        // } else {
-        //     const { end, approved } = storageData as v9111.ReferendumInfo_Finished
-        //     return {
-        //         status,
-        //         end,
-        //         approved,
-        //     }
-        // }
-    } 
+        const { __kind: status } = storageData
+        if (status === 'Ongoing') {
+            const { proposal, end, delay, threshold } = (storageData as v9320.ReferendumInfo_Ongoing).value
+            let hash
+            switch (proposal.__kind) {
+                case "Legacy":
+                    hash = proposal.hash
+                    break;
+                case "Inline":
+                    hash = proposal.value
+                    break;
+                case "Lookup":
+                    hash = proposal.hash
+                    break;
+            }
+            return {
+                status,
+                hash,
+                end,
+                delay,
+                threshold: threshold.__kind,
+            }
+        } else {
+            const { end, approved } = storageData as v9320.ReferendumInfo_Finished
+            return {
+                status,
+                end,
+                approved,
+            }
+        }
+    }
     else {
         throw new UnknownVersionError(storage.constructor.name)
     }
