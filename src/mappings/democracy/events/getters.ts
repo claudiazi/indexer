@@ -241,7 +241,7 @@ export function getProposedData(ctx: BatchContext<Store, unknown>, itemEvent: Ev
 interface TabledEventData {
     index: number
     deposit: bigint
-    depositors: Uint8Array[]
+    depositors?: Uint8Array[]
 }
 
 export function getTabledEventData(ctx: BatchContext<Store, unknown>, itemEvent: Event): TabledEventData {
@@ -260,6 +260,12 @@ export function getTabledEventData(ctx: BatchContext<Store, unknown>, itemEvent:
             deposit,
             depositors,
         }
+    } else if (event.isV9320) {
+        const { proposalIndex: index, deposit } = event.asV9320
+        return {
+            index,
+            deposit
+        } 
     } else {
         throw new UnknownVersionError(event.constructor.name)
     }
