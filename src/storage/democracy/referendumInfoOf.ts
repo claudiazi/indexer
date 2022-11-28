@@ -81,7 +81,32 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, 
                 approved,
             }
         }
-    } else {
+    }
+    else if (storage.isV9320) {
+        return
+        // const storageData = await storage.getAsV9320(index)
+        // if (!storageData) return undefined
+
+        // const { __kind: status } = storageData
+        // if (status === 'Ongoing') {
+        //     const { proposalHash: hash, end, delay, threshold } = (storageData as v9111.ReferendumInfo_Ongoing).value
+        //     return {
+        //         status,
+        //         hash,
+        //         end,
+        //         delay,
+        //         threshold: threshold.__kind,
+        //     }
+        // } else {
+        //     const { end, approved } = storageData as v9111.ReferendumInfo_Finished
+        //     return {
+        //         status,
+        //         end,
+        //         approved,
+        //     }
+        // }
+    } 
+    else {
         throw new UnknownVersionError(storage.constructor.name)
     }
 }
