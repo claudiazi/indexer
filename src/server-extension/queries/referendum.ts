@@ -27,7 +27,8 @@ export const referendumStats = `
                 voter
               , referendum_index
               , ROW_NUMBER() OVER (PARTITION BY voter order by timestamp) as referendum_seq
-              FROM vote_sequence
+              FROM vote
+              WHERE block_number_removed IS NULL
 
             ),
 
