@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class Delegation {
-    constructor(props?: Partial<Delegation>) {
+export class ConvictionVotingDelegation {
+    constructor(props?: Partial<ConvictionVotingDelegation>) {
         Object.assign(this, props)
     }
 
@@ -30,6 +30,9 @@ export class Delegation {
 
     @Column_("int4", {nullable: false})
     lockPeriod!: number
+
+    @Column_("int4", {nullable: true})
+    track!: number | undefined | null
 
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date

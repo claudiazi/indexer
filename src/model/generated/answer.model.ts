@@ -4,30 +4,30 @@ import {QuizSubmission} from "./quizSubmission.model"
 
 @Entity_()
 export class Answer {
-  constructor(props?: Partial<Answer>) {
-    Object.assign(this, props)
-  }
+    constructor(props?: Partial<Answer>) {
+        Object.assign(this, props)
+    }
 
-  @PrimaryColumn_()
-  id!: string
+    @PrimaryColumn_()
+    id!: string
 
-  @Column_("int4", {nullable: false})
-  answerIndex!: number
+    @Column_("int4", {nullable: false})
+    answerIndex!: number
 
-  @Column_("text", {nullable: false})
-  questionId!: string
+    @Column_("text", {nullable: false})
+    questionId!: string
 
-  @Index_()
-  @ManyToOne_(() => Question, {nullable: true})
-  question!: Question
+    @Index_()
+    @ManyToOne_(() => Question, {nullable: true})
+    question!: Question
 
-  @Index_()
-  @ManyToOne_(() => QuizSubmission, {nullable: true})
-  quizSubmission!: QuizSubmission
+    @Index_()
+    @ManyToOne_(() => QuizSubmission, {nullable: true})
+    quizSubmission!: QuizSubmission
 
-  @Column_("text", {nullable: false})
-  quizSubmissionId!: string
+    @Column_("text", {nullable: false})
+    quizSubmissionId!: string
 
-  @Column_("bool", {nullable: true})
-  isCorrect!: boolean | undefined | null
+    @Column_("bool", {nullable: true})
+    isCorrect!: boolean | undefined | null
 }

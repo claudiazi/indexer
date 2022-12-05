@@ -9,69 +9,69 @@ import {ReferendumOriginType} from "./_referendumOriginType"
 
 @Entity_()
 export class Referendum {
-  constructor(props?: Partial<Referendum>) {
-    Object.assign(this, props)
-  }
+    constructor(props?: Partial<Referendum>) {
+        Object.assign(this, props)
+    }
 
-  @PrimaryColumn_()
-  id!: string
+    @PrimaryColumn_()
+    id!: string
 
-  @Index_()
-  @Column_("text", {nullable: false})
-  hash!: string
+    @Index_()
+    @Column_("text", {nullable: false})
+    hash!: string
 
-  @Index_()
-  @Column_("int4", {nullable: false})
-  index!: number
+    @Index_()
+    @Column_("int4", {nullable: false})
+    index!: number
 
-  @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => new ReferendumThreshold(undefined, marshal.nonNull(obj))}, nullable: false})
-  threshold!: ReferendumThreshold
+    @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => obj == null ? undefined : new ReferendumThreshold(undefined, obj)}, nullable: false})
+    threshold!: ReferendumThreshold
 
-  @Column_("varchar", {length: 9, nullable: false})
-  status!: ReferendumStatus
+    @Column_("varchar", {length: 9, nullable: false})
+    status!: ReferendumStatus
 
-  @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => marshal.fromList(obj, val => new ReferendumStatusHistory(undefined, marshal.nonNull(val)))}, nullable: false})
-  statusHistory!: (ReferendumStatusHistory)[]
+    @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new ReferendumStatusHistory(undefined, marshal.nonNull(val)))}, nullable: false})
+    statusHistory!: (ReferendumStatusHistory)[]
 
-  @Index_()
-  @Column_("int4", {nullable: false})
-  createdAtBlock!: number
+    @Index_()
+    @Column_("int4", {nullable: false})
+    createdAtBlock!: number
 
-  @Index_()
-  @Column_("timestamp with time zone", {nullable: false})
-  createdAt!: Date
+    @Index_()
+    @Column_("timestamp with time zone", {nullable: false})
+    createdAt!: Date
 
-  @Column_("int4", {nullable: true})
-  endedAtBlock!: number | undefined | null
+    @Column_("int4", {nullable: true})
+    endedAtBlock!: number | undefined | null
 
-  @Column_("timestamp with time zone", {nullable: true})
-  endedAt!: Date | undefined | null
+    @Column_("timestamp with time zone", {nullable: true})
+    endedAt!: Date | undefined | null
 
-  @Column_("int4", {nullable: true})
-  updatedAtBlock!: number | undefined | null
+    @Column_("int4", {nullable: true})
+    updatedAtBlock!: number | undefined | null
 
-  @Column_("timestamp with time zone", {nullable: true})
-  updatedAt!: Date | undefined | null
+    @Column_("timestamp with time zone", {nullable: true})
+    updatedAt!: Date | undefined | null
 
-  @Column_("text", {nullable: true})
-  proposer!: string | undefined | null
+    @Column_("text", {nullable: true})
+    proposer!: string | undefined | null
 
-  @Index_()
-  @ManyToOne_(() => Preimage, {nullable: true})
-  preimage!: Preimage | undefined | null
+    @Index_()
+    @ManyToOne_(() => Preimage, {nullable: true})
+    preimage!: Preimage | undefined | null
 
-  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-  totalIssuance!: bigint
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    totalIssuance!: bigint
 
-  @OneToMany_(() => Vote, e => e.referendum)
-  voting!: Vote[]
+    @OneToMany_(() => Vote, e => e.referendum)
+    voting!: Vote[]
 
-  @Column_("int4", {nullable: false})
-  endsAt!: number
+    @Column_("int4", {nullable: false})
+    endsAt!: number
 
-  @Column_("int4", {nullable: false})
-  delay!: number
+    @Column_("int4", {nullable: false})
+    delay!: number
 
-  @Column_("varchar", {length: 19, nullable: true})
-  origin!: ReferendumOriginType | undefined | null
+    @Column_("varchar", {length: 19, nullable: true})
+    origin!: ReferendumOriginType | undefined | null
 }

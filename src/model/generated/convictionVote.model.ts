@@ -1,13 +1,13 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
-import {Referendum} from "./referendum.model"
+import {OpenGovReferendum} from "./openGovReferendum.model"
 import {VoteDecision} from "./_voteDecision"
 import {VoteBalance, fromJsonVoteBalance} from "./_voteBalance"
 import {VoteType} from "./_voteType"
 
 @Entity_()
-export class Vote {
-    constructor(props?: Partial<Vote>) {
+export class ConvictionVote {
+    constructor(props?: Partial<ConvictionVote>) {
         Object.assign(this, props)
     }
 
@@ -24,8 +24,8 @@ export class Vote {
     referendumIndex!: number
 
     @Index_()
-    @ManyToOne_(() => Referendum, {nullable: true})
-    referendum!: Referendum
+    @ManyToOne_(() => OpenGovReferendum, {nullable: true})
+    referendum!: OpenGovReferendum
 
     @Index_()
     @Column_("int4", {nullable: false})
@@ -60,7 +60,4 @@ export class Vote {
 
     @Column_("bool", {nullable: true})
     isValidator!: boolean | undefined | null
-
-    @Column_("bool", {nullable: true})
-    isCouncillor!: boolean | undefined | null
 }

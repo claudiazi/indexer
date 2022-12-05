@@ -1,9 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
-import {ReferendumOriginType} from "./_referendumOriginType"
 
 @Entity_()
-export class CouncilMotion {
-    constructor(props?: Partial<CouncilMotion>) {
+export class ReferendumSubmission {
+    constructor(props?: Partial<ReferendumSubmission>) {
         Object.assign(this, props)
     }
 
@@ -17,12 +16,9 @@ export class CouncilMotion {
     @Column_("text", {nullable: false})
     hash!: string
 
-    @Column_("text", {nullable: true})
-    proposalHash!: string | undefined | null
+    @Column_("int4", {nullable: false})
+    track!: number
 
     @Column_("text", {nullable: true})
     proposer!: string | undefined | null
-
-    @Column_("varchar", {length: 19, nullable: true})
-    type!: ReferendumOriginType | undefined | null
 }

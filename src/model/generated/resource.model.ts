@@ -3,50 +3,50 @@ import {Option} from "./option.model"
 
 @Entity_()
 export class Resource {
-  constructor(props?: Partial<Resource>) {
-    Object.assign(this, props)
-  }
+    constructor(props?: Partial<Resource>) {
+        Object.assign(this, props)
+    }
 
-  @PrimaryColumn_()
-  id!: string
+    @PrimaryColumn_()
+    id!: string
 
-  @Column_("text", {nullable: false})
-  optionId!: string
+    @Column_("text", {nullable: false})
+    optionId!: string
 
-  @Index_()
-  @ManyToOne_(() => Option, {nullable: true})
-  option!: Option
+    @Index_()
+    @ManyToOne_(() => Option, {nullable: true})
+    option!: Option
 
-  @Column_("text", {nullable: true})
-  name!: string | undefined | null
+    @Column_("text", {nullable: true})
+    name!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  mainCid!: string | undefined | null
+    @Column_("text", {nullable: true})
+    mainCid!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  thumbCid!: string | undefined | null
+    @Column_("text", {nullable: true})
+    thumbCid!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  text!: string | undefined | null
+    @Column_("text", {nullable: true})
+    text!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  artist!: string | undefined | null
+    @Column_("text", {nullable: true})
+    artist!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  creativeDirector!: string | undefined | null
+    @Column_("text", {nullable: true})
+    creativeDirector!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  rarity!: string | undefined | null
+    @Column_("text", {nullable: true})
+    rarity!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  itemName!: string | undefined | null
+    @Column_("text", {nullable: true})
+    itemName!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  slot!: string | undefined | null
+    @Column_("text", {nullable: true})
+    slot!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  metadataCidDirect!: string | undefined | null
+    @Column_("text", {nullable: true})
+    metadataCidDirect!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  metadataCidDelegated!: string | undefined | null
+    @Column_("text", {nullable: true})
+    metadataCidDelegated!: string | undefined | null
 }
