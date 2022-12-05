@@ -14,6 +14,19 @@ enum ReferendumStatus {
   Executed
 }
 
+enum OpenGovReferendumStatus {
+  DecisionStarted
+  Approved
+  Rejected
+  Cancelled
+  Executed
+  TimedOut
+  ConfirmStarted
+  ConfirmAborted
+  Confirmed
+  Killed
+}
+
 enum VoteType {
   Delegated
   Direct
@@ -119,6 +132,12 @@ type Preimage @entity {
 
 type ReferendumStatusHistory {
   status: ReferendumStatus!
+  block: Int!
+  timestamp: DateTime!
+}
+
+type OpenGovReferendumStatusHistory {
+  status: OpenGovReferendumStatus!
   block: Int!
   timestamp: DateTime!
 }
@@ -325,6 +344,81 @@ type Delegation @entity {
   to: String! @index
   balance: BigInt
   lockPeriod: Int!
+  timestamp: DateTime!
+  timestampEnd: DateTime
+}
+
+type ReferendumSubmission @entity {
+  id: ID!
+  index: Int! @index
+  hash: String!
+  track: Int!
+  proposer: String
+}
+
+type OpenGovReferendum @entity {
+  id: ID!
+  index: Int! @index
+  hash: String!
+  track: Int!
+  status: OpenGovReferendumStatus!
+  statusHistory: [OpenGovReferendumStatusHistory!]!
+  originKind: String!
+  enactmentKind: String!
+  enactmentValue: Int!
+  len: Int
+  submitted: Int!
+  submissionDepositWho: String!
+  submissionDepositAmount: BigInt!
+  decisionDepositWho: String
+  decisionDepositAmount: BigInt
+  decidingSince: Int
+  decidingConfirming: Int
+  ayes: BigInt
+  nays: BigInt
+  support: BigInt
+  inQueue: Boolean
+  createdAtBlock: Int! @index
+  createdAt: DateTime! @index
+  endedAtBlock: Int
+  endedAt: DateTime
+  updatedAtBlock: Int
+  updatedAt: DateTime
+  totalIssuance: BigInt!
+  voting: [ConvictionVote!] @derivedFrom(field: "referendum")
+  preimageSection: String
+  preimageMethod: String
+  preimageArgs: JSON
+  preimageDescription: String
+}
+
+type ConvictionVote @entity {
+  id: ID!
+  voter: String
+  referendumId: ID!
+  referendumIndex: Int!
+  referendum: OpenGovReferendum!
+  blockNumberVoted: Int! @index
+  blockNumberRemoved: Int @index
+  timestamp: DateTime! @index
+  timestampRemoved: DateTime @index
+  decision: VoteDecision!
+  balance: VoteBalance!
+  lockPeriod: Int
+  delegatedTo: String
+  type: VoteType!
+  isValidator: Boolean
+}
+
+type ConvictionVotingDelegation @entity {
+  id: ID!
+  blockNumberStart: Int! @index
+  blockNumberEnd: Int
+  wallet: String! @index
+  to: String! @index
+  balance: BigInt
+  lockPeriod: Int!
+  track: Int
   timestamp: DateTime!
   timestampEnd: DateTime
 }
