@@ -1,27 +1,27 @@
 import assert from "assert"
 import * as marshal from "./marshal"
-import {PreimageStatus} from "./_preimageStatus"
+import {OpenGovReferendumStatus} from "./_openGovReferendumStatus"
 
-export class PreimageStatusHistory {
-    private _status!: PreimageStatus
+export class OpenGovReferendumStatusHistory {
+    private _status!: OpenGovReferendumStatus
     private _block!: number
     private _timestamp!: Date
 
-    constructor(props?: Partial<Omit<PreimageStatusHistory, 'toJSON'>>, json?: any) {
+    constructor(props?: Partial<Omit<OpenGovReferendumStatusHistory, 'toJSON'>>, json?: any) {
         Object.assign(this, props)
         if (json != null) {
-            this._status = marshal.enumFromJson(json.status, PreimageStatus)
+            this._status = marshal.enumFromJson(json.status, OpenGovReferendumStatus)
             this._block = marshal.int.fromJSON(json.block)
             this._timestamp = marshal.datetime.fromJSON(json.timestamp)
         }
     }
 
-    get status(): PreimageStatus {
+    get status(): OpenGovReferendumStatus {
         assert(this._status != null, 'uninitialized access')
         return this._status
     }
 
-    set status(value: PreimageStatus) {
+    set status(value: OpenGovReferendumStatus) {
         this._status = value
     }
 

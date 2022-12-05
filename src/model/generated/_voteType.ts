@@ -1,4 +1,4 @@
 export enum VoteType {
-  Delegated = "Delegated",
-  Direct = "Direct",
+    Delegated = "Delegated",
+    Direct = "Direct",
 }
