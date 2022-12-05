@@ -27,7 +27,7 @@ type ReferendumStorageData = FinishedReferendumData | OngoingReferendumData
 async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, block: SubstrateBlock): Promise<ReferendumStorageData | undefined> {
     const storage = new DemocracyReferendumInfoOfStorage(ctx, block)
     if (storage.isV1020) {
-        const storageData = await storage.getAsV1020(index)
+        const storageData = await storage.asV1020.get(index)
         if (!storageData) return undefined
 
         const { proposalHash: hash, end, delay, threshold } = storageData
@@ -39,7 +39,7 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, 
             threshold: threshold.__kind,
         }
     } else if (storage.isV1055) {
-        const storageData = await storage.getAsV1055(index)
+        const storageData = await storage.asV1055.get(index)
         if (!storageData) return undefined
 
         const { __kind: status } = storageData
@@ -61,7 +61,7 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, 
             }
         }
     } else if (storage.isV9111) {
-        const storageData = await storage.getAsV9111(index)
+        const storageData = await storage.asV9111.get(index)
         if (!storageData) return undefined
 
         const { __kind: status } = storageData
@@ -84,7 +84,7 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, 
         }
     }
     else if (storage.isV9320) {
-        const storageData = await storage.getAsV9320(index)
+        const storageData = await storage.asV9320.get(index)
         if (!storageData) return undefined
 
         const { __kind: status } = storageData

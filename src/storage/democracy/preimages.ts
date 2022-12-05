@@ -13,7 +13,7 @@ interface PreimageStorageData {
 export async function getPreimageData(ctx: BatchContext<Store, unknown>, hash: Uint8Array, block: SubstrateBlock): Promise<PreimageStorageData | undefined> {
     const storage = new DemocracyPreimagesStorage(ctx, block)
     if (storage.isV1022) {
-        const storageData = await storage.getAsV1022(hash)
+        const storageData = await storage.asV1022.get(hash)
         if (!storageData) return undefined
 
         const [data, provider, deposit, block] = storageData
@@ -25,7 +25,7 @@ export async function getPreimageData(ctx: BatchContext<Store, unknown>, hash: U
             block,
         }
     } else if (storage.isV1058) {
-        const storageData = await storage.getAsV1058(hash)
+        const storageData = await storage.asV1058.get(hash)
         if (!storageData || storageData.__kind === 'Missing') return undefined
 
         const { provider, deposit, since, data } = storageData.value
@@ -37,7 +37,7 @@ export async function getPreimageData(ctx: BatchContext<Store, unknown>, hash: U
             block: since,
         }
     } else if (storage.isV9111) {
-        const storageData = await storage.getAsV9111(hash)
+        const storageData = await storage.asV9111.get(hash)
         if (!storageData || storageData.__kind === 'Missing') return undefined
 
         const { provider, deposit, since, data } = storageData
