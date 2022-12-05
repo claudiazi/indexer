@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Block, Chain, ChainContext, BlockContext, Result, Option} from './support'
+import {Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase} from './support'
 import * as v1020 from './v1020'
 import * as v1022 from './v1022'
 import * as v1024 from './v1024'
@@ -52,3136 +52,3722 @@ import * as v9291 from './v9291'
 import * as v9300 from './v9300'
 import * as v9320 from './v9320'
 
-export class BalancesTotalIssuanceStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+export class BalancesTotalIssuanceStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Balances'
+    }
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
+    protected getName() {
+        return 'TotalIssuance'
+    }
 
-  /**
-   *  The total units issued in the system.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Balances', 'TotalIssuance') === 'f8ebe28eb30158172c0ccf672f7747c46a244f892d08ef2ebcbaadde34a26bc0'
-  }
+    /**
+     *  The total units issued in the system.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === 'f8ebe28eb30158172c0ccf672f7747c46a244f892d08ef2ebcbaadde34a26bc0'
+    }
 
-  /**
-   *  The total units issued in the system.
-   */
-  async getAsV1020(): Promise<bigint> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Balances', 'TotalIssuance')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Balances', 'TotalIssuance') != null
-  }
+    /**
+     *  The total units issued in the system.
+     */
+    get asV1020(): BalancesTotalIssuanceStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
 }
 
-export class CouncilMembersStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  The current members of the collective. This is stored sorted (just by value).
-   */
-  get isV9111() {
-    return this._chain.getStorageItemTypeHash('Council', 'Members') === 'f5df25eadcdffaa0d2a68b199d671d3921ca36a7b70d22d57506dca52b4b5895'
-  }
-
-  /**
-   *  The current members of the collective. This is stored sorted (just by value).
-   */
-  async getAsV9111(): Promise<Uint8Array[]> {
-    assert(this.isV9111)
-    return this._chain.getStorage(this.blockHash, 'Council', 'Members')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Council', 'Members') != null
-  }
+/**
+ *  The total units issued in the system.
+ */
+export interface BalancesTotalIssuanceStorageV1020 {
+    get(): Promise<bigint>
 }
 
-export class CouncilProposalOfStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+export class CouncilMembersStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Council'
+    }
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
+    protected getName() {
+        return 'Members'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9111() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '54e55db1bed5771689c23398470e3d79c164300b3002e905baf8a07324946142'
-  }
+    /**
+     *  The current members of the collective. This is stored sorted (just by value).
+     */
+    get isV9111(): boolean {
+        return this.getTypeHash() === 'f5df25eadcdffaa0d2a68b199d671d3921ca36a7b70d22d57506dca52b4b5895'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9111(key: Uint8Array): Promise<v9111.Call | undefined> {
-    assert(this.isV9111)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9111(keys: Uint8Array[]): Promise<(v9111.Call | undefined)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9111(): Promise<(v9111.Call)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9122() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '35e9c06eaf393488c6b16cf365c09693bf1c81cc6d198b6016c29648cb8b11db'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9122(key: Uint8Array): Promise<v9122.Call | undefined> {
-    assert(this.isV9122)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9122(keys: Uint8Array[]): Promise<(v9122.Call | undefined)[]> {
-    assert(this.isV9122)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9122(): Promise<(v9122.Call)[]> {
-    assert(this.isV9122)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9130() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '000fa9eac9f34fd52e1de16af6c8184e689b16aff5b69e5b770310c6592b9a23'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9130(key: Uint8Array): Promise<v9130.Call | undefined> {
-    assert(this.isV9130)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9130(keys: Uint8Array[]): Promise<(v9130.Call | undefined)[]> {
-    assert(this.isV9130)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9130(): Promise<(v9130.Call)[]> {
-    assert(this.isV9130)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9160() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === 'ae191f57edfafa0ed77684f6c6956e661698f7626fcceabc35fc02aa204fc327'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9160(key: Uint8Array): Promise<v9160.Call | undefined> {
-    assert(this.isV9160)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9160(keys: Uint8Array[]): Promise<(v9160.Call | undefined)[]> {
-    assert(this.isV9160)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9160(): Promise<(v9160.Call)[]> {
-    assert(this.isV9160)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9170() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '92131b74d89cee349edae227d67d4039f396e38796421ef6ccad698229d1be87'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9170(key: Uint8Array): Promise<v9170.Call | undefined> {
-    assert(this.isV9170)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9170(keys: Uint8Array[]): Promise<(v9170.Call | undefined)[]> {
-    assert(this.isV9170)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9170(): Promise<(v9170.Call)[]> {
-    assert(this.isV9170)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9180() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '75d269266869aab19a7c849bd16e82439d759218a7ceb76d9d44ca8913eac77b'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9180(key: Uint8Array): Promise<v9180.Call | undefined> {
-    assert(this.isV9180)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9180(keys: Uint8Array[]): Promise<(v9180.Call | undefined)[]> {
-    assert(this.isV9180)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9180(): Promise<(v9180.Call)[]> {
-    assert(this.isV9180)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9190() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === 'ad90492cf87d0e7973eb29afcc4224fdcd5cea7edbc9f874a78e09ffb7af764a'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9190(key: Uint8Array): Promise<v9190.Call | undefined> {
-    assert(this.isV9190)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9190(keys: Uint8Array[]): Promise<(v9190.Call | undefined)[]> {
-    assert(this.isV9190)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9190(): Promise<(v9190.Call)[]> {
-    assert(this.isV9190)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9220() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '4364e985a64c3f6addf377d90f061349553d92fcbc29839df8b7cde1ec346b0c'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9220(key: Uint8Array): Promise<v9220.Call | undefined> {
-    assert(this.isV9220)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9220(keys: Uint8Array[]): Promise<(v9220.Call | undefined)[]> {
-    assert(this.isV9220)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9220(): Promise<(v9220.Call)[]> {
-    assert(this.isV9220)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9230() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '60a712e8f852a3af336091a63ce735a781e9f17a09e4fb3ea560e93a76c19d2e'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9230(key: Uint8Array): Promise<v9230.Call | undefined> {
-    assert(this.isV9230)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9230(keys: Uint8Array[]): Promise<(v9230.Call | undefined)[]> {
-    assert(this.isV9230)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9230(): Promise<(v9230.Call)[]> {
-    assert(this.isV9230)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9250() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === 'c62c655cbb15038afffc766086c6f698f366a8695bacaa50b3b5b2d97d4b89f5'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9250(key: Uint8Array): Promise<v9250.Call | undefined> {
-    assert(this.isV9250)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9250(keys: Uint8Array[]): Promise<(v9250.Call | undefined)[]> {
-    assert(this.isV9250)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9250(): Promise<(v9250.Call)[]> {
-    assert(this.isV9250)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9271() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === 'b6f7b824ac82eac6e00f10809e508dfaacd22dda3aeafc8c9374020bd69d27ad'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9271(key: Uint8Array): Promise<v9271.Call | undefined> {
-    assert(this.isV9271)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9271(keys: Uint8Array[]): Promise<(v9271.Call | undefined)[]> {
-    assert(this.isV9271)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9271(): Promise<(v9271.Call)[]> {
-    assert(this.isV9271)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9291() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '15ce1541499aecffbe2bf8eeafc64023633a5d282a468972bd6c44aa77b52ce3'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9291(key: Uint8Array): Promise<v9291.Call | undefined> {
-    assert(this.isV9291)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9291(keys: Uint8Array[]): Promise<(v9291.Call | undefined)[]> {
-    assert(this.isV9291)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9291(): Promise<(v9291.Call)[]> {
-    assert(this.isV9291)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9300() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === '4489558a261f014c524a3fa533244e852a4234f4db9aba95f960d069aa1a2db7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9300(key: Uint8Array): Promise<v9300.Call | undefined> {
-    assert(this.isV9300)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9300(keys: Uint8Array[]): Promise<(v9300.Call | undefined)[]> {
-    assert(this.isV9300)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9300(): Promise<(v9300.Call)[]> {
-    assert(this.isV9300)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9320() {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') === 'e264f3acf17bae2089248c1b5be4b79c3766ff552e8565a925e0bceaa16c973b'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9320(key: Uint8Array): Promise<v9320.Call | undefined> {
-    assert(this.isV9320)
-    return this._chain.getStorage(this.blockHash, 'Council', 'ProposalOf', key)
-  }
-
-  async getManyAsV9320(keys: Uint8Array[]): Promise<(v9320.Call | undefined)[]> {
-    assert(this.isV9320)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9320(): Promise<(v9320.Call)[]> {
-    assert(this.isV9320)
-    return this._chain.queryStorage(this.blockHash, 'Council', 'ProposalOf')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Council', 'ProposalOf') != null
-  }
+    /**
+     *  The current members of the collective. This is stored sorted (just by value).
+     */
+    get asV9111(): CouncilMembersStorageV9111 {
+        assert(this.isV9111)
+        return this as any
+    }
 }
 
-export class DemocracyPreimagesStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
-   *  The block number is the block at which it was deposited.
-   */
-  get isV1022() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'Preimages') === '8d49bec84532cce5991ad4c420ddf4ab792644a27de5f8450488e36a6c1c40ef'
-  }
-
-  /**
-   *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
-   *  The block number is the block at which it was deposited.
-   */
-  async getAsV1022(key: Uint8Array): Promise<[Uint8Array, Uint8Array, bigint, number] | undefined> {
-    assert(this.isV1022)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'Preimages', key)
-  }
-
-  async getManyAsV1022(keys: Uint8Array[]): Promise<([Uint8Array, Uint8Array, bigint, number] | undefined)[]> {
-    assert(this.isV1022)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'Preimages', keys.map(k => [k]))
-  }
-
-  async getAllAsV1022(): Promise<([Uint8Array, Uint8Array, bigint, number])[]> {
-    assert(this.isV1022)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'Preimages')
-  }
-
-  /**
-   *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
-   *  The block number is the block at which it was deposited.
-   */
-  get isV1058() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'Preimages') === '0e0e3c0f32264d14a97bb80cf16ecda808e2404f87100dc025cf84cfcc821fef'
-  }
-
-  /**
-   *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
-   *  The block number is the block at which it was deposited.
-   */
-  async getAsV1058(key: Uint8Array): Promise<v1058.PreimageStatus | undefined> {
-    assert(this.isV1058)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'Preimages', key)
-  }
-
-  async getManyAsV1058(keys: Uint8Array[]): Promise<(v1058.PreimageStatus | undefined)[]> {
-    assert(this.isV1058)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'Preimages', keys.map(k => [k]))
-  }
-
-  async getAllAsV1058(): Promise<(v1058.PreimageStatus)[]> {
-    assert(this.isV1058)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'Preimages')
-  }
-
-  /**
-   *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
-   *  The block number is the block at which it was deposited.
-   */
-  get isV9111() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'Preimages') === '2762abd948712e87f9324ca0c5ad1523f92ac946c587c97414ce71252440341f'
-  }
-
-  /**
-   *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
-   *  The block number is the block at which it was deposited.
-   */
-  async getAsV9111(key: Uint8Array): Promise<v9111.PreimageStatus | undefined> {
-    assert(this.isV9111)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'Preimages', key)
-  }
-
-  async getManyAsV9111(keys: Uint8Array[]): Promise<(v9111.PreimageStatus | undefined)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'Preimages', keys.map(k => [k]))
-  }
-
-  async getAllAsV9111(): Promise<(v9111.PreimageStatus)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'Preimages')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Democracy', 'Preimages') != null
-  }
+/**
+ *  The current members of the collective. This is stored sorted (just by value).
+ */
+export interface CouncilMembersStorageV9111 {
+    get(): Promise<Uint8Array[]>
 }
 
-export class DemocracyPublicPropCountStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+export class CouncilProposalOfStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Council'
+    }
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
+    protected getName() {
+        return 'ProposalOf'
+    }
 
-  /**
-   *  The number of (public) proposals that have been made so far.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicPropCount') === '81bbbe8e62451cbcc227306706c919527aa2538970bd6d67a9969dd52c257d02'
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9111(): boolean {
+        return this.getTypeHash() === '54e55db1bed5771689c23398470e3d79c164300b3002e905baf8a07324946142'
+    }
 
-  /**
-   *  The number of (public) proposals that have been made so far.
-   */
-  async getAsV1020(): Promise<number> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'PublicPropCount')
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9111(): CouncilProposalOfStorageV9111 {
+        assert(this.isV9111)
+        return this as any
+    }
 
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicPropCount') != null
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9122(): boolean {
+        return this.getTypeHash() === '35e9c06eaf393488c6b16cf365c09693bf1c81cc6d198b6016c29648cb8b11db'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9122(): CouncilProposalOfStorageV9122 {
+        assert(this.isV9122)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9130(): boolean {
+        return this.getTypeHash() === '000fa9eac9f34fd52e1de16af6c8184e689b16aff5b69e5b770310c6592b9a23'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9130(): CouncilProposalOfStorageV9130 {
+        assert(this.isV9130)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9160(): boolean {
+        return this.getTypeHash() === 'ae191f57edfafa0ed77684f6c6956e661698f7626fcceabc35fc02aa204fc327'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9160(): CouncilProposalOfStorageV9160 {
+        assert(this.isV9160)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9170(): boolean {
+        return this.getTypeHash() === '92131b74d89cee349edae227d67d4039f396e38796421ef6ccad698229d1be87'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9170(): CouncilProposalOfStorageV9170 {
+        assert(this.isV9170)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9180(): boolean {
+        return this.getTypeHash() === '75d269266869aab19a7c849bd16e82439d759218a7ceb76d9d44ca8913eac77b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9180(): CouncilProposalOfStorageV9180 {
+        assert(this.isV9180)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9190(): boolean {
+        return this.getTypeHash() === 'ad90492cf87d0e7973eb29afcc4224fdcd5cea7edbc9f874a78e09ffb7af764a'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9190(): CouncilProposalOfStorageV9190 {
+        assert(this.isV9190)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9220(): boolean {
+        return this.getTypeHash() === '4364e985a64c3f6addf377d90f061349553d92fcbc29839df8b7cde1ec346b0c'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9220(): CouncilProposalOfStorageV9220 {
+        assert(this.isV9220)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9230(): boolean {
+        return this.getTypeHash() === '60a712e8f852a3af336091a63ce735a781e9f17a09e4fb3ea560e93a76c19d2e'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9230(): CouncilProposalOfStorageV9230 {
+        assert(this.isV9230)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9250(): boolean {
+        return this.getTypeHash() === 'c62c655cbb15038afffc766086c6f698f366a8695bacaa50b3b5b2d97d4b89f5'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9250(): CouncilProposalOfStorageV9250 {
+        assert(this.isV9250)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9271(): boolean {
+        return this.getTypeHash() === 'b6f7b824ac82eac6e00f10809e508dfaacd22dda3aeafc8c9374020bd69d27ad'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9271(): CouncilProposalOfStorageV9271 {
+        assert(this.isV9271)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9291(): boolean {
+        return this.getTypeHash() === '15ce1541499aecffbe2bf8eeafc64023633a5d282a468972bd6c44aa77b52ce3'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9291(): CouncilProposalOfStorageV9291 {
+        assert(this.isV9291)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9300(): boolean {
+        return this.getTypeHash() === '4489558a261f014c524a3fa533244e852a4234f4db9aba95f960d069aa1a2db7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9300(): CouncilProposalOfStorageV9300 {
+        assert(this.isV9300)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9320(): boolean {
+        return this.getTypeHash() === 'e264f3acf17bae2089248c1b5be4b79c3766ff552e8565a925e0bceaa16c973b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9320(): CouncilProposalOfStorageV9320 {
+        assert(this.isV9320)
+        return this as any
+    }
 }
 
-export class DemocracyPublicPropsStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  The public proposals. Unsorted.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') === '0da61e381ba5d7090741171fee74491d6e5f0d3b420709a45911270de6f4da0a'
-  }
-
-  /**
-   *  The public proposals. Unsorted.
-   */
-  async getAsV1020(): Promise<[number, v1020.Proposal, Uint8Array][]> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'PublicProps')
-  }
-
-  /**
-   *  The public proposals. Unsorted. The second item is the proposal's hash.
-   */
-  get isV1022() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') === '54835df1906ed20adb15939607ddf49a9a1447f02d476ca5b7b39c1f35e1a40f'
-  }
-
-  /**
-   *  The public proposals. Unsorted. The second item is the proposal's hash.
-   */
-  async getAsV1022(): Promise<[number, Uint8Array, Uint8Array][]> {
-    assert(this.isV1022)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'PublicProps')
-  }
-
-  /**
-   *  The public proposals. Unsorted. The second item is the proposal.
-   */
-  get isV9320() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') === '3472d1c9441381a2b9709395dfc47ee60b049d41fbd71ce557eb1a61ef656bec'
-  }
-
-  /**
-   *  The public proposals. Unsorted. The second item is the proposal.
-   */
-  async getAsV9320(): Promise<[number, v9320.Bounded, Uint8Array][]> {
-    assert(this.isV9320)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'PublicProps')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Democracy', 'PublicProps') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9111 {
+    get(key: Uint8Array): Promise<(v9111.Call | undefined)>
+    getAll(): Promise<v9111.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9111.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9111.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9111.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9111.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9111.Call][]>
 }
 
-export class DemocracyReferendumInfoOfStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'ReferendumInfoOf') === 'b841a2a79796892945d8a9256375f0a9e422926b95cb3e85c8edae023ec07300'
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   */
-  async getAsV1020(key: number): Promise<v1020.Type_283 | undefined> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', key)
-  }
-
-  async getManyAsV1020(keys: number[]): Promise<(v1020.Type_283 | undefined)[]> {
-    assert(this.isV1020)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1020(): Promise<(v1020.Type_283)[]> {
-    assert(this.isV1020)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf')
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   */
-  get isV1055() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'ReferendumInfoOf') === '657d9c0cc58504c79c02d5040424e2dce3c3e5fe2b52b13a7a024ff5b06c7a99'
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   */
-  async getAsV1055(key: number): Promise<v1055.ReferendumInfo | undefined> {
-    assert(this.isV1055)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', key)
-  }
-
-  async getManyAsV1055(keys: number[]): Promise<(v1055.ReferendumInfo | undefined)[]> {
-    assert(this.isV1055)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1055(): Promise<(v1055.ReferendumInfo)[]> {
-    assert(this.isV1055)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf')
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   * 
-   *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
-   */
-  get isV9111() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'ReferendumInfoOf') === '2e86290b25fe028668a12b0e97306da926c3578533bd5de6396ccfc917cb15e5'
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   * 
-   *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
-   */
-  async getAsV9111(key: number): Promise<v9111.ReferendumInfo | undefined> {
-    assert(this.isV9111)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', key)
-  }
-
-  async getManyAsV9111(keys: number[]): Promise<(v9111.ReferendumInfo | undefined)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9111(): Promise<(v9111.ReferendumInfo)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf')
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   * 
-   *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
-   */
-  get isV9320() {
-    return this._chain.getStorageItemTypeHash('Democracy', 'ReferendumInfoOf') === 'ba926738202889ee118b1f40d70a1edbd71f0893c703c708a73330af6ca468e1'
-  }
-
-  /**
-   *  Information concerning any given referendum.
-   * 
-   *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
-   */
-  async getAsV9320(key: number): Promise<v9320.ReferendumInfo | undefined> {
-    assert(this.isV9320)
-    return this._chain.getStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', key)
-  }
-
-  async getManyAsV9320(keys: number[]): Promise<(v9320.ReferendumInfo | undefined)[]> {
-    assert(this.isV9320)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9320(): Promise<(v9320.ReferendumInfo)[]> {
-    assert(this.isV9320)
-    return this._chain.queryStorage(this.blockHash, 'Democracy', 'ReferendumInfoOf')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Democracy', 'ReferendumInfoOf') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9122 {
+    get(key: Uint8Array): Promise<(v9122.Call | undefined)>
+    getAll(): Promise<v9122.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9122.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9122.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9122.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9122.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9122.Call][]>
 }
 
-export class ElectionProviderMultiPhaseCurrentPhaseStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  Current phase.
-   */
-  get isV2029() {
-    return this._chain.getStorageItemTypeHash('ElectionProviderMultiPhase', 'CurrentPhase') === 'd43c46e1fdaabf223f7ddc55f3636b227c163ebca9bccdb6f6aca606816cba64'
-  }
-
-  /**
-   *  Current phase.
-   */
-  async getAsV2029(): Promise<v2029.ElectionPhase> {
-    assert(this.isV2029)
-    return this._chain.getStorage(this.blockHash, 'ElectionProviderMultiPhase', 'CurrentPhase')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('ElectionProviderMultiPhase', 'CurrentPhase') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9130 {
+    get(key: Uint8Array): Promise<(v9130.Call | undefined)>
+    getAll(): Promise<v9130.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9130.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9130.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9130.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9130.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9130.Call][]>
 }
 
-export class Instance1CollectiveProposalOfStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ff658fad55af8e9e38fe1bed80067dc6842aefcacc9835f3404ef79a9bfa9a7f'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1020(key: Uint8Array): Promise<v1020.Proposal | undefined> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1020(keys: Uint8Array[]): Promise<(v1020.Proposal | undefined)[]> {
-    assert(this.isV1020)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1020(): Promise<(v1020.Proposal)[]> {
-    assert(this.isV1020)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1022() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'cf2bde75ee5bf4aedef305aabd50a859b561d2ea72a3ad32f0253c133c791f40'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1022(key: Uint8Array): Promise<v1022.Proposal | undefined> {
-    assert(this.isV1022)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1022(keys: Uint8Array[]): Promise<(v1022.Proposal | undefined)[]> {
-    assert(this.isV1022)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1022(): Promise<(v1022.Proposal)[]> {
-    assert(this.isV1022)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1024() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'af9a5b7fd3313a46c1c6b41b8b6812f69ff0f2b1edd8d66693a82c0ca49db343'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1024(key: Uint8Array): Promise<v1024.Proposal | undefined> {
-    assert(this.isV1024)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1024(keys: Uint8Array[]): Promise<(v1024.Proposal | undefined)[]> {
-    assert(this.isV1024)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1024(): Promise<(v1024.Proposal)[]> {
-    assert(this.isV1024)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1027() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'fcb038bcf495bae551346ead7a5d7cb7edff11f26babbbe2fcc9d0fbbfb0ee86'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1027(key: Uint8Array): Promise<v1027.Proposal | undefined> {
-    assert(this.isV1027)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1027(keys: Uint8Array[]): Promise<(v1027.Proposal | undefined)[]> {
-    assert(this.isV1027)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1027(): Promise<(v1027.Proposal)[]> {
-    assert(this.isV1027)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1029() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '1fa524953ff02a11fb7b9dc520b34c836bf4a94b731f96f02d8442061891be9a'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1029(key: Uint8Array): Promise<v1029.Proposal | undefined> {
-    assert(this.isV1029)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1029(keys: Uint8Array[]): Promise<(v1029.Proposal | undefined)[]> {
-    assert(this.isV1029)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1029(): Promise<(v1029.Proposal)[]> {
-    assert(this.isV1029)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1030() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '722c944e5d464430da96eb7afb30cb22dcf97958e77a989b11b76e0a08bc91ae'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1030(key: Uint8Array): Promise<v1030.Proposal | undefined> {
-    assert(this.isV1030)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1030(keys: Uint8Array[]): Promise<(v1030.Proposal | undefined)[]> {
-    assert(this.isV1030)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1030(): Promise<(v1030.Proposal)[]> {
-    assert(this.isV1030)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1031() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '04587b1736af13aca0b303f067e8d8ca82708a7c35f7e540deb889b26b16e850'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1031(key: Uint8Array): Promise<v1031.Proposal | undefined> {
-    assert(this.isV1031)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1031(keys: Uint8Array[]): Promise<(v1031.Proposal | undefined)[]> {
-    assert(this.isV1031)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1031(): Promise<(v1031.Proposal)[]> {
-    assert(this.isV1031)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1032() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '687ab865a15f03a5c5501e45563136c8c7e04087d3f2d252349b1e3afc2bb95b'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1032(key: Uint8Array): Promise<v1032.Proposal | undefined> {
-    assert(this.isV1032)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1032(keys: Uint8Array[]): Promise<(v1032.Proposal | undefined)[]> {
-    assert(this.isV1032)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1032(): Promise<(v1032.Proposal)[]> {
-    assert(this.isV1032)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1038() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '4b12bc407721d3d627ff8c350094c66df705befac88991c10ee1900190e41fcd'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1038(key: Uint8Array): Promise<v1038.Proposal | undefined> {
-    assert(this.isV1038)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1038(keys: Uint8Array[]): Promise<(v1038.Proposal | undefined)[]> {
-    assert(this.isV1038)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1038(): Promise<(v1038.Proposal)[]> {
-    assert(this.isV1038)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1039() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '280c2b5e09651099a2df56d3a3b1021971981e68df34b2cc71f846a279441cf7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1039(key: Uint8Array): Promise<v1039.Proposal | undefined> {
-    assert(this.isV1039)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1039(keys: Uint8Array[]): Promise<(v1039.Proposal | undefined)[]> {
-    assert(this.isV1039)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1039(): Promise<(v1039.Proposal)[]> {
-    assert(this.isV1039)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1040() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '7b716afbe6383efdfa96087dbe25666ef1749a83171459d7a417e308370bf5ce'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1040(key: Uint8Array): Promise<v1040.Proposal | undefined> {
-    assert(this.isV1040)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1040(keys: Uint8Array[]): Promise<(v1040.Proposal | undefined)[]> {
-    assert(this.isV1040)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1040(): Promise<(v1040.Proposal)[]> {
-    assert(this.isV1040)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1042() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ba9ae3f886667e78e6929d4b9f36feb891aad7e94d36a75d3c2835143d849183'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1042(key: Uint8Array): Promise<v1042.Proposal | undefined> {
-    assert(this.isV1042)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1042(keys: Uint8Array[]): Promise<(v1042.Proposal | undefined)[]> {
-    assert(this.isV1042)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1042(): Promise<(v1042.Proposal)[]> {
-    assert(this.isV1042)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1050() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'd780ab190a15dcdf4e9424c86844bcd43951578af085195d51e82860b74ea017'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1050(key: Uint8Array): Promise<v1050.Proposal | undefined> {
-    assert(this.isV1050)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1050(keys: Uint8Array[]): Promise<(v1050.Proposal | undefined)[]> {
-    assert(this.isV1050)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1050(): Promise<(v1050.Proposal)[]> {
-    assert(this.isV1050)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1054() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '4ee1bcb3e88f1695c390a015a7bb5456bbed70aea3e714981690f4d1e6647d20'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1054(key: Uint8Array): Promise<v1054.Proposal | undefined> {
-    assert(this.isV1054)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1054(keys: Uint8Array[]): Promise<(v1054.Proposal | undefined)[]> {
-    assert(this.isV1054)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1054(): Promise<(v1054.Proposal)[]> {
-    assert(this.isV1054)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1055() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '9b1888d08bbc63ca77fc479899195e8abbc91196043f964ed6ae05f7a6b92ac2'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1055(key: Uint8Array): Promise<v1055.Proposal | undefined> {
-    assert(this.isV1055)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1055(keys: Uint8Array[]): Promise<(v1055.Proposal | undefined)[]> {
-    assert(this.isV1055)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1055(): Promise<(v1055.Proposal)[]> {
-    assert(this.isV1055)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1058() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '51d22c65a4493fbee384e3c6b5480902226dcb7f07fdae2e09b1ed994581b8a2'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1058(key: Uint8Array): Promise<v1058.Proposal | undefined> {
-    assert(this.isV1058)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1058(keys: Uint8Array[]): Promise<(v1058.Proposal | undefined)[]> {
-    assert(this.isV1058)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1058(): Promise<(v1058.Proposal)[]> {
-    assert(this.isV1058)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1062() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '2bebfde2c19829d495b45d6c78ef1337d124232bf319c06661a736c67899c40b'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1062(key: Uint8Array): Promise<v1062.Proposal | undefined> {
-    assert(this.isV1062)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1062(keys: Uint8Array[]): Promise<(v1062.Proposal | undefined)[]> {
-    assert(this.isV1062)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1062(): Promise<(v1062.Proposal)[]> {
-    assert(this.isV1062)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2005() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'b1d8bd7af8a0bdba85190975d77d06e416603175b1c190c6efc22966d2222b42'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2005(key: Uint8Array): Promise<v2005.Proposal | undefined> {
-    assert(this.isV2005)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2005(keys: Uint8Array[]): Promise<(v2005.Proposal | undefined)[]> {
-    assert(this.isV2005)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2005(): Promise<(v2005.Proposal)[]> {
-    assert(this.isV2005)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2007() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '961aa31652f228fead4d9c95205bb44df6d3431225fc46ab1b2bb180613401d3'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2007(key: Uint8Array): Promise<v2007.Proposal | undefined> {
-    assert(this.isV2007)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2007(keys: Uint8Array[]): Promise<(v2007.Proposal | undefined)[]> {
-    assert(this.isV2007)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2007(): Promise<(v2007.Proposal)[]> {
-    assert(this.isV2007)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2011() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '611412d18d1c6341ce497288da6f8d52d113a683fd777fa5d7a6c0ac089326a1'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2011(key: Uint8Array): Promise<v2011.Proposal | undefined> {
-    assert(this.isV2011)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2011(keys: Uint8Array[]): Promise<(v2011.Proposal | undefined)[]> {
-    assert(this.isV2011)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2011(): Promise<(v2011.Proposal)[]> {
-    assert(this.isV2011)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2013() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '1095e28f34062b5a0a31d9abd5578a7aa39d989d65d6cd2c6987346f2cacface'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2013(key: Uint8Array): Promise<v2013.Proposal | undefined> {
-    assert(this.isV2013)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2013(keys: Uint8Array[]): Promise<(v2013.Proposal | undefined)[]> {
-    assert(this.isV2013)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2013(): Promise<(v2013.Proposal)[]> {
-    assert(this.isV2013)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2015() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '633a2c0a40bf70aa7d1a84d140419484144593cd4c1fbd16efca4f71428abd5c'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2015(key: Uint8Array): Promise<v2015.Proposal | undefined> {
-    assert(this.isV2015)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2015(keys: Uint8Array[]): Promise<(v2015.Proposal | undefined)[]> {
-    assert(this.isV2015)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2015(): Promise<(v2015.Proposal)[]> {
-    assert(this.isV2015)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2022() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'ba39e6f89dc7984a5de5986ba21ea9c7874a17928d35ee22e9f19a6a32b06ed7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2022(key: Uint8Array): Promise<v2022.Proposal | undefined> {
-    assert(this.isV2022)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2022(keys: Uint8Array[]): Promise<(v2022.Proposal | undefined)[]> {
-    assert(this.isV2022)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2022(): Promise<(v2022.Proposal)[]> {
-    assert(this.isV2022)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2023() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '0eff9f067f650895cebad9eb8f6d2e0b87378eb99f6cfcc9188519b6809e81c7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2023(key: Uint8Array): Promise<v2023.Proposal | undefined> {
-    assert(this.isV2023)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2023(keys: Uint8Array[]): Promise<(v2023.Proposal | undefined)[]> {
-    assert(this.isV2023)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2023(): Promise<(v2023.Proposal)[]> {
-    assert(this.isV2023)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2024() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'f47e7718dc7af5fdbceb48ad3c23c248921145bbaaefecdaf3c6e766071a0379'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2024(key: Uint8Array): Promise<v2024.Proposal | undefined> {
-    assert(this.isV2024)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2024(keys: Uint8Array[]): Promise<(v2024.Proposal | undefined)[]> {
-    assert(this.isV2024)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2024(): Promise<(v2024.Proposal)[]> {
-    assert(this.isV2024)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2025() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '20b9a67d80ebdfbcdbeab6296df5fb3c08e4edd42eb821b0d267a4e6a5639fe3'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2025(key: Uint8Array): Promise<v2025.Proposal | undefined> {
-    assert(this.isV2025)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2025(keys: Uint8Array[]): Promise<(v2025.Proposal | undefined)[]> {
-    assert(this.isV2025)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2025(): Promise<(v2025.Proposal)[]> {
-    assert(this.isV2025)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2026() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'b96abbff6a00bf4f4edb47eab52154f403f584ec4ab38b7e4be1af0d215bc2e2'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2026(key: Uint8Array): Promise<v2026.Proposal | undefined> {
-    assert(this.isV2026)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2026(keys: Uint8Array[]): Promise<(v2026.Proposal | undefined)[]> {
-    assert(this.isV2026)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2026(): Promise<(v2026.Proposal)[]> {
-    assert(this.isV2026)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2028() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '399c92d404fea7dc92e323f9384520a1dcaf371691e5db7723306cc5b1246d94'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2028(key: Uint8Array): Promise<v2028.Proposal | undefined> {
-    assert(this.isV2028)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2028(keys: Uint8Array[]): Promise<(v2028.Proposal | undefined)[]> {
-    assert(this.isV2028)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2028(): Promise<(v2028.Proposal)[]> {
-    assert(this.isV2028)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2029() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '468d59d5b40e80c13c2d81c4774d12f145dcf6ba2363aef718241ac2abc28d12'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2029(key: Uint8Array): Promise<v2029.Proposal | undefined> {
-    assert(this.isV2029)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2029(keys: Uint8Array[]): Promise<(v2029.Proposal | undefined)[]> {
-    assert(this.isV2029)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2029(): Promise<(v2029.Proposal)[]> {
-    assert(this.isV2029)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2030() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === 'd82835c91c052dffa0a14eb20b7a8a134d538d2d60742b962f3fa7823c1657fa'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2030(key: Uint8Array): Promise<v2030.Proposal | undefined> {
-    assert(this.isV2030)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2030(keys: Uint8Array[]): Promise<(v2030.Proposal | undefined)[]> {
-    assert(this.isV2030)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2030(): Promise<(v2030.Proposal)[]> {
-    assert(this.isV2030)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9010() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '198809793338f28c0a822990194fdeaf2dec25e8848048ce7bb835b676396a37'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9010(key: Uint8Array): Promise<v9010.Proposal | undefined> {
-    assert(this.isV9010)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9010(keys: Uint8Array[]): Promise<(v9010.Proposal | undefined)[]> {
-    assert(this.isV9010)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9010(): Promise<(v9010.Proposal)[]> {
-    assert(this.isV9010)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9030() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '133daac7167756eaebbdcb23c93e2211158671e84e107af848071d3534ed99bd'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9030(key: Uint8Array): Promise<v9030.Proposal | undefined> {
-    assert(this.isV9030)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9030(keys: Uint8Array[]): Promise<(v9030.Proposal | undefined)[]> {
-    assert(this.isV9030)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9030(): Promise<(v9030.Proposal)[]> {
-    assert(this.isV9030)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9040() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '45640f8fa172b75c33ced53cedf23106c06b9a91427a71e706d9d136aed8d3a6'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9040(key: Uint8Array): Promise<v9040.Proposal | undefined> {
-    assert(this.isV9040)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9040(keys: Uint8Array[]): Promise<(v9040.Proposal | undefined)[]> {
-    assert(this.isV9040)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9040(): Promise<(v9040.Proposal)[]> {
-    assert(this.isV9040)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9050() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '6ffbddf00697f7a651ddd2bd8789384e7dca3980a60aa5a2499d016d43b1ac56'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9050(key: Uint8Array): Promise<v9050.Proposal | undefined> {
-    assert(this.isV9050)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9050(keys: Uint8Array[]): Promise<(v9050.Proposal | undefined)[]> {
-    assert(this.isV9050)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9050(): Promise<(v9050.Proposal)[]> {
-    assert(this.isV9050)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9080() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '5c95cef639e096f92226c0b752c338b2195817a6e7f6d387b5199e8de3e02bab'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9080(key: Uint8Array): Promise<v9080.Proposal | undefined> {
-    assert(this.isV9080)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9080(keys: Uint8Array[]): Promise<(v9080.Proposal | undefined)[]> {
-    assert(this.isV9080)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9080(): Promise<(v9080.Proposal)[]> {
-    assert(this.isV9080)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9090() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '3060f9c0543c77d2a8f13dd41a665b6e953b60cd682f2cd0a4b9e47ca76c255d'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9090(key: Uint8Array): Promise<v9090.Proposal | undefined> {
-    assert(this.isV9090)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9090(keys: Uint8Array[]): Promise<(v9090.Proposal | undefined)[]> {
-    assert(this.isV9090)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9090(): Promise<(v9090.Proposal)[]> {
-    assert(this.isV9090)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9100() {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') === '4da47ef769f8cd0065a1642d93ed9e4664c7b938642677491109a7b2d9dffc5c'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9100(key: Uint8Array): Promise<v9100.Proposal | undefined> {
-    assert(this.isV9100)
-    return this._chain.getStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9100(keys: Uint8Array[]): Promise<(v9100.Proposal | undefined)[]> {
-    assert(this.isV9100)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9100(): Promise<(v9100.Proposal)[]> {
-    assert(this.isV9100)
-    return this._chain.queryStorage(this.blockHash, 'Instance1Collective', 'ProposalOf')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Instance1Collective', 'ProposalOf') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9160 {
+    get(key: Uint8Array): Promise<(v9160.Call | undefined)>
+    getAll(): Promise<v9160.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9160.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9160.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9160.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9160.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9160.Call][]>
 }
 
-export class Instance2CollectiveProposalOfStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ff658fad55af8e9e38fe1bed80067dc6842aefcacc9835f3404ef79a9bfa9a7f'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1020(key: Uint8Array): Promise<v1020.Proposal | undefined> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1020(keys: Uint8Array[]): Promise<(v1020.Proposal | undefined)[]> {
-    assert(this.isV1020)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1020(): Promise<(v1020.Proposal)[]> {
-    assert(this.isV1020)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1022() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'cf2bde75ee5bf4aedef305aabd50a859b561d2ea72a3ad32f0253c133c791f40'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1022(key: Uint8Array): Promise<v1022.Proposal | undefined> {
-    assert(this.isV1022)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1022(keys: Uint8Array[]): Promise<(v1022.Proposal | undefined)[]> {
-    assert(this.isV1022)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1022(): Promise<(v1022.Proposal)[]> {
-    assert(this.isV1022)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1024() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'af9a5b7fd3313a46c1c6b41b8b6812f69ff0f2b1edd8d66693a82c0ca49db343'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1024(key: Uint8Array): Promise<v1024.Proposal | undefined> {
-    assert(this.isV1024)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1024(keys: Uint8Array[]): Promise<(v1024.Proposal | undefined)[]> {
-    assert(this.isV1024)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1024(): Promise<(v1024.Proposal)[]> {
-    assert(this.isV1024)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1027() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'fcb038bcf495bae551346ead7a5d7cb7edff11f26babbbe2fcc9d0fbbfb0ee86'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1027(key: Uint8Array): Promise<v1027.Proposal | undefined> {
-    assert(this.isV1027)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1027(keys: Uint8Array[]): Promise<(v1027.Proposal | undefined)[]> {
-    assert(this.isV1027)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1027(): Promise<(v1027.Proposal)[]> {
-    assert(this.isV1027)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1029() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '1fa524953ff02a11fb7b9dc520b34c836bf4a94b731f96f02d8442061891be9a'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1029(key: Uint8Array): Promise<v1029.Proposal | undefined> {
-    assert(this.isV1029)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1029(keys: Uint8Array[]): Promise<(v1029.Proposal | undefined)[]> {
-    assert(this.isV1029)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1029(): Promise<(v1029.Proposal)[]> {
-    assert(this.isV1029)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1030() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '722c944e5d464430da96eb7afb30cb22dcf97958e77a989b11b76e0a08bc91ae'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1030(key: Uint8Array): Promise<v1030.Proposal | undefined> {
-    assert(this.isV1030)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1030(keys: Uint8Array[]): Promise<(v1030.Proposal | undefined)[]> {
-    assert(this.isV1030)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1030(): Promise<(v1030.Proposal)[]> {
-    assert(this.isV1030)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1031() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '04587b1736af13aca0b303f067e8d8ca82708a7c35f7e540deb889b26b16e850'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1031(key: Uint8Array): Promise<v1031.Proposal | undefined> {
-    assert(this.isV1031)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1031(keys: Uint8Array[]): Promise<(v1031.Proposal | undefined)[]> {
-    assert(this.isV1031)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1031(): Promise<(v1031.Proposal)[]> {
-    assert(this.isV1031)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1032() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '687ab865a15f03a5c5501e45563136c8c7e04087d3f2d252349b1e3afc2bb95b'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1032(key: Uint8Array): Promise<v1032.Proposal | undefined> {
-    assert(this.isV1032)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1032(keys: Uint8Array[]): Promise<(v1032.Proposal | undefined)[]> {
-    assert(this.isV1032)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1032(): Promise<(v1032.Proposal)[]> {
-    assert(this.isV1032)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1038() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '4b12bc407721d3d627ff8c350094c66df705befac88991c10ee1900190e41fcd'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1038(key: Uint8Array): Promise<v1038.Proposal | undefined> {
-    assert(this.isV1038)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1038(keys: Uint8Array[]): Promise<(v1038.Proposal | undefined)[]> {
-    assert(this.isV1038)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1038(): Promise<(v1038.Proposal)[]> {
-    assert(this.isV1038)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1039() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '280c2b5e09651099a2df56d3a3b1021971981e68df34b2cc71f846a279441cf7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1039(key: Uint8Array): Promise<v1039.Proposal | undefined> {
-    assert(this.isV1039)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1039(keys: Uint8Array[]): Promise<(v1039.Proposal | undefined)[]> {
-    assert(this.isV1039)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1039(): Promise<(v1039.Proposal)[]> {
-    assert(this.isV1039)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1040() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '7b716afbe6383efdfa96087dbe25666ef1749a83171459d7a417e308370bf5ce'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1040(key: Uint8Array): Promise<v1040.Proposal | undefined> {
-    assert(this.isV1040)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1040(keys: Uint8Array[]): Promise<(v1040.Proposal | undefined)[]> {
-    assert(this.isV1040)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1040(): Promise<(v1040.Proposal)[]> {
-    assert(this.isV1040)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1042() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ba9ae3f886667e78e6929d4b9f36feb891aad7e94d36a75d3c2835143d849183'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1042(key: Uint8Array): Promise<v1042.Proposal | undefined> {
-    assert(this.isV1042)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1042(keys: Uint8Array[]): Promise<(v1042.Proposal | undefined)[]> {
-    assert(this.isV1042)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1042(): Promise<(v1042.Proposal)[]> {
-    assert(this.isV1042)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1050() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'd780ab190a15dcdf4e9424c86844bcd43951578af085195d51e82860b74ea017'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1050(key: Uint8Array): Promise<v1050.Proposal | undefined> {
-    assert(this.isV1050)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1050(keys: Uint8Array[]): Promise<(v1050.Proposal | undefined)[]> {
-    assert(this.isV1050)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1050(): Promise<(v1050.Proposal)[]> {
-    assert(this.isV1050)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1054() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '4ee1bcb3e88f1695c390a015a7bb5456bbed70aea3e714981690f4d1e6647d20'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1054(key: Uint8Array): Promise<v1054.Proposal | undefined> {
-    assert(this.isV1054)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1054(keys: Uint8Array[]): Promise<(v1054.Proposal | undefined)[]> {
-    assert(this.isV1054)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1054(): Promise<(v1054.Proposal)[]> {
-    assert(this.isV1054)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1055() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '9b1888d08bbc63ca77fc479899195e8abbc91196043f964ed6ae05f7a6b92ac2'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1055(key: Uint8Array): Promise<v1055.Proposal | undefined> {
-    assert(this.isV1055)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1055(keys: Uint8Array[]): Promise<(v1055.Proposal | undefined)[]> {
-    assert(this.isV1055)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1055(): Promise<(v1055.Proposal)[]> {
-    assert(this.isV1055)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1058() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '51d22c65a4493fbee384e3c6b5480902226dcb7f07fdae2e09b1ed994581b8a2'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1058(key: Uint8Array): Promise<v1058.Proposal | undefined> {
-    assert(this.isV1058)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1058(keys: Uint8Array[]): Promise<(v1058.Proposal | undefined)[]> {
-    assert(this.isV1058)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1058(): Promise<(v1058.Proposal)[]> {
-    assert(this.isV1058)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV1062() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '2bebfde2c19829d495b45d6c78ef1337d124232bf319c06661a736c67899c40b'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV1062(key: Uint8Array): Promise<v1062.Proposal | undefined> {
-    assert(this.isV1062)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV1062(keys: Uint8Array[]): Promise<(v1062.Proposal | undefined)[]> {
-    assert(this.isV1062)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV1062(): Promise<(v1062.Proposal)[]> {
-    assert(this.isV1062)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2005() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'b1d8bd7af8a0bdba85190975d77d06e416603175b1c190c6efc22966d2222b42'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2005(key: Uint8Array): Promise<v2005.Proposal | undefined> {
-    assert(this.isV2005)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2005(keys: Uint8Array[]): Promise<(v2005.Proposal | undefined)[]> {
-    assert(this.isV2005)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2005(): Promise<(v2005.Proposal)[]> {
-    assert(this.isV2005)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2007() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '961aa31652f228fead4d9c95205bb44df6d3431225fc46ab1b2bb180613401d3'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2007(key: Uint8Array): Promise<v2007.Proposal | undefined> {
-    assert(this.isV2007)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2007(keys: Uint8Array[]): Promise<(v2007.Proposal | undefined)[]> {
-    assert(this.isV2007)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2007(): Promise<(v2007.Proposal)[]> {
-    assert(this.isV2007)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2011() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '611412d18d1c6341ce497288da6f8d52d113a683fd777fa5d7a6c0ac089326a1'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2011(key: Uint8Array): Promise<v2011.Proposal | undefined> {
-    assert(this.isV2011)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2011(keys: Uint8Array[]): Promise<(v2011.Proposal | undefined)[]> {
-    assert(this.isV2011)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2011(): Promise<(v2011.Proposal)[]> {
-    assert(this.isV2011)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2013() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '1095e28f34062b5a0a31d9abd5578a7aa39d989d65d6cd2c6987346f2cacface'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2013(key: Uint8Array): Promise<v2013.Proposal | undefined> {
-    assert(this.isV2013)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2013(keys: Uint8Array[]): Promise<(v2013.Proposal | undefined)[]> {
-    assert(this.isV2013)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2013(): Promise<(v2013.Proposal)[]> {
-    assert(this.isV2013)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2015() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '633a2c0a40bf70aa7d1a84d140419484144593cd4c1fbd16efca4f71428abd5c'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2015(key: Uint8Array): Promise<v2015.Proposal | undefined> {
-    assert(this.isV2015)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2015(keys: Uint8Array[]): Promise<(v2015.Proposal | undefined)[]> {
-    assert(this.isV2015)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2015(): Promise<(v2015.Proposal)[]> {
-    assert(this.isV2015)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2022() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'ba39e6f89dc7984a5de5986ba21ea9c7874a17928d35ee22e9f19a6a32b06ed7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2022(key: Uint8Array): Promise<v2022.Proposal | undefined> {
-    assert(this.isV2022)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2022(keys: Uint8Array[]): Promise<(v2022.Proposal | undefined)[]> {
-    assert(this.isV2022)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2022(): Promise<(v2022.Proposal)[]> {
-    assert(this.isV2022)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2023() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '0eff9f067f650895cebad9eb8f6d2e0b87378eb99f6cfcc9188519b6809e81c7'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2023(key: Uint8Array): Promise<v2023.Proposal | undefined> {
-    assert(this.isV2023)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2023(keys: Uint8Array[]): Promise<(v2023.Proposal | undefined)[]> {
-    assert(this.isV2023)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2023(): Promise<(v2023.Proposal)[]> {
-    assert(this.isV2023)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2024() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'f47e7718dc7af5fdbceb48ad3c23c248921145bbaaefecdaf3c6e766071a0379'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2024(key: Uint8Array): Promise<v2024.Proposal | undefined> {
-    assert(this.isV2024)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2024(keys: Uint8Array[]): Promise<(v2024.Proposal | undefined)[]> {
-    assert(this.isV2024)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2024(): Promise<(v2024.Proposal)[]> {
-    assert(this.isV2024)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2025() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '20b9a67d80ebdfbcdbeab6296df5fb3c08e4edd42eb821b0d267a4e6a5639fe3'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2025(key: Uint8Array): Promise<v2025.Proposal | undefined> {
-    assert(this.isV2025)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2025(keys: Uint8Array[]): Promise<(v2025.Proposal | undefined)[]> {
-    assert(this.isV2025)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2025(): Promise<(v2025.Proposal)[]> {
-    assert(this.isV2025)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2026() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'b96abbff6a00bf4f4edb47eab52154f403f584ec4ab38b7e4be1af0d215bc2e2'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2026(key: Uint8Array): Promise<v2026.Proposal | undefined> {
-    assert(this.isV2026)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2026(keys: Uint8Array[]): Promise<(v2026.Proposal | undefined)[]> {
-    assert(this.isV2026)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2026(): Promise<(v2026.Proposal)[]> {
-    assert(this.isV2026)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2028() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '399c92d404fea7dc92e323f9384520a1dcaf371691e5db7723306cc5b1246d94'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2028(key: Uint8Array): Promise<v2028.Proposal | undefined> {
-    assert(this.isV2028)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2028(keys: Uint8Array[]): Promise<(v2028.Proposal | undefined)[]> {
-    assert(this.isV2028)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2028(): Promise<(v2028.Proposal)[]> {
-    assert(this.isV2028)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2029() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '468d59d5b40e80c13c2d81c4774d12f145dcf6ba2363aef718241ac2abc28d12'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2029(key: Uint8Array): Promise<v2029.Proposal | undefined> {
-    assert(this.isV2029)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2029(keys: Uint8Array[]): Promise<(v2029.Proposal | undefined)[]> {
-    assert(this.isV2029)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2029(): Promise<(v2029.Proposal)[]> {
-    assert(this.isV2029)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV2030() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === 'd82835c91c052dffa0a14eb20b7a8a134d538d2d60742b962f3fa7823c1657fa'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV2030(key: Uint8Array): Promise<v2030.Proposal | undefined> {
-    assert(this.isV2030)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV2030(keys: Uint8Array[]): Promise<(v2030.Proposal | undefined)[]> {
-    assert(this.isV2030)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV2030(): Promise<(v2030.Proposal)[]> {
-    assert(this.isV2030)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9010() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '198809793338f28c0a822990194fdeaf2dec25e8848048ce7bb835b676396a37'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9010(key: Uint8Array): Promise<v9010.Proposal | undefined> {
-    assert(this.isV9010)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9010(keys: Uint8Array[]): Promise<(v9010.Proposal | undefined)[]> {
-    assert(this.isV9010)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9010(): Promise<(v9010.Proposal)[]> {
-    assert(this.isV9010)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9030() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '133daac7167756eaebbdcb23c93e2211158671e84e107af848071d3534ed99bd'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9030(key: Uint8Array): Promise<v9030.Proposal | undefined> {
-    assert(this.isV9030)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9030(keys: Uint8Array[]): Promise<(v9030.Proposal | undefined)[]> {
-    assert(this.isV9030)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9030(): Promise<(v9030.Proposal)[]> {
-    assert(this.isV9030)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9040() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '45640f8fa172b75c33ced53cedf23106c06b9a91427a71e706d9d136aed8d3a6'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9040(key: Uint8Array): Promise<v9040.Proposal | undefined> {
-    assert(this.isV9040)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9040(keys: Uint8Array[]): Promise<(v9040.Proposal | undefined)[]> {
-    assert(this.isV9040)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9040(): Promise<(v9040.Proposal)[]> {
-    assert(this.isV9040)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9050() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '6ffbddf00697f7a651ddd2bd8789384e7dca3980a60aa5a2499d016d43b1ac56'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9050(key: Uint8Array): Promise<v9050.Proposal | undefined> {
-    assert(this.isV9050)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9050(keys: Uint8Array[]): Promise<(v9050.Proposal | undefined)[]> {
-    assert(this.isV9050)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9050(): Promise<(v9050.Proposal)[]> {
-    assert(this.isV9050)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9080() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '5c95cef639e096f92226c0b752c338b2195817a6e7f6d387b5199e8de3e02bab'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9080(key: Uint8Array): Promise<v9080.Proposal | undefined> {
-    assert(this.isV9080)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9080(keys: Uint8Array[]): Promise<(v9080.Proposal | undefined)[]> {
-    assert(this.isV9080)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9080(): Promise<(v9080.Proposal)[]> {
-    assert(this.isV9080)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9090() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '3060f9c0543c77d2a8f13dd41a665b6e953b60cd682f2cd0a4b9e47ca76c255d'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9090(key: Uint8Array): Promise<v9090.Proposal | undefined> {
-    assert(this.isV9090)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9090(keys: Uint8Array[]): Promise<(v9090.Proposal | undefined)[]> {
-    assert(this.isV9090)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9090(): Promise<(v9090.Proposal)[]> {
-    assert(this.isV9090)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9100() {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') === '4da47ef769f8cd0065a1642d93ed9e4664c7b938642677491109a7b2d9dffc5c'
-  }
-
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9100(key: Uint8Array): Promise<v9100.Proposal | undefined> {
-    assert(this.isV9100)
-    return this._chain.getStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', key)
-  }
-
-  async getManyAsV9100(keys: Uint8Array[]): Promise<(v9100.Proposal | undefined)[]> {
-    assert(this.isV9100)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf', keys.map(k => [k]))
-  }
-
-  async getAllAsV9100(): Promise<(v9100.Proposal)[]> {
-    assert(this.isV9100)
-    return this._chain.queryStorage(this.blockHash, 'Instance2Collective', 'ProposalOf')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Instance2Collective', 'ProposalOf') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9170 {
+    get(key: Uint8Array): Promise<(v9170.Call | undefined)>
+    getAll(): Promise<v9170.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9170.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9170.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9170.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9170.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9170.Call][]>
 }
 
-export class SessionCurrentIndexStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  Current index of the session.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Session', 'CurrentIndex') === '81bbbe8e62451cbcc227306706c919527aa2538970bd6d67a9969dd52c257d02'
-  }
-
-  /**
-   *  Current index of the session.
-   */
-  async getAsV1020(): Promise<number> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Session', 'CurrentIndex')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Session', 'CurrentIndex') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9180 {
+    get(key: Uint8Array): Promise<(v9180.Call | undefined)>
+    getAll(): Promise<v9180.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9180.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9180.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9180.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9180.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9180.Call][]>
 }
 
-export class SessionValidatorsStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
-
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
-
-  /**
-   *  The current set of validators.
-   */
-  get isV1020() {
-    return this._chain.getStorageItemTypeHash('Session', 'Validators') === 'f5df25eadcdffaa0d2a68b199d671d3921ca36a7b70d22d57506dca52b4b5895'
-  }
-
-  /**
-   *  The current set of validators.
-   */
-  async getAsV1020(): Promise<Uint8Array[]> {
-    assert(this.isV1020)
-    return this._chain.getStorage(this.blockHash, 'Session', 'Validators')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Session', 'Validators') != null
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9190 {
+    get(key: Uint8Array): Promise<(v9190.Call | undefined)>
+    getAll(): Promise<v9190.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9190.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9190.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9190.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9190.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9190.Call][]>
 }
 
-export class TechnicalCommitteeProposalOfStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9220 {
+    get(key: Uint8Array): Promise<(v9220.Call | undefined)>
+    getAll(): Promise<v9220.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9220.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9220.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9220.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9220.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9220.Call][]>
+}
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9230 {
+    get(key: Uint8Array): Promise<(v9230.Call | undefined)>
+    getAll(): Promise<v9230.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9230.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9230.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9230.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9230.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9230.Call][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9111() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '54e55db1bed5771689c23398470e3d79c164300b3002e905baf8a07324946142'
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9250 {
+    get(key: Uint8Array): Promise<(v9250.Call | undefined)>
+    getAll(): Promise<v9250.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9250.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9250.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9250.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9250.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9250.Call][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9111(key: Uint8Array): Promise<v9111.Call | undefined> {
-    assert(this.isV9111)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9271 {
+    get(key: Uint8Array): Promise<(v9271.Call | undefined)>
+    getAll(): Promise<v9271.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9271.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9271.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9271.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9271.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9271.Call][]>
+}
 
-  async getManyAsV9111(keys: Uint8Array[]): Promise<(v9111.Call | undefined)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9291 {
+    get(key: Uint8Array): Promise<(v9291.Call | undefined)>
+    getAll(): Promise<v9291.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9291.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9291.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9291.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9291.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9291.Call][]>
+}
 
-  async getAllAsV9111(): Promise<(v9111.Call)[]> {
-    assert(this.isV9111)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9300 {
+    get(key: Uint8Array): Promise<(v9300.Call | undefined)>
+    getAll(): Promise<v9300.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9300.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9300.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9300.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9300.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9300.Call][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9122() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '35e9c06eaf393488c6b16cf365c09693bf1c81cc6d198b6016c29648cb8b11db'
-  }
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface CouncilProposalOfStorageV9320 {
+    get(key: Uint8Array): Promise<(v9320.Call | undefined)>
+    getAll(): Promise<v9320.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9320.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9320.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9320.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9320.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9320.Call][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9122(key: Uint8Array): Promise<v9122.Call | undefined> {
-    assert(this.isV9122)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+export class DemocracyPreimagesStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Democracy'
+    }
 
-  async getManyAsV9122(keys: Uint8Array[]): Promise<(v9122.Call | undefined)[]> {
-    assert(this.isV9122)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    protected getName() {
+        return 'Preimages'
+    }
 
-  async getAllAsV9122(): Promise<(v9122.Call)[]> {
-    assert(this.isV9122)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+     *  The block number is the block at which it was deposited.
+     */
+    get isV1022(): boolean {
+        return this.getTypeHash() === '8d49bec84532cce5991ad4c420ddf4ab792644a27de5f8450488e36a6c1c40ef'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9130() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '000fa9eac9f34fd52e1de16af6c8184e689b16aff5b69e5b770310c6592b9a23'
-  }
+    /**
+     *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+     *  The block number is the block at which it was deposited.
+     */
+    get asV1022(): DemocracyPreimagesStorageV1022 {
+        assert(this.isV1022)
+        return this as any
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9130(key: Uint8Array): Promise<v9130.Call | undefined> {
-    assert(this.isV9130)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    /**
+     *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+     *  The block number is the block at which it was deposited.
+     */
+    get isV1058(): boolean {
+        return this.getTypeHash() === '0e0e3c0f32264d14a97bb80cf16ecda808e2404f87100dc025cf84cfcc821fef'
+    }
 
-  async getManyAsV9130(keys: Uint8Array[]): Promise<(v9130.Call | undefined)[]> {
-    assert(this.isV9130)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    /**
+     *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+     *  The block number is the block at which it was deposited.
+     */
+    get asV1058(): DemocracyPreimagesStorageV1058 {
+        assert(this.isV1058)
+        return this as any
+    }
 
-  async getAllAsV9130(): Promise<(v9130.Call)[]> {
-    assert(this.isV9130)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+     *  The block number is the block at which it was deposited.
+     */
+    get isV9111(): boolean {
+        return this.getTypeHash() === '2762abd948712e87f9324ca0c5ad1523f92ac946c587c97414ce71252440341f'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9160() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === 'ae191f57edfafa0ed77684f6c6956e661698f7626fcceabc35fc02aa204fc327'
-  }
+    /**
+     *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+     *  The block number is the block at which it was deposited.
+     */
+    get asV9111(): DemocracyPreimagesStorageV9111 {
+        assert(this.isV9111)
+        return this as any
+    }
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9160(key: Uint8Array): Promise<v9160.Call | undefined> {
-    assert(this.isV9160)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+/**
+ *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+ *  The block number is the block at which it was deposited.
+ */
+export interface DemocracyPreimagesStorageV1022 {
+    get(key: Uint8Array): Promise<([Uint8Array, Uint8Array, bigint, number] | undefined)>
+    getAll(): Promise<[Uint8Array, Uint8Array, bigint, number][]>
+    getMany(keys: Uint8Array[]): Promise<([Uint8Array, Uint8Array, bigint, number] | undefined)[]>
+}
 
-  async getManyAsV9160(keys: Uint8Array[]): Promise<(v9160.Call | undefined)[]> {
-    assert(this.isV9160)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+/**
+ *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+ *  The block number is the block at which it was deposited.
+ */
+export interface DemocracyPreimagesStorageV1058 {
+    get(key: Uint8Array): Promise<(v1058.PreimageStatus | undefined)>
+    getAll(): Promise<v1058.PreimageStatus[]>
+    getMany(keys: Uint8Array[]): Promise<(v1058.PreimageStatus | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1058.PreimageStatus][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1058.PreimageStatus][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1058.PreimageStatus][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1058.PreimageStatus][]>
+}
 
-  async getAllAsV9160(): Promise<(v9160.Call)[]> {
-    assert(this.isV9160)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+/**
+ *  Map of hashes to the proposal preimage, along with who registered it and their deposit.
+ *  The block number is the block at which it was deposited.
+ */
+export interface DemocracyPreimagesStorageV9111 {
+    get(key: Uint8Array): Promise<(v9111.PreimageStatus | undefined)>
+    getAll(): Promise<v9111.PreimageStatus[]>
+    getMany(keys: Uint8Array[]): Promise<(v9111.PreimageStatus | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9111.PreimageStatus][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9111.PreimageStatus][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9111.PreimageStatus][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9111.PreimageStatus][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9170() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '92131b74d89cee349edae227d67d4039f396e38796421ef6ccad698229d1be87'
-  }
+export class DemocracyPublicPropCountStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Democracy'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9170(key: Uint8Array): Promise<v9170.Call | undefined> {
-    assert(this.isV9170)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    protected getName() {
+        return 'PublicPropCount'
+    }
 
-  async getManyAsV9170(keys: Uint8Array[]): Promise<(v9170.Call | undefined)[]> {
-    assert(this.isV9170)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    /**
+     *  The number of (public) proposals that have been made so far.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === '81bbbe8e62451cbcc227306706c919527aa2538970bd6d67a9969dd52c257d02'
+    }
 
-  async getAllAsV9170(): Promise<(v9170.Call)[]> {
-    assert(this.isV9170)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  The number of (public) proposals that have been made so far.
+     */
+    get asV1020(): DemocracyPublicPropCountStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9180() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '75d269266869aab19a7c849bd16e82439d759218a7ceb76d9d44ca8913eac77b'
-  }
+/**
+ *  The number of (public) proposals that have been made so far.
+ */
+export interface DemocracyPublicPropCountStorageV1020 {
+    get(): Promise<number>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9180(key: Uint8Array): Promise<v9180.Call | undefined> {
-    assert(this.isV9180)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+export class DemocracyPublicPropsStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Democracy'
+    }
 
-  async getManyAsV9180(keys: Uint8Array[]): Promise<(v9180.Call | undefined)[]> {
-    assert(this.isV9180)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    protected getName() {
+        return 'PublicProps'
+    }
 
-  async getAllAsV9180(): Promise<(v9180.Call)[]> {
-    assert(this.isV9180)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  The public proposals. Unsorted.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === '0da61e381ba5d7090741171fee74491d6e5f0d3b420709a45911270de6f4da0a'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9190() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === 'ad90492cf87d0e7973eb29afcc4224fdcd5cea7edbc9f874a78e09ffb7af764a'
-  }
+    /**
+     *  The public proposals. Unsorted.
+     */
+    get asV1020(): DemocracyPublicPropsStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9190(key: Uint8Array): Promise<v9190.Call | undefined> {
-    assert(this.isV9190)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    /**
+     *  The public proposals. Unsorted. The second item is the proposal's hash.
+     */
+    get isV1022(): boolean {
+        return this.getTypeHash() === '54835df1906ed20adb15939607ddf49a9a1447f02d476ca5b7b39c1f35e1a40f'
+    }
 
-  async getManyAsV9190(keys: Uint8Array[]): Promise<(v9190.Call | undefined)[]> {
-    assert(this.isV9190)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    /**
+     *  The public proposals. Unsorted. The second item is the proposal's hash.
+     */
+    get asV1022(): DemocracyPublicPropsStorageV1022 {
+        assert(this.isV1022)
+        return this as any
+    }
 
-  async getAllAsV9190(): Promise<(v9190.Call)[]> {
-    assert(this.isV9190)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  The public proposals. Unsorted. The second item is the proposal.
+     */
+    get isV9320(): boolean {
+        return this.getTypeHash() === '3472d1c9441381a2b9709395dfc47ee60b049d41fbd71ce557eb1a61ef656bec'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9220() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '4364e985a64c3f6addf377d90f061349553d92fcbc29839df8b7cde1ec346b0c'
-  }
+    /**
+     *  The public proposals. Unsorted. The second item is the proposal.
+     */
+    get asV9320(): DemocracyPublicPropsStorageV9320 {
+        assert(this.isV9320)
+        return this as any
+    }
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9220(key: Uint8Array): Promise<v9220.Call | undefined> {
-    assert(this.isV9220)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+/**
+ *  The public proposals. Unsorted.
+ */
+export interface DemocracyPublicPropsStorageV1020 {
+    get(): Promise<[number, v1020.Proposal, Uint8Array][]>
+}
 
-  async getManyAsV9220(keys: Uint8Array[]): Promise<(v9220.Call | undefined)[]> {
-    assert(this.isV9220)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+/**
+ *  The public proposals. Unsorted. The second item is the proposal's hash.
+ */
+export interface DemocracyPublicPropsStorageV1022 {
+    get(): Promise<[number, Uint8Array, Uint8Array][]>
+}
 
-  async getAllAsV9220(): Promise<(v9220.Call)[]> {
-    assert(this.isV9220)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+/**
+ *  The public proposals. Unsorted. The second item is the proposal.
+ */
+export interface DemocracyPublicPropsStorageV9320 {
+    get(): Promise<[number, v9320.Bounded, Uint8Array][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9230() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '60a712e8f852a3af336091a63ce735a781e9f17a09e4fb3ea560e93a76c19d2e'
-  }
+export class DemocracyReferendumInfoOfStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Democracy'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9230(key: Uint8Array): Promise<v9230.Call | undefined> {
-    assert(this.isV9230)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    protected getName() {
+        return 'ReferendumInfoOf'
+    }
 
-  async getManyAsV9230(keys: Uint8Array[]): Promise<(v9230.Call | undefined)[]> {
-    assert(this.isV9230)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    /**
+     *  Information concerning any given referendum.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === 'b841a2a79796892945d8a9256375f0a9e422926b95cb3e85c8edae023ec07300'
+    }
 
-  async getAllAsV9230(): Promise<(v9230.Call)[]> {
-    assert(this.isV9230)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  Information concerning any given referendum.
+     */
+    get asV1020(): DemocracyReferendumInfoOfStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9250() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === 'c62c655cbb15038afffc766086c6f698f366a8695bacaa50b3b5b2d97d4b89f5'
-  }
+    /**
+     *  Information concerning any given referendum.
+     */
+    get isV1055(): boolean {
+        return this.getTypeHash() === '657d9c0cc58504c79c02d5040424e2dce3c3e5fe2b52b13a7a024ff5b06c7a99'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9250(key: Uint8Array): Promise<v9250.Call | undefined> {
-    assert(this.isV9250)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    /**
+     *  Information concerning any given referendum.
+     */
+    get asV1055(): DemocracyReferendumInfoOfStorageV1055 {
+        assert(this.isV1055)
+        return this as any
+    }
 
-  async getManyAsV9250(keys: Uint8Array[]): Promise<(v9250.Call | undefined)[]> {
-    assert(this.isV9250)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    /**
+     *  Information concerning any given referendum.
+     * 
+     *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+     */
+    get isV9111(): boolean {
+        return this.getTypeHash() === '2e86290b25fe028668a12b0e97306da926c3578533bd5de6396ccfc917cb15e5'
+    }
 
-  async getAllAsV9250(): Promise<(v9250.Call)[]> {
-    assert(this.isV9250)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  Information concerning any given referendum.
+     * 
+     *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+     */
+    get asV9111(): DemocracyReferendumInfoOfStorageV9111 {
+        assert(this.isV9111)
+        return this as any
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9271() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === 'b6f7b824ac82eac6e00f10809e508dfaacd22dda3aeafc8c9374020bd69d27ad'
-  }
+    /**
+     *  Information concerning any given referendum.
+     * 
+     *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+     */
+    get isV9320(): boolean {
+        return this.getTypeHash() === 'ba926738202889ee118b1f40d70a1edbd71f0893c703c708a73330af6ca468e1'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9271(key: Uint8Array): Promise<v9271.Call | undefined> {
-    assert(this.isV9271)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    /**
+     *  Information concerning any given referendum.
+     * 
+     *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+     */
+    get asV9320(): DemocracyReferendumInfoOfStorageV9320 {
+        assert(this.isV9320)
+        return this as any
+    }
+}
 
-  async getManyAsV9271(keys: Uint8Array[]): Promise<(v9271.Call | undefined)[]> {
-    assert(this.isV9271)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+/**
+ *  Information concerning any given referendum.
+ */
+export interface DemocracyReferendumInfoOfStorageV1020 {
+    get(key: number): Promise<(v1020.Type_283 | undefined)>
+    getAll(): Promise<v1020.Type_283[]>
+    getMany(keys: number[]): Promise<(v1020.Type_283 | undefined)[]>
+}
 
-  async getAllAsV9271(): Promise<(v9271.Call)[]> {
-    assert(this.isV9271)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+/**
+ *  Information concerning any given referendum.
+ */
+export interface DemocracyReferendumInfoOfStorageV1055 {
+    get(key: number): Promise<(v1055.ReferendumInfo | undefined)>
+    getAll(): Promise<v1055.ReferendumInfo[]>
+    getMany(keys: number[]): Promise<(v1055.ReferendumInfo | undefined)[]>
+    getKeys(): Promise<number[]>
+    getKeys(key: number): Promise<number[]>
+    getKeysPaged(pageSize: number): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, key: number): AsyncIterable<number[]>
+    getPairs(): Promise<[k: number, v: v1055.ReferendumInfo][]>
+    getPairs(key: number): Promise<[k: number, v: v1055.ReferendumInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: number, v: v1055.ReferendumInfo][]>
+    getPairsPaged(pageSize: number, key: number): AsyncIterable<[k: number, v: v1055.ReferendumInfo][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9291() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '15ce1541499aecffbe2bf8eeafc64023633a5d282a468972bd6c44aa77b52ce3'
-  }
+/**
+ *  Information concerning any given referendum.
+ * 
+ *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+ */
+export interface DemocracyReferendumInfoOfStorageV9111 {
+    get(key: number): Promise<(v9111.ReferendumInfo | undefined)>
+    getAll(): Promise<v9111.ReferendumInfo[]>
+    getMany(keys: number[]): Promise<(v9111.ReferendumInfo | undefined)[]>
+    getKeys(): Promise<number[]>
+    getKeys(key: number): Promise<number[]>
+    getKeysPaged(pageSize: number): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, key: number): AsyncIterable<number[]>
+    getPairs(): Promise<[k: number, v: v9111.ReferendumInfo][]>
+    getPairs(key: number): Promise<[k: number, v: v9111.ReferendumInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: number, v: v9111.ReferendumInfo][]>
+    getPairsPaged(pageSize: number, key: number): AsyncIterable<[k: number, v: v9111.ReferendumInfo][]>
+}
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9291(key: Uint8Array): Promise<v9291.Call | undefined> {
-    assert(this.isV9291)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+/**
+ *  Information concerning any given referendum.
+ * 
+ *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
+ */
+export interface DemocracyReferendumInfoOfStorageV9320 {
+    get(key: number): Promise<(v9320.ReferendumInfo | undefined)>
+    getAll(): Promise<v9320.ReferendumInfo[]>
+    getMany(keys: number[]): Promise<(v9320.ReferendumInfo | undefined)[]>
+    getKeys(): Promise<number[]>
+    getKeys(key: number): Promise<number[]>
+    getKeysPaged(pageSize: number): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, key: number): AsyncIterable<number[]>
+    getPairs(): Promise<[k: number, v: v9320.ReferendumInfo][]>
+    getPairs(key: number): Promise<[k: number, v: v9320.ReferendumInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: number, v: v9320.ReferendumInfo][]>
+    getPairsPaged(pageSize: number, key: number): AsyncIterable<[k: number, v: v9320.ReferendumInfo][]>
+}
 
-  async getManyAsV9291(keys: Uint8Array[]): Promise<(v9291.Call | undefined)[]> {
-    assert(this.isV9291)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+export class ElectionProviderMultiPhaseCurrentPhaseStorage extends StorageBase {
+    protected getPrefix() {
+        return 'ElectionProviderMultiPhase'
+    }
 
-  async getAllAsV9291(): Promise<(v9291.Call)[]> {
-    assert(this.isV9291)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    protected getName() {
+        return 'CurrentPhase'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9300() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === '4489558a261f014c524a3fa533244e852a4234f4db9aba95f960d069aa1a2db7'
-  }
+    /**
+     *  Current phase.
+     */
+    get isV2029(): boolean {
+        return this.getTypeHash() === 'd43c46e1fdaabf223f7ddc55f3636b227c163ebca9bccdb6f6aca606816cba64'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9300(key: Uint8Array): Promise<v9300.Call | undefined> {
-    assert(this.isV9300)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    /**
+     *  Current phase.
+     */
+    get asV2029(): ElectionProviderMultiPhaseCurrentPhaseStorageV2029 {
+        assert(this.isV2029)
+        return this as any
+    }
+}
 
-  async getManyAsV9300(keys: Uint8Array[]): Promise<(v9300.Call | undefined)[]> {
-    assert(this.isV9300)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+/**
+ *  Current phase.
+ */
+export interface ElectionProviderMultiPhaseCurrentPhaseStorageV2029 {
+    get(): Promise<v2029.ElectionPhase>
+}
 
-  async getAllAsV9300(): Promise<(v9300.Call)[]> {
-    assert(this.isV9300)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+export class Instance1CollectiveProposalOfStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Instance1Collective'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  get isV9320() {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') === 'e264f3acf17bae2089248c1b5be4b79c3766ff552e8565a925e0bceaa16c973b'
-  }
+    protected getName() {
+        return 'ProposalOf'
+    }
 
-  /**
-   *  Actual proposal for a given hash, if it's current.
-   */
-  async getAsV9320(key: Uint8Array): Promise<v9320.Call | undefined> {
-    assert(this.isV9320)
-    return this._chain.getStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', key)
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === 'ff658fad55af8e9e38fe1bed80067dc6842aefcacc9835f3404ef79a9bfa9a7f'
+    }
 
-  async getManyAsV9320(keys: Uint8Array[]): Promise<(v9320.Call | undefined)[]> {
-    assert(this.isV9320)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf', keys.map(k => [k]))
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1020(): Instance1CollectiveProposalOfStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
 
-  async getAllAsV9320(): Promise<(v9320.Call)[]> {
-    assert(this.isV9320)
-    return this._chain.queryStorage(this.blockHash, 'TechnicalCommittee', 'ProposalOf')
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1022(): boolean {
+        return this.getTypeHash() === 'cf2bde75ee5bf4aedef305aabd50a859b561d2ea72a3ad32f0253c133c791f40'
+    }
 
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('TechnicalCommittee', 'ProposalOf') != null
-  }
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1022(): Instance1CollectiveProposalOfStorageV1022 {
+        assert(this.isV1022)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1024(): boolean {
+        return this.getTypeHash() === 'af9a5b7fd3313a46c1c6b41b8b6812f69ff0f2b1edd8d66693a82c0ca49db343'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1024(): Instance1CollectiveProposalOfStorageV1024 {
+        assert(this.isV1024)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1027(): boolean {
+        return this.getTypeHash() === 'fcb038bcf495bae551346ead7a5d7cb7edff11f26babbbe2fcc9d0fbbfb0ee86'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1027(): Instance1CollectiveProposalOfStorageV1027 {
+        assert(this.isV1027)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1029(): boolean {
+        return this.getTypeHash() === '1fa524953ff02a11fb7b9dc520b34c836bf4a94b731f96f02d8442061891be9a'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1029(): Instance1CollectiveProposalOfStorageV1029 {
+        assert(this.isV1029)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1030(): boolean {
+        return this.getTypeHash() === '722c944e5d464430da96eb7afb30cb22dcf97958e77a989b11b76e0a08bc91ae'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1030(): Instance1CollectiveProposalOfStorageV1030 {
+        assert(this.isV1030)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1031(): boolean {
+        return this.getTypeHash() === '04587b1736af13aca0b303f067e8d8ca82708a7c35f7e540deb889b26b16e850'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1031(): Instance1CollectiveProposalOfStorageV1031 {
+        assert(this.isV1031)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1032(): boolean {
+        return this.getTypeHash() === '687ab865a15f03a5c5501e45563136c8c7e04087d3f2d252349b1e3afc2bb95b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1032(): Instance1CollectiveProposalOfStorageV1032 {
+        assert(this.isV1032)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1038(): boolean {
+        return this.getTypeHash() === '4b12bc407721d3d627ff8c350094c66df705befac88991c10ee1900190e41fcd'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1038(): Instance1CollectiveProposalOfStorageV1038 {
+        assert(this.isV1038)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1039(): boolean {
+        return this.getTypeHash() === '280c2b5e09651099a2df56d3a3b1021971981e68df34b2cc71f846a279441cf7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1039(): Instance1CollectiveProposalOfStorageV1039 {
+        assert(this.isV1039)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1040(): boolean {
+        return this.getTypeHash() === '7b716afbe6383efdfa96087dbe25666ef1749a83171459d7a417e308370bf5ce'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1040(): Instance1CollectiveProposalOfStorageV1040 {
+        assert(this.isV1040)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1042(): boolean {
+        return this.getTypeHash() === 'ba9ae3f886667e78e6929d4b9f36feb891aad7e94d36a75d3c2835143d849183'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1042(): Instance1CollectiveProposalOfStorageV1042 {
+        assert(this.isV1042)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1050(): boolean {
+        return this.getTypeHash() === 'd780ab190a15dcdf4e9424c86844bcd43951578af085195d51e82860b74ea017'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1050(): Instance1CollectiveProposalOfStorageV1050 {
+        assert(this.isV1050)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1054(): boolean {
+        return this.getTypeHash() === '4ee1bcb3e88f1695c390a015a7bb5456bbed70aea3e714981690f4d1e6647d20'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1054(): Instance1CollectiveProposalOfStorageV1054 {
+        assert(this.isV1054)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1055(): boolean {
+        return this.getTypeHash() === '9b1888d08bbc63ca77fc479899195e8abbc91196043f964ed6ae05f7a6b92ac2'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1055(): Instance1CollectiveProposalOfStorageV1055 {
+        assert(this.isV1055)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1058(): boolean {
+        return this.getTypeHash() === '51d22c65a4493fbee384e3c6b5480902226dcb7f07fdae2e09b1ed994581b8a2'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1058(): Instance1CollectiveProposalOfStorageV1058 {
+        assert(this.isV1058)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1062(): boolean {
+        return this.getTypeHash() === '2bebfde2c19829d495b45d6c78ef1337d124232bf319c06661a736c67899c40b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1062(): Instance1CollectiveProposalOfStorageV1062 {
+        assert(this.isV1062)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2005(): boolean {
+        return this.getTypeHash() === 'b1d8bd7af8a0bdba85190975d77d06e416603175b1c190c6efc22966d2222b42'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2005(): Instance1CollectiveProposalOfStorageV2005 {
+        assert(this.isV2005)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2007(): boolean {
+        return this.getTypeHash() === '961aa31652f228fead4d9c95205bb44df6d3431225fc46ab1b2bb180613401d3'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2007(): Instance1CollectiveProposalOfStorageV2007 {
+        assert(this.isV2007)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2011(): boolean {
+        return this.getTypeHash() === '611412d18d1c6341ce497288da6f8d52d113a683fd777fa5d7a6c0ac089326a1'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2011(): Instance1CollectiveProposalOfStorageV2011 {
+        assert(this.isV2011)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2013(): boolean {
+        return this.getTypeHash() === '1095e28f34062b5a0a31d9abd5578a7aa39d989d65d6cd2c6987346f2cacface'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2013(): Instance1CollectiveProposalOfStorageV2013 {
+        assert(this.isV2013)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2015(): boolean {
+        return this.getTypeHash() === '633a2c0a40bf70aa7d1a84d140419484144593cd4c1fbd16efca4f71428abd5c'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2015(): Instance1CollectiveProposalOfStorageV2015 {
+        assert(this.isV2015)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2022(): boolean {
+        return this.getTypeHash() === 'ba39e6f89dc7984a5de5986ba21ea9c7874a17928d35ee22e9f19a6a32b06ed7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2022(): Instance1CollectiveProposalOfStorageV2022 {
+        assert(this.isV2022)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2023(): boolean {
+        return this.getTypeHash() === '0eff9f067f650895cebad9eb8f6d2e0b87378eb99f6cfcc9188519b6809e81c7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2023(): Instance1CollectiveProposalOfStorageV2023 {
+        assert(this.isV2023)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2024(): boolean {
+        return this.getTypeHash() === 'f47e7718dc7af5fdbceb48ad3c23c248921145bbaaefecdaf3c6e766071a0379'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2024(): Instance1CollectiveProposalOfStorageV2024 {
+        assert(this.isV2024)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2025(): boolean {
+        return this.getTypeHash() === '20b9a67d80ebdfbcdbeab6296df5fb3c08e4edd42eb821b0d267a4e6a5639fe3'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2025(): Instance1CollectiveProposalOfStorageV2025 {
+        assert(this.isV2025)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2026(): boolean {
+        return this.getTypeHash() === 'b96abbff6a00bf4f4edb47eab52154f403f584ec4ab38b7e4be1af0d215bc2e2'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2026(): Instance1CollectiveProposalOfStorageV2026 {
+        assert(this.isV2026)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2028(): boolean {
+        return this.getTypeHash() === '399c92d404fea7dc92e323f9384520a1dcaf371691e5db7723306cc5b1246d94'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2028(): Instance1CollectiveProposalOfStorageV2028 {
+        assert(this.isV2028)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2029(): boolean {
+        return this.getTypeHash() === '468d59d5b40e80c13c2d81c4774d12f145dcf6ba2363aef718241ac2abc28d12'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2029(): Instance1CollectiveProposalOfStorageV2029 {
+        assert(this.isV2029)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2030(): boolean {
+        return this.getTypeHash() === 'd82835c91c052dffa0a14eb20b7a8a134d538d2d60742b962f3fa7823c1657fa'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2030(): Instance1CollectiveProposalOfStorageV2030 {
+        assert(this.isV2030)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9010(): boolean {
+        return this.getTypeHash() === '198809793338f28c0a822990194fdeaf2dec25e8848048ce7bb835b676396a37'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9010(): Instance1CollectiveProposalOfStorageV9010 {
+        assert(this.isV9010)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9030(): boolean {
+        return this.getTypeHash() === '133daac7167756eaebbdcb23c93e2211158671e84e107af848071d3534ed99bd'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9030(): Instance1CollectiveProposalOfStorageV9030 {
+        assert(this.isV9030)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9040(): boolean {
+        return this.getTypeHash() === '45640f8fa172b75c33ced53cedf23106c06b9a91427a71e706d9d136aed8d3a6'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9040(): Instance1CollectiveProposalOfStorageV9040 {
+        assert(this.isV9040)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9050(): boolean {
+        return this.getTypeHash() === '6ffbddf00697f7a651ddd2bd8789384e7dca3980a60aa5a2499d016d43b1ac56'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9050(): Instance1CollectiveProposalOfStorageV9050 {
+        assert(this.isV9050)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9080(): boolean {
+        return this.getTypeHash() === '5c95cef639e096f92226c0b752c338b2195817a6e7f6d387b5199e8de3e02bab'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9080(): Instance1CollectiveProposalOfStorageV9080 {
+        assert(this.isV9080)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9090(): boolean {
+        return this.getTypeHash() === '3060f9c0543c77d2a8f13dd41a665b6e953b60cd682f2cd0a4b9e47ca76c255d'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9090(): Instance1CollectiveProposalOfStorageV9090 {
+        assert(this.isV9090)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9100(): boolean {
+        return this.getTypeHash() === '4da47ef769f8cd0065a1642d93ed9e4664c7b938642677491109a7b2d9dffc5c'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9100(): Instance1CollectiveProposalOfStorageV9100 {
+        assert(this.isV9100)
+        return this as any
+    }
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1020 {
+    get(key: Uint8Array): Promise<(v1020.Proposal | undefined)>
+    getAll(): Promise<v1020.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1020.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1022 {
+    get(key: Uint8Array): Promise<(v1022.Proposal | undefined)>
+    getAll(): Promise<v1022.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1022.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1024 {
+    get(key: Uint8Array): Promise<(v1024.Proposal | undefined)>
+    getAll(): Promise<v1024.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1024.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1027 {
+    get(key: Uint8Array): Promise<(v1027.Proposal | undefined)>
+    getAll(): Promise<v1027.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1027.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1029 {
+    get(key: Uint8Array): Promise<(v1029.Proposal | undefined)>
+    getAll(): Promise<v1029.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1029.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1030 {
+    get(key: Uint8Array): Promise<(v1030.Proposal | undefined)>
+    getAll(): Promise<v1030.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1030.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1031 {
+    get(key: Uint8Array): Promise<(v1031.Proposal | undefined)>
+    getAll(): Promise<v1031.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1031.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1032 {
+    get(key: Uint8Array): Promise<(v1032.Proposal | undefined)>
+    getAll(): Promise<v1032.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1032.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1038 {
+    get(key: Uint8Array): Promise<(v1038.Proposal | undefined)>
+    getAll(): Promise<v1038.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1038.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1039 {
+    get(key: Uint8Array): Promise<(v1039.Proposal | undefined)>
+    getAll(): Promise<v1039.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1039.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1040 {
+    get(key: Uint8Array): Promise<(v1040.Proposal | undefined)>
+    getAll(): Promise<v1040.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1040.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1042 {
+    get(key: Uint8Array): Promise<(v1042.Proposal | undefined)>
+    getAll(): Promise<v1042.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1042.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1050 {
+    get(key: Uint8Array): Promise<(v1050.Proposal | undefined)>
+    getAll(): Promise<v1050.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1050.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1054 {
+    get(key: Uint8Array): Promise<(v1054.Proposal | undefined)>
+    getAll(): Promise<v1054.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1054.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1054.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1054.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1054.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1054.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1055 {
+    get(key: Uint8Array): Promise<(v1055.Proposal | undefined)>
+    getAll(): Promise<v1055.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1055.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1055.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1055.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1055.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1055.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1058 {
+    get(key: Uint8Array): Promise<(v1058.Proposal | undefined)>
+    getAll(): Promise<v1058.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1058.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1058.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1058.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1058.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1058.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV1062 {
+    get(key: Uint8Array): Promise<(v1062.Proposal | undefined)>
+    getAll(): Promise<v1062.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1062.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1062.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1062.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1062.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1062.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2005 {
+    get(key: Uint8Array): Promise<(v2005.Proposal | undefined)>
+    getAll(): Promise<v2005.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2005.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2005.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2005.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2005.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2005.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2007 {
+    get(key: Uint8Array): Promise<(v2007.Proposal | undefined)>
+    getAll(): Promise<v2007.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2007.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2007.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2007.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2007.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2007.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2011 {
+    get(key: Uint8Array): Promise<(v2011.Proposal | undefined)>
+    getAll(): Promise<v2011.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2011.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2011.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2011.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2011.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2011.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2013 {
+    get(key: Uint8Array): Promise<(v2013.Proposal | undefined)>
+    getAll(): Promise<v2013.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2013.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2013.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2013.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2013.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2013.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2015 {
+    get(key: Uint8Array): Promise<(v2015.Proposal | undefined)>
+    getAll(): Promise<v2015.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2015.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2015.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2015.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2015.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2015.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2022 {
+    get(key: Uint8Array): Promise<(v2022.Proposal | undefined)>
+    getAll(): Promise<v2022.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2022.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2022.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2022.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2022.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2022.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2023 {
+    get(key: Uint8Array): Promise<(v2023.Proposal | undefined)>
+    getAll(): Promise<v2023.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2023.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2023.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2023.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2023.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2023.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2024 {
+    get(key: Uint8Array): Promise<(v2024.Proposal | undefined)>
+    getAll(): Promise<v2024.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2024.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2024.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2024.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2024.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2024.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2025 {
+    get(key: Uint8Array): Promise<(v2025.Proposal | undefined)>
+    getAll(): Promise<v2025.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2025.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2025.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2025.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2025.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2025.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2026 {
+    get(key: Uint8Array): Promise<(v2026.Proposal | undefined)>
+    getAll(): Promise<v2026.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2026.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2026.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2026.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2026.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2026.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2028 {
+    get(key: Uint8Array): Promise<(v2028.Proposal | undefined)>
+    getAll(): Promise<v2028.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2028.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2028.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2028.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2028.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2028.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2029 {
+    get(key: Uint8Array): Promise<(v2029.Proposal | undefined)>
+    getAll(): Promise<v2029.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2029.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2029.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2029.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2029.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2029.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV2030 {
+    get(key: Uint8Array): Promise<(v2030.Proposal | undefined)>
+    getAll(): Promise<v2030.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2030.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2030.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2030.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2030.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2030.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9010 {
+    get(key: Uint8Array): Promise<(v9010.Proposal | undefined)>
+    getAll(): Promise<v9010.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9010.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9010.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9010.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9010.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9010.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9030 {
+    get(key: Uint8Array): Promise<(v9030.Proposal | undefined)>
+    getAll(): Promise<v9030.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9030.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9030.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9030.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9030.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9030.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9040 {
+    get(key: Uint8Array): Promise<(v9040.Proposal | undefined)>
+    getAll(): Promise<v9040.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9040.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9040.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9040.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9040.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9040.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9050 {
+    get(key: Uint8Array): Promise<(v9050.Proposal | undefined)>
+    getAll(): Promise<v9050.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9050.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9050.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9050.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9050.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9050.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9080 {
+    get(key: Uint8Array): Promise<(v9080.Proposal | undefined)>
+    getAll(): Promise<v9080.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9080.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9080.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9080.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9080.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9080.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9090 {
+    get(key: Uint8Array): Promise<(v9090.Proposal | undefined)>
+    getAll(): Promise<v9090.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9090.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9090.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9090.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9090.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9090.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance1CollectiveProposalOfStorageV9100 {
+    get(key: Uint8Array): Promise<(v9100.Proposal | undefined)>
+    getAll(): Promise<v9100.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9100.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9100.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9100.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9100.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9100.Proposal][]>
+}
+
+export class Instance2CollectiveProposalOfStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Instance2Collective'
+    }
+
+    protected getName() {
+        return 'ProposalOf'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === 'ff658fad55af8e9e38fe1bed80067dc6842aefcacc9835f3404ef79a9bfa9a7f'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1020(): Instance2CollectiveProposalOfStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1022(): boolean {
+        return this.getTypeHash() === 'cf2bde75ee5bf4aedef305aabd50a859b561d2ea72a3ad32f0253c133c791f40'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1022(): Instance2CollectiveProposalOfStorageV1022 {
+        assert(this.isV1022)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1024(): boolean {
+        return this.getTypeHash() === 'af9a5b7fd3313a46c1c6b41b8b6812f69ff0f2b1edd8d66693a82c0ca49db343'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1024(): Instance2CollectiveProposalOfStorageV1024 {
+        assert(this.isV1024)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1027(): boolean {
+        return this.getTypeHash() === 'fcb038bcf495bae551346ead7a5d7cb7edff11f26babbbe2fcc9d0fbbfb0ee86'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1027(): Instance2CollectiveProposalOfStorageV1027 {
+        assert(this.isV1027)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1029(): boolean {
+        return this.getTypeHash() === '1fa524953ff02a11fb7b9dc520b34c836bf4a94b731f96f02d8442061891be9a'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1029(): Instance2CollectiveProposalOfStorageV1029 {
+        assert(this.isV1029)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1030(): boolean {
+        return this.getTypeHash() === '722c944e5d464430da96eb7afb30cb22dcf97958e77a989b11b76e0a08bc91ae'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1030(): Instance2CollectiveProposalOfStorageV1030 {
+        assert(this.isV1030)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1031(): boolean {
+        return this.getTypeHash() === '04587b1736af13aca0b303f067e8d8ca82708a7c35f7e540deb889b26b16e850'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1031(): Instance2CollectiveProposalOfStorageV1031 {
+        assert(this.isV1031)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1032(): boolean {
+        return this.getTypeHash() === '687ab865a15f03a5c5501e45563136c8c7e04087d3f2d252349b1e3afc2bb95b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1032(): Instance2CollectiveProposalOfStorageV1032 {
+        assert(this.isV1032)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1038(): boolean {
+        return this.getTypeHash() === '4b12bc407721d3d627ff8c350094c66df705befac88991c10ee1900190e41fcd'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1038(): Instance2CollectiveProposalOfStorageV1038 {
+        assert(this.isV1038)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1039(): boolean {
+        return this.getTypeHash() === '280c2b5e09651099a2df56d3a3b1021971981e68df34b2cc71f846a279441cf7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1039(): Instance2CollectiveProposalOfStorageV1039 {
+        assert(this.isV1039)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1040(): boolean {
+        return this.getTypeHash() === '7b716afbe6383efdfa96087dbe25666ef1749a83171459d7a417e308370bf5ce'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1040(): Instance2CollectiveProposalOfStorageV1040 {
+        assert(this.isV1040)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1042(): boolean {
+        return this.getTypeHash() === 'ba9ae3f886667e78e6929d4b9f36feb891aad7e94d36a75d3c2835143d849183'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1042(): Instance2CollectiveProposalOfStorageV1042 {
+        assert(this.isV1042)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1050(): boolean {
+        return this.getTypeHash() === 'd780ab190a15dcdf4e9424c86844bcd43951578af085195d51e82860b74ea017'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1050(): Instance2CollectiveProposalOfStorageV1050 {
+        assert(this.isV1050)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1054(): boolean {
+        return this.getTypeHash() === '4ee1bcb3e88f1695c390a015a7bb5456bbed70aea3e714981690f4d1e6647d20'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1054(): Instance2CollectiveProposalOfStorageV1054 {
+        assert(this.isV1054)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1055(): boolean {
+        return this.getTypeHash() === '9b1888d08bbc63ca77fc479899195e8abbc91196043f964ed6ae05f7a6b92ac2'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1055(): Instance2CollectiveProposalOfStorageV1055 {
+        assert(this.isV1055)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1058(): boolean {
+        return this.getTypeHash() === '51d22c65a4493fbee384e3c6b5480902226dcb7f07fdae2e09b1ed994581b8a2'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1058(): Instance2CollectiveProposalOfStorageV1058 {
+        assert(this.isV1058)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV1062(): boolean {
+        return this.getTypeHash() === '2bebfde2c19829d495b45d6c78ef1337d124232bf319c06661a736c67899c40b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV1062(): Instance2CollectiveProposalOfStorageV1062 {
+        assert(this.isV1062)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2005(): boolean {
+        return this.getTypeHash() === 'b1d8bd7af8a0bdba85190975d77d06e416603175b1c190c6efc22966d2222b42'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2005(): Instance2CollectiveProposalOfStorageV2005 {
+        assert(this.isV2005)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2007(): boolean {
+        return this.getTypeHash() === '961aa31652f228fead4d9c95205bb44df6d3431225fc46ab1b2bb180613401d3'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2007(): Instance2CollectiveProposalOfStorageV2007 {
+        assert(this.isV2007)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2011(): boolean {
+        return this.getTypeHash() === '611412d18d1c6341ce497288da6f8d52d113a683fd777fa5d7a6c0ac089326a1'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2011(): Instance2CollectiveProposalOfStorageV2011 {
+        assert(this.isV2011)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2013(): boolean {
+        return this.getTypeHash() === '1095e28f34062b5a0a31d9abd5578a7aa39d989d65d6cd2c6987346f2cacface'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2013(): Instance2CollectiveProposalOfStorageV2013 {
+        assert(this.isV2013)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2015(): boolean {
+        return this.getTypeHash() === '633a2c0a40bf70aa7d1a84d140419484144593cd4c1fbd16efca4f71428abd5c'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2015(): Instance2CollectiveProposalOfStorageV2015 {
+        assert(this.isV2015)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2022(): boolean {
+        return this.getTypeHash() === 'ba39e6f89dc7984a5de5986ba21ea9c7874a17928d35ee22e9f19a6a32b06ed7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2022(): Instance2CollectiveProposalOfStorageV2022 {
+        assert(this.isV2022)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2023(): boolean {
+        return this.getTypeHash() === '0eff9f067f650895cebad9eb8f6d2e0b87378eb99f6cfcc9188519b6809e81c7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2023(): Instance2CollectiveProposalOfStorageV2023 {
+        assert(this.isV2023)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2024(): boolean {
+        return this.getTypeHash() === 'f47e7718dc7af5fdbceb48ad3c23c248921145bbaaefecdaf3c6e766071a0379'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2024(): Instance2CollectiveProposalOfStorageV2024 {
+        assert(this.isV2024)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2025(): boolean {
+        return this.getTypeHash() === '20b9a67d80ebdfbcdbeab6296df5fb3c08e4edd42eb821b0d267a4e6a5639fe3'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2025(): Instance2CollectiveProposalOfStorageV2025 {
+        assert(this.isV2025)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2026(): boolean {
+        return this.getTypeHash() === 'b96abbff6a00bf4f4edb47eab52154f403f584ec4ab38b7e4be1af0d215bc2e2'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2026(): Instance2CollectiveProposalOfStorageV2026 {
+        assert(this.isV2026)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2028(): boolean {
+        return this.getTypeHash() === '399c92d404fea7dc92e323f9384520a1dcaf371691e5db7723306cc5b1246d94'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2028(): Instance2CollectiveProposalOfStorageV2028 {
+        assert(this.isV2028)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2029(): boolean {
+        return this.getTypeHash() === '468d59d5b40e80c13c2d81c4774d12f145dcf6ba2363aef718241ac2abc28d12'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2029(): Instance2CollectiveProposalOfStorageV2029 {
+        assert(this.isV2029)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV2030(): boolean {
+        return this.getTypeHash() === 'd82835c91c052dffa0a14eb20b7a8a134d538d2d60742b962f3fa7823c1657fa'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV2030(): Instance2CollectiveProposalOfStorageV2030 {
+        assert(this.isV2030)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9010(): boolean {
+        return this.getTypeHash() === '198809793338f28c0a822990194fdeaf2dec25e8848048ce7bb835b676396a37'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9010(): Instance2CollectiveProposalOfStorageV9010 {
+        assert(this.isV9010)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9030(): boolean {
+        return this.getTypeHash() === '133daac7167756eaebbdcb23c93e2211158671e84e107af848071d3534ed99bd'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9030(): Instance2CollectiveProposalOfStorageV9030 {
+        assert(this.isV9030)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9040(): boolean {
+        return this.getTypeHash() === '45640f8fa172b75c33ced53cedf23106c06b9a91427a71e706d9d136aed8d3a6'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9040(): Instance2CollectiveProposalOfStorageV9040 {
+        assert(this.isV9040)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9050(): boolean {
+        return this.getTypeHash() === '6ffbddf00697f7a651ddd2bd8789384e7dca3980a60aa5a2499d016d43b1ac56'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9050(): Instance2CollectiveProposalOfStorageV9050 {
+        assert(this.isV9050)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9080(): boolean {
+        return this.getTypeHash() === '5c95cef639e096f92226c0b752c338b2195817a6e7f6d387b5199e8de3e02bab'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9080(): Instance2CollectiveProposalOfStorageV9080 {
+        assert(this.isV9080)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9090(): boolean {
+        return this.getTypeHash() === '3060f9c0543c77d2a8f13dd41a665b6e953b60cd682f2cd0a4b9e47ca76c255d'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9090(): Instance2CollectiveProposalOfStorageV9090 {
+        assert(this.isV9090)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9100(): boolean {
+        return this.getTypeHash() === '4da47ef769f8cd0065a1642d93ed9e4664c7b938642677491109a7b2d9dffc5c'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9100(): Instance2CollectiveProposalOfStorageV9100 {
+        assert(this.isV9100)
+        return this as any
+    }
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1020 {
+    get(key: Uint8Array): Promise<(v1020.Proposal | undefined)>
+    getAll(): Promise<v1020.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1020.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1022 {
+    get(key: Uint8Array): Promise<(v1022.Proposal | undefined)>
+    getAll(): Promise<v1022.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1022.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1024 {
+    get(key: Uint8Array): Promise<(v1024.Proposal | undefined)>
+    getAll(): Promise<v1024.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1024.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1027 {
+    get(key: Uint8Array): Promise<(v1027.Proposal | undefined)>
+    getAll(): Promise<v1027.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1027.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1029 {
+    get(key: Uint8Array): Promise<(v1029.Proposal | undefined)>
+    getAll(): Promise<v1029.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1029.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1030 {
+    get(key: Uint8Array): Promise<(v1030.Proposal | undefined)>
+    getAll(): Promise<v1030.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1030.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1031 {
+    get(key: Uint8Array): Promise<(v1031.Proposal | undefined)>
+    getAll(): Promise<v1031.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1031.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1032 {
+    get(key: Uint8Array): Promise<(v1032.Proposal | undefined)>
+    getAll(): Promise<v1032.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1032.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1038 {
+    get(key: Uint8Array): Promise<(v1038.Proposal | undefined)>
+    getAll(): Promise<v1038.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1038.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1039 {
+    get(key: Uint8Array): Promise<(v1039.Proposal | undefined)>
+    getAll(): Promise<v1039.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1039.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1040 {
+    get(key: Uint8Array): Promise<(v1040.Proposal | undefined)>
+    getAll(): Promise<v1040.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1040.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1042 {
+    get(key: Uint8Array): Promise<(v1042.Proposal | undefined)>
+    getAll(): Promise<v1042.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1042.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1050 {
+    get(key: Uint8Array): Promise<(v1050.Proposal | undefined)>
+    getAll(): Promise<v1050.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1050.Proposal | undefined)[]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1054 {
+    get(key: Uint8Array): Promise<(v1054.Proposal | undefined)>
+    getAll(): Promise<v1054.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1054.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1054.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1054.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1054.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1054.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1055 {
+    get(key: Uint8Array): Promise<(v1055.Proposal | undefined)>
+    getAll(): Promise<v1055.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1055.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1055.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1055.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1055.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1055.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1058 {
+    get(key: Uint8Array): Promise<(v1058.Proposal | undefined)>
+    getAll(): Promise<v1058.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1058.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1058.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1058.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1058.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1058.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV1062 {
+    get(key: Uint8Array): Promise<(v1062.Proposal | undefined)>
+    getAll(): Promise<v1062.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v1062.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v1062.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v1062.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v1062.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v1062.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2005 {
+    get(key: Uint8Array): Promise<(v2005.Proposal | undefined)>
+    getAll(): Promise<v2005.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2005.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2005.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2005.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2005.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2005.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2007 {
+    get(key: Uint8Array): Promise<(v2007.Proposal | undefined)>
+    getAll(): Promise<v2007.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2007.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2007.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2007.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2007.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2007.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2011 {
+    get(key: Uint8Array): Promise<(v2011.Proposal | undefined)>
+    getAll(): Promise<v2011.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2011.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2011.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2011.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2011.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2011.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2013 {
+    get(key: Uint8Array): Promise<(v2013.Proposal | undefined)>
+    getAll(): Promise<v2013.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2013.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2013.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2013.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2013.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2013.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2015 {
+    get(key: Uint8Array): Promise<(v2015.Proposal | undefined)>
+    getAll(): Promise<v2015.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2015.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2015.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2015.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2015.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2015.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2022 {
+    get(key: Uint8Array): Promise<(v2022.Proposal | undefined)>
+    getAll(): Promise<v2022.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2022.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2022.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2022.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2022.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2022.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2023 {
+    get(key: Uint8Array): Promise<(v2023.Proposal | undefined)>
+    getAll(): Promise<v2023.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2023.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2023.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2023.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2023.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2023.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2024 {
+    get(key: Uint8Array): Promise<(v2024.Proposal | undefined)>
+    getAll(): Promise<v2024.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2024.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2024.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2024.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2024.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2024.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2025 {
+    get(key: Uint8Array): Promise<(v2025.Proposal | undefined)>
+    getAll(): Promise<v2025.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2025.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2025.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2025.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2025.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2025.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2026 {
+    get(key: Uint8Array): Promise<(v2026.Proposal | undefined)>
+    getAll(): Promise<v2026.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2026.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2026.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2026.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2026.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2026.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2028 {
+    get(key: Uint8Array): Promise<(v2028.Proposal | undefined)>
+    getAll(): Promise<v2028.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2028.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2028.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2028.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2028.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2028.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2029 {
+    get(key: Uint8Array): Promise<(v2029.Proposal | undefined)>
+    getAll(): Promise<v2029.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2029.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2029.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2029.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2029.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2029.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV2030 {
+    get(key: Uint8Array): Promise<(v2030.Proposal | undefined)>
+    getAll(): Promise<v2030.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v2030.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v2030.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v2030.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v2030.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v2030.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9010 {
+    get(key: Uint8Array): Promise<(v9010.Proposal | undefined)>
+    getAll(): Promise<v9010.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9010.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9010.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9010.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9010.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9010.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9030 {
+    get(key: Uint8Array): Promise<(v9030.Proposal | undefined)>
+    getAll(): Promise<v9030.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9030.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9030.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9030.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9030.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9030.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9040 {
+    get(key: Uint8Array): Promise<(v9040.Proposal | undefined)>
+    getAll(): Promise<v9040.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9040.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9040.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9040.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9040.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9040.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9050 {
+    get(key: Uint8Array): Promise<(v9050.Proposal | undefined)>
+    getAll(): Promise<v9050.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9050.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9050.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9050.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9050.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9050.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9080 {
+    get(key: Uint8Array): Promise<(v9080.Proposal | undefined)>
+    getAll(): Promise<v9080.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9080.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9080.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9080.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9080.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9080.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9090 {
+    get(key: Uint8Array): Promise<(v9090.Proposal | undefined)>
+    getAll(): Promise<v9090.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9090.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9090.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9090.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9090.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9090.Proposal][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface Instance2CollectiveProposalOfStorageV9100 {
+    get(key: Uint8Array): Promise<(v9100.Proposal | undefined)>
+    getAll(): Promise<v9100.Proposal[]>
+    getMany(keys: Uint8Array[]): Promise<(v9100.Proposal | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9100.Proposal][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9100.Proposal][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9100.Proposal][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9100.Proposal][]>
+}
+
+export class PreimagePreimageForStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Preimage'
+    }
+
+    protected getName() {
+        return 'PreimageFor'
+    }
+
+    /**
+     *  The preimages stored by this pallet.
+     */
+    get isV9160(): boolean {
+        return this.getTypeHash() === '2c57d2b4da44b4d6783b1eb7d03f42f23490455080a2c71c813169067dfe1a54'
+    }
+
+    /**
+     *  The preimages stored by this pallet.
+     */
+    get asV9160(): PreimagePreimageForStorageV9160 {
+        assert(this.isV9160)
+        return this as any
+    }
+
+    get isV9320(): boolean {
+        return this.getTypeHash() === '55fa1a08a9fac4bcf15d53fce590e3fb5af7fbc408ac4b8e1ed28f5f8a242534'
+    }
+
+    get asV9320(): PreimagePreimageForStorageV9320 {
+        assert(this.isV9320)
+        return this as any
+    }
+}
+
+/**
+ *  The preimages stored by this pallet.
+ */
+export interface PreimagePreimageForStorageV9160 {
+    get(key: Uint8Array): Promise<(Uint8Array | undefined)>
+    getAll(): Promise<Uint8Array[]>
+    getMany(keys: Uint8Array[]): Promise<(Uint8Array | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: Uint8Array][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: Uint8Array][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: Uint8Array][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: Uint8Array][]>
+}
+
+export interface PreimagePreimageForStorageV9320 {
+    get(key: [Uint8Array, number]): Promise<(Uint8Array | undefined)>
+    getAll(): Promise<Uint8Array[]>
+    getMany(keys: [Uint8Array, number][]): Promise<(Uint8Array | undefined)[]>
+    getKeys(): Promise<[Uint8Array, number][]>
+    getKeys(key: [Uint8Array, number]): Promise<[Uint8Array, number][]>
+    getKeysPaged(pageSize: number): AsyncIterable<[Uint8Array, number][]>
+    getKeysPaged(pageSize: number, key: [Uint8Array, number]): AsyncIterable<[Uint8Array, number][]>
+    getPairs(): Promise<[k: [Uint8Array, number], v: Uint8Array][]>
+    getPairs(key: [Uint8Array, number]): Promise<[k: [Uint8Array, number], v: Uint8Array][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: [Uint8Array, number], v: Uint8Array][]>
+    getPairsPaged(pageSize: number, key: [Uint8Array, number]): AsyncIterable<[k: [Uint8Array, number], v: Uint8Array][]>
+}
+
+export class ReferendaReferendumInfoForStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Referenda'
+    }
+
+    protected getName() {
+        return 'ReferendumInfoFor'
+    }
+
+    /**
+     *  Information concerning any given referendum.
+     */
+    get isV9320(): boolean {
+        return this.getTypeHash() === '33899ab47ab8fe6857d9da2d98b7b7168468bb2627a189bdae062d9c5ad90e3a'
+    }
+
+    /**
+     *  Information concerning any given referendum.
+     */
+    get asV9320(): ReferendaReferendumInfoForStorageV9320 {
+        assert(this.isV9320)
+        return this as any
+    }
+}
+
+/**
+ *  Information concerning any given referendum.
+ */
+export interface ReferendaReferendumInfoForStorageV9320 {
+    get(key: number): Promise<(v9320.Type_620 | undefined)>
+    getAll(): Promise<v9320.Type_620[]>
+    getMany(keys: number[]): Promise<(v9320.Type_620 | undefined)[]>
+    getKeys(): Promise<number[]>
+    getKeys(key: number): Promise<number[]>
+    getKeysPaged(pageSize: number): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, key: number): AsyncIterable<number[]>
+    getPairs(): Promise<[k: number, v: v9320.Type_620][]>
+    getPairs(key: number): Promise<[k: number, v: v9320.Type_620][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: number, v: v9320.Type_620][]>
+    getPairsPaged(pageSize: number, key: number): AsyncIterable<[k: number, v: v9320.Type_620][]>
+}
+
+export class SessionCurrentIndexStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Session'
+    }
+
+    protected getName() {
+        return 'CurrentIndex'
+    }
+
+    /**
+     *  Current index of the session.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === '81bbbe8e62451cbcc227306706c919527aa2538970bd6d67a9969dd52c257d02'
+    }
+
+    /**
+     *  Current index of the session.
+     */
+    get asV1020(): SessionCurrentIndexStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
+}
+
+/**
+ *  Current index of the session.
+ */
+export interface SessionCurrentIndexStorageV1020 {
+    get(): Promise<number>
+}
+
+export class SessionValidatorsStorage extends StorageBase {
+    protected getPrefix() {
+        return 'Session'
+    }
+
+    protected getName() {
+        return 'Validators'
+    }
+
+    /**
+     *  The current set of validators.
+     */
+    get isV1020(): boolean {
+        return this.getTypeHash() === 'f5df25eadcdffaa0d2a68b199d671d3921ca36a7b70d22d57506dca52b4b5895'
+    }
+
+    /**
+     *  The current set of validators.
+     */
+    get asV1020(): SessionValidatorsStorageV1020 {
+        assert(this.isV1020)
+        return this as any
+    }
+}
+
+/**
+ *  The current set of validators.
+ */
+export interface SessionValidatorsStorageV1020 {
+    get(): Promise<Uint8Array[]>
+}
+
+export class TechnicalCommitteeProposalOfStorage extends StorageBase {
+    protected getPrefix() {
+        return 'TechnicalCommittee'
+    }
+
+    protected getName() {
+        return 'ProposalOf'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9111(): boolean {
+        return this.getTypeHash() === '54e55db1bed5771689c23398470e3d79c164300b3002e905baf8a07324946142'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9111(): TechnicalCommitteeProposalOfStorageV9111 {
+        assert(this.isV9111)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9122(): boolean {
+        return this.getTypeHash() === '35e9c06eaf393488c6b16cf365c09693bf1c81cc6d198b6016c29648cb8b11db'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9122(): TechnicalCommitteeProposalOfStorageV9122 {
+        assert(this.isV9122)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9130(): boolean {
+        return this.getTypeHash() === '000fa9eac9f34fd52e1de16af6c8184e689b16aff5b69e5b770310c6592b9a23'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9130(): TechnicalCommitteeProposalOfStorageV9130 {
+        assert(this.isV9130)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9160(): boolean {
+        return this.getTypeHash() === 'ae191f57edfafa0ed77684f6c6956e661698f7626fcceabc35fc02aa204fc327'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9160(): TechnicalCommitteeProposalOfStorageV9160 {
+        assert(this.isV9160)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9170(): boolean {
+        return this.getTypeHash() === '92131b74d89cee349edae227d67d4039f396e38796421ef6ccad698229d1be87'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9170(): TechnicalCommitteeProposalOfStorageV9170 {
+        assert(this.isV9170)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9180(): boolean {
+        return this.getTypeHash() === '75d269266869aab19a7c849bd16e82439d759218a7ceb76d9d44ca8913eac77b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9180(): TechnicalCommitteeProposalOfStorageV9180 {
+        assert(this.isV9180)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9190(): boolean {
+        return this.getTypeHash() === 'ad90492cf87d0e7973eb29afcc4224fdcd5cea7edbc9f874a78e09ffb7af764a'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9190(): TechnicalCommitteeProposalOfStorageV9190 {
+        assert(this.isV9190)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9220(): boolean {
+        return this.getTypeHash() === '4364e985a64c3f6addf377d90f061349553d92fcbc29839df8b7cde1ec346b0c'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9220(): TechnicalCommitteeProposalOfStorageV9220 {
+        assert(this.isV9220)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9230(): boolean {
+        return this.getTypeHash() === '60a712e8f852a3af336091a63ce735a781e9f17a09e4fb3ea560e93a76c19d2e'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9230(): TechnicalCommitteeProposalOfStorageV9230 {
+        assert(this.isV9230)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9250(): boolean {
+        return this.getTypeHash() === 'c62c655cbb15038afffc766086c6f698f366a8695bacaa50b3b5b2d97d4b89f5'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9250(): TechnicalCommitteeProposalOfStorageV9250 {
+        assert(this.isV9250)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9271(): boolean {
+        return this.getTypeHash() === 'b6f7b824ac82eac6e00f10809e508dfaacd22dda3aeafc8c9374020bd69d27ad'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9271(): TechnicalCommitteeProposalOfStorageV9271 {
+        assert(this.isV9271)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9291(): boolean {
+        return this.getTypeHash() === '15ce1541499aecffbe2bf8eeafc64023633a5d282a468972bd6c44aa77b52ce3'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9291(): TechnicalCommitteeProposalOfStorageV9291 {
+        assert(this.isV9291)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9300(): boolean {
+        return this.getTypeHash() === '4489558a261f014c524a3fa533244e852a4234f4db9aba95f960d069aa1a2db7'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9300(): TechnicalCommitteeProposalOfStorageV9300 {
+        assert(this.isV9300)
+        return this as any
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get isV9320(): boolean {
+        return this.getTypeHash() === 'e264f3acf17bae2089248c1b5be4b79c3766ff552e8565a925e0bceaa16c973b'
+    }
+
+    /**
+     *  Actual proposal for a given hash, if it's current.
+     */
+    get asV9320(): TechnicalCommitteeProposalOfStorageV9320 {
+        assert(this.isV9320)
+        return this as any
+    }
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9111 {
+    get(key: Uint8Array): Promise<(v9111.Call | undefined)>
+    getAll(): Promise<v9111.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9111.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9111.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9111.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9111.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9111.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9122 {
+    get(key: Uint8Array): Promise<(v9122.Call | undefined)>
+    getAll(): Promise<v9122.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9122.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9122.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9122.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9122.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9122.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9130 {
+    get(key: Uint8Array): Promise<(v9130.Call | undefined)>
+    getAll(): Promise<v9130.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9130.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9130.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9130.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9130.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9130.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9160 {
+    get(key: Uint8Array): Promise<(v9160.Call | undefined)>
+    getAll(): Promise<v9160.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9160.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9160.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9160.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9160.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9160.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9170 {
+    get(key: Uint8Array): Promise<(v9170.Call | undefined)>
+    getAll(): Promise<v9170.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9170.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9170.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9170.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9170.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9170.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9180 {
+    get(key: Uint8Array): Promise<(v9180.Call | undefined)>
+    getAll(): Promise<v9180.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9180.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9180.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9180.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9180.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9180.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9190 {
+    get(key: Uint8Array): Promise<(v9190.Call | undefined)>
+    getAll(): Promise<v9190.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9190.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9190.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9190.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9190.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9190.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9220 {
+    get(key: Uint8Array): Promise<(v9220.Call | undefined)>
+    getAll(): Promise<v9220.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9220.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9220.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9220.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9220.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9220.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9230 {
+    get(key: Uint8Array): Promise<(v9230.Call | undefined)>
+    getAll(): Promise<v9230.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9230.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9230.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9230.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9230.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9230.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9250 {
+    get(key: Uint8Array): Promise<(v9250.Call | undefined)>
+    getAll(): Promise<v9250.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9250.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9250.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9250.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9250.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9250.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9271 {
+    get(key: Uint8Array): Promise<(v9271.Call | undefined)>
+    getAll(): Promise<v9271.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9271.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9271.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9271.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9271.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9271.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9291 {
+    get(key: Uint8Array): Promise<(v9291.Call | undefined)>
+    getAll(): Promise<v9291.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9291.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9291.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9291.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9291.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9291.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9300 {
+    get(key: Uint8Array): Promise<(v9300.Call | undefined)>
+    getAll(): Promise<v9300.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9300.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9300.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9300.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9300.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9300.Call][]>
+}
+
+/**
+ *  Actual proposal for a given hash, if it's current.
+ */
+export interface TechnicalCommitteeProposalOfStorageV9320 {
+    get(key: Uint8Array): Promise<(v9320.Call | undefined)>
+    getAll(): Promise<v9320.Call[]>
+    getMany(keys: Uint8Array[]): Promise<(v9320.Call | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v9320.Call][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v9320.Call][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v9320.Call][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v9320.Call][]>
 }
