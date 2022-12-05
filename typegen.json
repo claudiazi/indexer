@@ -5,6 +5,7 @@
     "Democracy.PublicPropCount",
     "Balances.TotalIssuance",
     "Democracy.Preimages",
+    "Preimage.PreimageFor",
     "Democracy.PublicProps",
     "Democracy.ReferendumInfoOf",
     "TechnicalCommittee.ProposalOf",
@@ -14,7 +15,8 @@
     "Session.Validators",
     "Council.Members",
     "Session.CurrentIndex",
-    "ElectionProviderMultiPhase.CurrentPhase"
+    "ElectionProviderMultiPhase.CurrentPhase",
+    "Referenda.ReferendumInfoFor"
   ],
   "events": [
     "Democracy.Proposed",
@@ -35,7 +37,20 @@
     "Council.Approved",
     "TechnicalCommittee.Approved",
     "Session.NewSession",
-    "PhragmenElection.NewTerm"
+    "PhragmenElection.NewTerm",
+    "Referenda.Submitted",
+    "Referenda.Approved",
+    "Referenda.Cancelled",
+    "Referenda.Confirmed",
+    "Referenda.DecisionStarted",
+    "Referenda.Killed",
+    "Referenda.Rejected",
+    "Referenda.TimedOut",
+    "Referenda.ConfirmStarted",
+    "Referenda.ConfirmAborted",
+    "Preimage.Noted",
+    "Preimage.Requested",
+    "Preimage.Cleared"
   ],
   "calls": [
     "Democracy.vote",
@@ -43,6 +58,11 @@
     "Democracy.remove_other_vote",
     "System.remark",
     "Democracy.delegate",
-    "Democracy.undelegate"
+    "Democracy.undelegate",
+    "ConvictionVoting.vote",
+    "ConvictionVoting.delegate",
+    "ConvictionVoting.undelegate",
+    "ConvictionVoting.remove_vote",
+    "ConvictionVoting.remove_other_vote"
   ]
 }
