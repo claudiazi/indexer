@@ -40,15 +40,38 @@ export function decodeId(id: string) {
     return ss58codec.decode(id)
 }
 
-export function getOriginAccountId(origin: any): string | undefined {
-    if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
-        const id = origin.value.value
-        if (id.__kind === 'Id') {
-            return encodeId(id.value)
-        } else {
-            return encodeId(id)
-        }
-    } else {
-        return undefined
+export function getOriginAccountId(origin: any) {
+    // eslint-disable-next-line sonarjs/no-small-switch
+    if (!origin) return undefined
+    switch (origin.__kind) {
+        case 'system':
+            // eslint-disable-next-line sonarjs/no-nested-switch, sonarjs/no-small-switch
+            switch (origin.value.__kind) {
+                case 'Signed':
+                    let accountID
+                    try {
+                        // origin.value:
+                        // {
+                        //     __kind: 'Signed',
+                        //     value: '0x988740c0cb624d6228e22704f9dddd8a526775c81506cb9eab96d3be870d4a04'
+                        // }
+                        accountID = ss58codec.encode(decodeHex(origin.value.value))
+                    } catch (e) {
+                        // origin.value:
+                        // {
+                        //     __kind: 'Signed',
+                        //     value: {
+                        //         __kind: 'Id',
+                        //         value: '0x988740c0cb624d6228e22704f9dddd8a526775c81506cb9eab96d3be870d4a04'
+                        //     }
+                        // }
+                        accountID = ss58codec.encode(decodeHex(origin.value.value.value))
+                    }
+                    return accountID
+                default:
+                    return undefined
+            }
+        default:
+            return undefined
     }
 }

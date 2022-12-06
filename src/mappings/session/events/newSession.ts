@@ -13,6 +13,6 @@ export async function handleNewSession(ctx: BatchContext<Store, unknown>,
 }
 
 export async function setValidators(ctx: BatchContext<Store, unknown>, header: SubstrateBlock): Promise<string[]> {
-    currentValidators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).getAsV1020()).map(validator => encodeId(validator)) : []
+    currentValidators = new SessionValidatorsStorage(ctx, header).isExists ? (await new SessionValidatorsStorage(ctx, header).asV1020.get()).map(validator => encodeId(validator)) : []
     return currentValidators
 }

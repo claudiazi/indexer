@@ -4,5 +4,8 @@ import techComittee from './techCommittee'
 import system from './system'
 import session from './session'
 import election from './election'
+import referenda from './referenda'
+import preimage from './preimage'
+import convictionVoting from './convictionVoting'
 
-export { democracy, council, techComittee, system, session, election }
+export { democracy, council, techComittee, system, session, election, referenda, preimage, convictionVoting }

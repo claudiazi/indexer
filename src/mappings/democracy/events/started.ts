@@ -54,7 +54,7 @@ export async function handleStarted(ctx: BatchContext<Store, unknown>,
         statusHistory: [],
         createdAtBlock: header.height,
         createdAt: new Date(header.timestamp),
-        totalIssuance: await new BalancesTotalIssuanceStorage(ctx, header).getAsV1020() || 0n,
+        totalIssuance: await new BalancesTotalIssuanceStorage(ctx, header).asV1020.get() || 0n,
         preimage,
         delay,
         endsAt: end
