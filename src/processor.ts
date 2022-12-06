@@ -8,7 +8,7 @@ const processor = new SubstrateBatchProcessor()
         chain: 'wss://kusama.api.onfinality.io/public-ws',
         archive: lookupArchive('kusama', { release: 'FireSquid' }),
     })
-    // .setBlockRange({from: 13776200})
+    // .setBlockRange({from: 15426395})
     .addCall('System.remark', {
         data: {
             call: {
@@ -241,6 +241,156 @@ const processor = new SubstrateBatchProcessor()
             },
         },
     } as const)
+    .addEvent('Referenda.Submitted', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.DecisionStarted', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.Approved', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.Cancelled', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.Confirmed', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.Rejected', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.TimedOut', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.Killed', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.ConfirmAborted', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    .addEvent('Referenda.ConfirmStarted', {
+        data: {
+            event: {
+                args: true,
+                extrinsic: {
+                    hash: true,
+                },
+            },
+        },
+    } as const)
+    // .addEvent('Preimage.Noted', {
+    //     data: {
+    //         event: {
+    //             args: true,
+    //             extrinsic: {
+    //                 hash: true,
+    //             },
+    //         },
+    //     },
+    // } as const)
+    .addCall('ConvictionVoting.vote', {
+        data: {
+            call: {
+                origin: true,
+                args: true,
+            },
+        },
+    } as const)
+    .addCall('ConvictionVoting.delegate', {
+        data: {
+            call: {
+                origin: true,
+                args: true,
+            },
+        },
+    } as const)
+    .addCall('ConvictionVoting.undelegate', {
+        data: {
+            call: {
+                origin: true,
+                args: true,
+            },
+        },
+    } as const)
+    .addCall('ConvictionVoting.remove_vote', {
+        data: {
+            call: {
+                origin: true,
+                args: true,
+            },
+        },
+    } as const)
+    .addCall('ConvictionVoting.remove_other_vote', {
+        data: {
+            call: {
+                origin: true,
+                args: true,
+            },
+        },
+    } as const)
     
 
 processor.run(new TypeormDatabase(), async (ctx) => {
@@ -264,6 +414,21 @@ processor.run(new TypeormDatabase(), async (ctx) => {
                 }
                 if (item.name == 'Democracy.undelegate') {
                     await modules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
+                }
+                if (item.name == 'ConvictionVoting.vote') {
+                    await modules.convictionVoting.extrinsics.handleVote(ctx, item, block.header)
+                }
+                if (item.name == 'ConvictionVoting.delegate') {
+                    await modules.convictionVoting.extrinsics.handleDelegate(ctx, item, block.header)
+                }
+                if (item.name == 'ConvictionVoting.undelegate') {
+                    await modules.convictionVoting.extrinsics.handleUndelegate(ctx, item, block.header)
+                }
+                if (item.name == 'ConvictionVoting.remove_vote') {
+                    await modules.convictionVoting.extrinsics.handleRemoveVote(ctx, item, block.header)
+                }
+                if (item.name == 'ConvictionVoting.remove_other_vote') {
+                    await modules.convictionVoting.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
                 }
             }
             if (item.kind === 'event') {
@@ -320,6 +485,39 @@ processor.run(new TypeormDatabase(), async (ctx) => {
                 }
                 if (item.name == 'PhragmenElection.NewTerm') {
                     await modules.election.events.handleNewTerm(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.Submitted') {
+                    await modules.referenda.events.handleSubmitted(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.DecisionStarted') {
+                    await modules.referenda.events.handleDecisionStarted(ctx, item, block.header)
+                }
+                // if (item.name == 'Preimage.Noted') {
+                //     await modules.preimage.events.handleNoted(ctx, item, block.header)
+                // }
+                if (item.name == 'Referenda.Approved') {
+                    await modules.referenda.events.handleApproved(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.Cancelled') {
+                    await modules.referenda.events.handleCancelled(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.Confirmed') {
+                    await modules.referenda.events.handleConfirmed(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.Rejected') {
+                    await modules.referenda.events.handleRejected(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.TimedOut') {
+                    await modules.referenda.events.handleTimedOut(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.Killed') {
+                    await modules.referenda.events.handleKilled(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.ConfirmStarted') {
+                    await modules.referenda.events.handleConfirmStarted(ctx, item, block.header)
+                }
+                if (item.name == 'Referenda.ConfirmAborted') {
+                    await modules.referenda.events.handleConfirmAborted(ctx, item, block.header)
                 }
             }
         }
