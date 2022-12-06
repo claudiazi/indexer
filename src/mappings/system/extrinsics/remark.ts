@@ -7,16 +7,16 @@ import { Quiz } from '../../../model/generated/quiz.model'
 import { SystemRemarkCall } from '../../../types/calls'
 import { getOriginAccountId } from '../../../common/tools'
 import { AnswerDataNotComplete, AnswerDataNotJSONParsable, AnswerSubmissionTooLate, InvalidCorrectAnswerIndex, MissingQuizVersionWarn, NotProposerNotProofOfChaos, QuizSubmissionTooLate, WrongAnswerLength, WrongCorrectAnswerLength } from './errors'
-import { MissingConfigWarn, MissingOptionWarn, MissingQuestionWarn, MissingQuizWarn, MissingReferendumWarn } from '../../utils/errors'
+import { MissingConfigWarn, MissingOpenGovReferendumWarn, MissingOptionWarn, MissingQuestionWarn, MissingQuizWarn, MissingReferendumWarn } from '../../utils/errors'
 import { AnswerOption } from '../../../model/generated/answerOption.model'
-import { Referendum } from '../../../model'
+import { OpenGovReferendum, Referendum } from '../../../model'
 import { QuizSubmission } from '../../../model/generated/quizSubmission.model'
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { CorrectAnswer } from '../../../model/generated/correctAnswer.model'
 import { AnswerData, ConfigData, CorrectAnswerData, OptionData, QuizData, UserItem } from './types'
-import { getAnswerCount, getAnswerOptionCount, getConfigVersion, getCorrectAnswerVersion, getDistributionCount, getDistributionVersion, getOptionCount, getQuestionCount, getQuizVersion, getResourceCount, getSubmissionCount, getSubmissionVersion, isProofOfChaosAddress, isProofOfChaosMessage, isProposer } from './helpers'
+import { getAnswerCount, getAnswerOptionCount, getConfigVersion, getCorrectAnswerVersion, getDistributionCount, getDistributionVersion, getOptionCount, getQuestionCount, getQuizVersion, getResourceCount, getSubmissionCount, getSubmissionVersion, isProofOfChaosAddress, isProofOfChaosv1Message, isProofOfChaosv2Message, isProposerv1, isProposerv2 } from './helpers'
 import { Answer } from '../../../model/generated/answer.model'
 import { needUpdate } from '../../../server-extension/resolvers/referendaStats'
 
@@ -27,23 +27,26 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
     header: SubstrateBlock): Promise<void> {
     if (!(item.call as any).success) return
     const message = new SystemRemarkCall(ctx, item.call).asV1020.remark.toString()
-    if (!isProofOfChaosMessage(message)) return
+    if (!isProofOfChaosv1Message(message) || !isProofOfChaosv2Message(message)) return
 
     const originAccountId = getOriginAccountId(item.call.origin)
 
     if (originAccountId == null) return
     const args = message.split('::')
+    const governanceVersion = isProofOfChaosv1Message(message) ? 1 : 2
+
     switch (args[2]) {
         case 'DISTRIBUTION':
             if (isProofOfChaosAddress(originAccountId) && header.height >= 14936046) {
                 const distributionData: UserItem[] = JSON.parse(args[3])
-                const distributionVersion = await getDistributionVersion(ctx, parseInt(args[1]))
+                const distributionVersion = await getDistributionVersion(ctx, parseInt(args[1]), governanceVersion)
                 for (const dist of distributionData) {
-                    const count = await getDistributionCount(ctx, parseInt(args[1]), distributionVersion)
+                    const count = await getDistributionCount(ctx, parseInt(args[1]), governanceVersion, distributionVersion)
                     const distribution = new Distribution({
                         id: `${args[1]}-${distributionVersion}-${count.toString().padStart(8, '0')}`,
                         blockNumber: header.height,
                         distributionVersion,
+                        governanceVersion,
                         referendumIndex: parseInt(args[1]),
                         wallet: dist.wallet,
                         amountConsidered: BigInt(dist.amountConsidered),
@@ -62,7 +65,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             if (isProofOfChaosAddress(originAccountId) && header.height >= 14936046) {
                 //break quiz apart
                 const configData: ConfigData = JSON.parse(args[3])
-                const version = await getConfigVersion(ctx, parseInt(args[1]))
+                const version = await getConfigVersion(ctx, parseInt(args[1]), governanceVersion)
                 const { minValue,
                     maxValue,
                     median,
@@ -86,12 +89,13 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     max,
                     defaultRoyalty } = configData
 
-                const configId = `${args[1]}-${version.toString().padStart(8, '0')}`
+                const configId = `${args[1]}-${governanceVersion}-${version.toString().padStart(8, '0')}`
 
                 const config = new Config({
                     id: configId,
                     blockNumber: header.height,
                     referendumIndex: parseInt(args[1]),
+                    governanceVersion,
                     version,
                     minValue,
                     maxValue,
@@ -210,25 +214,26 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             }
             break
         case 'QUIZ':
-            if (isProofOfChaosAddress(originAccountId) || await isProposer(ctx, originAccountId, parseInt(args[1]))) {
-                const referendum = await ctx.store.get(Referendum, { where: { index: parseInt(args[1]) } })
+            if (isProofOfChaosAddress(originAccountId) || (governanceVersion === 1 ? await isProposerv1(ctx, originAccountId, parseInt(args[1])) : await isProposerv2(ctx, originAccountId, parseInt(args[1])))) {
+                const referendum = governanceVersion === 1 ? await ctx.store.get(Referendum, { where: { index: parseInt(args[1]) } }) : await ctx.store.get(OpenGovReferendum, { where: { index: parseInt(args[1]) } })
                 if (!referendum) {
-                    ctx.log.warn(MissingReferendumWarn(args[1]))
+                    ctx.log.warn(governanceVersion === 1 ? MissingReferendumWarn(args[1]) : MissingOpenGovReferendumWarn(args[1]))
                     return
                 }
 
-                if (header.height > referendum?.endsAt) {
-                    ctx.log.warn(QuizSubmissionTooLate(referendum.index, referendum?.endsAt, header.height))
+                if (referendum?.endedAtBlock && header.height > referendum?.endedAtBlock) {
+                    ctx.log.warn(QuizSubmissionTooLate(referendum.index, referendum?.endedAtBlock, header.height))
                     return
                 }
                 //check that quiz author is proposer/ proofofchaos
                 const quizData: QuizData = JSON.parse(args[3])
-                const version = await getQuizVersion(ctx, parseInt(args[1]))
+                const version = await getQuizVersion(ctx, parseInt(args[1]), governanceVersion)
                 const quizId = `${args[1]}-${version.toString().padStart(8, '0')}`
                 const quiz = new Quiz({
                     id: quizId,
                     blockNumber: header.height,
                     referendumIndex: parseInt(args[1]),
+                    governanceVersion,
                     creator: originAccountId,
                     version,
                     timestamp: new Date(header.timestamp),
@@ -274,13 +279,13 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             break
         case 'ANSWERS':
             //check that answer block is before ref end and after ref start
-            const referendum = await ctx.store.get(Referendum, { where: { index: parseInt(args[1]) } })
+            const referendum = governanceVersion === 1 ? await ctx.store.get(Referendum, { where: { index: parseInt(args[1]) } }) : await ctx.store.get(OpenGovReferendum, { where: { index: parseInt(args[1]) } })
             if (!referendum) {
-                ctx.log.warn(MissingReferendumWarn(args[1]))
+                ctx.log.warn(governanceVersion === 1 ? MissingReferendumWarn(args[1]) : MissingOpenGovReferendumWarn(args[1]))
                 return
             }
-            if (header.height > referendum?.endsAt) {
-                ctx.log.warn(AnswerSubmissionTooLate(referendum.index, referendum?.endsAt, header.height))
+            if (referendum?.endedAtBlock && header.height > referendum?.endedAtBlock) {
+                ctx.log.warn(AnswerSubmissionTooLate(referendum.index, referendum?.endedAtBlock, header.height))
                 return
             }
             else {
@@ -293,13 +298,13 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     return
                 }
 
-                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), version: answerData.quizVersion } })
+                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex: parseInt(args[1]), governanceVersion, version: answerData.quizVersion } })
                 if (answerData.answers == null || answerData.quizVersion == null || answerData.answers.length == 0) {
                     ctx.log.warn(AnswerDataNotComplete(answerData))
                     return
                 }
                 if (!quizDb) {
-                    ctx.log.warn(MissingQuizVersionWarn(args[1], answerData.quizVersion))
+                    ctx.log.warn(MissingQuizVersionWarn(args[1], governanceVersion, answerData.quizVersion))
                     return
                 }
                 const quizDbQuestions = await ctx.store.find(Question, { where: { quizId: quizDb.id } })
@@ -308,7 +313,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                     ctx.log.warn(WrongAnswerLength(quizDb.id, quizDbQuestions.length, answerData.answers))
                     return
                 }
-                const submissionVersion = await getSubmissionVersion(ctx, parseInt(args[1]), originAccountId)
+                const submissionVersion = await getSubmissionVersion(ctx, parseInt(args[1]), governanceVersion, originAccountId)
                 //getsubmissioncount for version
                 const submissionCount = await getSubmissionCount(ctx, quizDb.id)
                 const submissionId = `${quizDb.id}-${submissionCount.toString().padStart(8, '0')}`
@@ -342,13 +347,13 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
             break
         case 'CORRECTANSWERS':
             const referendumIndex = parseInt(args[1])
-            if (isProofOfChaosAddress(originAccountId) || await isProposer(ctx, originAccountId, referendumIndex)) {
+            if (isProofOfChaosAddress(originAccountId) || (governanceVersion === 1 ? await isProposerv1(ctx, originAccountId, parseInt(args[1])) : await isProposerv2(ctx, originAccountId, parseInt(args[1])))) {
                 const correctAnswerData: CorrectAnswerData = JSON.parse(args[3])
                 // const quizVersion = parseInt(args[3])
                 // const correctAnswers = JSON.parse(args[4])
-                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex, version: correctAnswerData.quizVersion } })
+                const quizDb = await ctx.store.get(Quiz, { where: { referendumIndex, governanceVersion, version: correctAnswerData.quizVersion } })
                 if (!quizDb) {
-                    ctx.log.warn(MissingQuizVersionWarn(args[1], correctAnswerData.quizVersion))
+                    ctx.log.warn(MissingQuizVersionWarn(args[1], governanceVersion, correctAnswerData.quizVersion))
                     return
                 }
                 const quizDbQuestions = await ctx.store.find(Question, { where: { quizId: quizDb.id } })

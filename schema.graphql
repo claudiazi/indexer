@@ -195,6 +195,7 @@ type Config @entity {
   id: ID!
   referendumIndex: Int! @index
   version: Int! @index
+  governanceVersion: Int!
   blockNumber: Int! @index
   minValue: Float
   maxValue: Float
@@ -265,6 +266,7 @@ type Distribution @entity {
   referendumIndex: Int!
   blockNumber: Int! @index
   distributionVersion: Int!
+  governanceVersion: Int!
   wallet: String @index
   amountConsidered: BigInt! @index
   indexItemReceived: Int
@@ -306,6 +308,7 @@ type Question @entity {
 type Quiz @entity {
   id: ID!
   referendumIndex: Int
+  governanceVersion: Int
   blockNumber: Int! @index
   creator: String @index
   questions: [Question!] @derivedFrom(field: "quiz")
@@ -327,6 +330,7 @@ type Answer @entity {
 type QuizSubmission @entity {
   id: ID!
   referendumIndex: Int!
+  governanceVersion: Int!
   blockNumber: Int! @index
   wallet: String! @index
   quiz: Quiz

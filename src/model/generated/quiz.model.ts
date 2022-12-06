@@ -14,6 +14,9 @@ export class Quiz {
     @Column_("int4", {nullable: true})
     referendumIndex!: number | undefined | null
 
+    @Column_("int4", {nullable: true})
+    governanceVersion!: number | undefined | null
+
     @Index_()
     @Column_("int4", {nullable: false})
     blockNumber!: number

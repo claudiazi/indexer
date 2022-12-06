@@ -4,24 +4,28 @@ import { Config } from '../../../model/generated/config.model'
 import { Option } from '../../../model/generated/option.model'
 import { Resource } from '../../../model/generated/resource.model'
 import { Quiz } from '../../../model/generated/quiz.model'
-import { MissingReferendumRelationWarn } from '../../utils/errors'
+import { MissingOpenGovReferendumWarn, MissingReferendumRelationWarn } from '../../utils/errors'
 import { AnswerOption } from '../../../model/generated/answerOption.model'
-import { ReferendumRelation } from '../../../model'
+import { OpenGovReferendum, ReferendumRelation } from '../../../model'
 import { QuizSubmission } from '../../../model/generated/quizSubmission.model'
 import { BatchContext } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CorrectAnswer } from '../../../model/generated/correctAnswer.model'
 import { Answer } from '../../../model/generated/answer.model'
 
-export function isProofOfChaosMessage(str: string) {
+export function isProofOfChaosv1Message(str: string) {
     return /^PROOFOFCHAOS::\d+::.*$/.test(str)
+}
+
+export function isProofOfChaosv2Message(str: string) {
+    return /^PROOFOFCHAOS2::\d+::.*$/.test(str)
 }
 
 export function isProofOfChaosAddress(address: string) {
     return address === 'DhvRNnnsyykGpmaa9GMjK9H4DeeQojd5V5qCTWd1GoYwnTc' || address === 'D3iNikJw3cPq6SasyQCy3k4Y77ZeecgdweTWoSegomHznG3'
 }
 
-export async function isProposer(ctx: BatchContext<Store, unknown>, address: string, referendumIndex: number): Promise<boolean> {
+export async function isProposerv1(ctx: BatchContext<Store, unknown>, address: string, referendumIndex: number): Promise<boolean> {
     const referendumRelation = await ctx.store.get(ReferendumRelation, { where: { referendumIndex } })
     if (!referendumRelation) {
         ctx.log.warn(MissingReferendumRelationWarn(referendumIndex))
@@ -30,18 +34,28 @@ export async function isProposer(ctx: BatchContext<Store, unknown>, address: str
     return referendumRelation.proposer === address
 }
 
-const configVersions = new Map<number, number>()
+export async function isProposerv2(ctx: BatchContext<Store, unknown>, address: string, referendumIndex: number): Promise<boolean> {
+    const referendum = await ctx.store.get(OpenGovReferendum, { where: { index: referendumIndex } })
+    if (!referendum) {
+        ctx.log.warn(MissingOpenGovReferendumWarn(referendumIndex))
+        return false
+    }
+    return referendum.submissionDepositWho === address || referendum.decisionDepositWho === address
+}
 
-export async function getConfigVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number) {
-    let count = configVersions.get(referendumIndex)
+const configVersions = new Map<string, number>()
+
+export async function getConfigVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number, governanceVersion: number) {
+    let count = configVersions.get(`${referendumIndex}-${governanceVersion}`)
     if (count == null) {
         count = await ctx.store.count(Config, {
             where: {
                 referendumIndex,
+                governanceVersion
             },
         })
     }
-    configVersions.set(referendumIndex, count + 1)
+    configVersions.set(`${referendumIndex}-${governanceVersion}`, count + 1)
     return count
 }
 
@@ -75,49 +89,52 @@ export async function getResourceCount(ctx: BatchContext<Store, unknown>, option
     return count
 }
 
-const distributionVersions = new Map<number, number>()
+const distributionVersions = new Map<string, number>()
 
-export async function getDistributionVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number) {
-    let count = distributionVersions.get(referendumIndex)
+export async function getDistributionVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number, governanceVersion: number) {
+    let count = distributionVersions.get(`${referendumIndex}-${governanceVersion}`)
     if (count == null) {
         count = await ctx.store.count(Distribution, {
             where: {
                 referendumIndex,
+                governanceVersion
             },
         })
     }
-    distributionVersions.set(referendumIndex, count + 1)
+    distributionVersions.set(`${referendumIndex}-${governanceVersion}`, count + 1)
     return count
 }
 
 const referendumDistributions = new Map<string, number>()
 
-export async function getDistributionCount(ctx: BatchContext<Store, unknown>, referendumIndex: number, distributionVersion: number) {
-    let count = referendumDistributions.get(`${referendumIndex}-${distributionVersion}`)
+export async function getDistributionCount(ctx: BatchContext<Store, unknown>, referendumIndex: number, governanceVersion: number, distributionVersion: number) {
+    let count = referendumDistributions.get(`${referendumIndex}-${governanceVersion}-${distributionVersion}`)
     if (count == null) {
         count = await ctx.store.count(Distribution, {
             where: {
                 referendumIndex,
+                governanceVersion,
                 distributionVersion
             },
         })
     }
-    optionResources.set(`${referendumIndex}-${distributionVersion}`, count + 1)
+    optionResources.set(`${referendumIndex}-${governanceVersion}-${distributionVersion}`, count + 1)
     return count
 }
 
-const quizVersions = new Map<number, number>()
+const quizVersions = new Map<string, number>()
 
-export async function getQuizVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number) {
-    let count = quizVersions.get(referendumIndex)
+export async function getQuizVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number, governanceVersion: number) {
+    let count = quizVersions.get(`${referendumIndex}-${governanceVersion}`)
     if (count == null) {
         count = await ctx.store.count(Quiz, {
             where: {
                 referendumIndex,
+                governanceVersion
             },
         })
     }
-    quizVersions.set(referendumIndex, count + 1)
+    quizVersions.set(`${referendumIndex}-${governanceVersion}`, count + 1)
     return count
 }
 
@@ -168,17 +185,18 @@ export async function getAnswerCount(ctx: BatchContext<Store, unknown>, quizSubm
 
 const submissionVersions = new Map<string, number>()
 
-export async function getSubmissionVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number, wallet: string) {
-    let count = submissionVersions.get(referendumIndex + "-" + wallet)
+export async function getSubmissionVersion(ctx: BatchContext<Store, unknown>, referendumIndex: number, governanceVersion: number, wallet: string) {
+    let count = submissionVersions.get(`${referendumIndex}-${governanceVersion}-${wallet}`)
     if (count == null) {
         count = await ctx.store.count(QuizSubmission, {
             where: {
                 referendumIndex,
-                wallet
+                wallet,
+                governanceVersion
             },
         })
     }
-    submissionVersions.set(referendumIndex + "-" + wallet, count + 1)
+    submissionVersions.set(`${referendumIndex}-${governanceVersion}-${wallet}`, count + 1)
     return count
 }
 

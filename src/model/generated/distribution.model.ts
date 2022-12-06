@@ -20,6 +20,9 @@ export class Distribution {
     @Column_("int4", {nullable: false})
     distributionVersion!: number
 
+    @Column_("int4", {nullable: false})
+    governanceVersion!: number
+
     @Index_()
     @Column_("text", {nullable: true})
     wallet!: string | undefined | null

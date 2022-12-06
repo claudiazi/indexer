@@ -1,7 +1,7 @@
 import { AnswerData } from "./types"
 
-export function MissingQuizVersionWarn(hashOrIndex: string | number, quizVersion: number) {
-    return `Missing quiz version ${quizVersion} for referendum ${hashOrIndex}`
+export function MissingQuizVersionWarn(hashOrIndex: string | number, governanceVersion: number, quizVersion: number) {
+    return `Missing quiz version ${quizVersion} for referendum ${hashOrIndex} and governanceVersion ${governanceVersion}`
 }
 
 export function WrongAnswerLength(quizId: string, expectedLength: number, answersSubmitted: number[]) {

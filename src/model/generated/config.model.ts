@@ -19,6 +19,9 @@ export class Config {
     @Column_("int4", {nullable: false})
     version!: number
 
+    @Column_("int4", {nullable: false})
+    governanceVersion!: number
+
     @Index_()
     @Column_("int4", {nullable: false})
     blockNumber!: number
