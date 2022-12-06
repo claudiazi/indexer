@@ -321,6 +321,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
                 const quizSubmission = new QuizSubmission({
                     id: submissionId,
                     referendumIndex: parseInt(args[1]),
+                    governanceVersion,
                     blockNumber: header.height,
                     quiz: quizDb,
                     quizId: quizDb.id,
