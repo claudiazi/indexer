@@ -27,7 +27,7 @@ export async function handleRemark(ctx: BatchContext<Store, unknown>,
     header: SubstrateBlock): Promise<void> {
     if (!(item.call as any).success) return
     const message = new SystemRemarkCall(ctx, item.call).asV1020.remark.toString()
-    if (!isProofOfChaosv1Message(message) || !isProofOfChaosv2Message(message)) return
+    if (!isProofOfChaosv1Message(message) && !isProofOfChaosv2Message(message)) return
 
     const originAccountId = getOriginAccountId(item.call.origin)
 
