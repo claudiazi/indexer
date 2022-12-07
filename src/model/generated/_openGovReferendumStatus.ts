@@ -1,4 +1,5 @@
 export enum OpenGovReferendumStatus {
+    Submitted = "Submitted",
     DecisionStarted = "DecisionStarted",
     Approved = "Approved",
     Rejected = "Rejected",

@@ -111,4 +111,7 @@ export class OpenGovReferendum {
 
     @Column_("text", {nullable: true})
     preimageDescription!: string | undefined | null
+
+    @Column_("jsonb", {nullable: true})
+    alarm!: unknown | undefined | null
 }

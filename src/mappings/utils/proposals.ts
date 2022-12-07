@@ -13,6 +13,7 @@ import {
 } from '../../model'
 import { BalancesTotalIssuanceStorage } from '../../types/storage'
 import { MissingPreimageWarn, MissingReferendumWarn } from './errors'
+import { toJSON } from '@subsquid/util-internal-json'
 
 export async function updateReferendum(ctx: BatchContext<Store, unknown>, index: number, status: ReferendumStatus, header: SubstrateBlock, totalIssuance?: string) {
     const referendum = await ctx.store.get(Referendum, {
@@ -54,7 +55,7 @@ export async function updateReferendum(ctx: BatchContext<Store, unknown>, index:
     await ctx.store.save(referendum)
 }
 
-export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>, index: number, status: OpenGovReferendumStatus, header: SubstrateBlock, ayes?: bigint, nays?: bigint, support?: bigint, totalIssuance?: string) {
+export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>, index: number, status: OpenGovReferendumStatus, header: SubstrateBlock, storageData?: any) {
     const referendum = await ctx.store.get(OpenGovReferendum, {
         where: {
             index,
@@ -73,9 +74,15 @@ export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>,
     referendum.updatedAtBlock = header.height
     referendum.status = status
     referendum.totalIssuance = await new BalancesTotalIssuanceStorage(ctx, header).asV1020.get() || 0n
-    referendum.ayes = ayes ? ayes : referendum.ayes 
-    referendum.nays = nays ? nays : referendum.nays 
-    referendum.support = support ? support : referendum.support 
+    referendum.ayes = storageData.ayes ? storageData.ayes : referendum.ayes 
+    referendum.nays = storageData.nays ? storageData.nays : referendum.nays 
+    referendum.support = storageData.support ? storageData.support : referendum.support
+    referendum.decisionDepositAmount = storageData.decisionDepositAmount ? storageData.decisionDepositAmount : referendum.decisionDepositAmount
+    referendum.decisionDepositWho = storageData.decisionDepositWho ? storageData.decisionDepositWho : referendum.decisionDepositWho
+    referendum.decidingSince = storageData.decidingSince ? storageData.decidingSince : referendum.decidingSince
+    referendum.decidingConfirming = storageData.decidingConfirming ? storageData.decidingConfirming : referendum.decidingConfirming
+    referendum.inQueue = storageData.inQueue ? storageData.inQueue : referendum.inQueue
+    referendum.alarm = storageData.alarm ? toJSON(storageData.alarm) : referendum.alarm
 
     switch (status) {
         case OpenGovReferendumStatus.Confirmed:

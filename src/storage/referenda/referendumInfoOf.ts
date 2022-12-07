@@ -115,7 +115,6 @@ async function getStorageData(ctx: BatchContext<Store, unknown>, index: number, 
         }
         else if (status === 'Killed') {
             const value = (storageData as v9320.Type_620_Killed).value
-            
         }
         else {
             const [end, deposit1, deposit2] = (storageData as v9320.Type_620_Approved | v9320.Type_620_Rejected).value

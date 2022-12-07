@@ -15,6 +15,7 @@ enum ReferendumStatus {
 }
 
 enum OpenGovReferendumStatus {
+  Submitted
   DecisionStarted
   Approved
   Rejected
@@ -352,14 +353,6 @@ type Delegation @entity {
   timestampEnd: DateTime
 }
 
-type ReferendumSubmission @entity {
-  id: ID!
-  index: Int! @index
-  hash: String!
-  track: Int!
-  proposer: String
-}
-
 type OpenGovReferendum @entity {
   id: ID!
   index: Int! @index
@@ -394,6 +387,7 @@ type OpenGovReferendum @entity {
   preimageMethod: String
   preimageArgs: JSON
   preimageDescription: String
+  alarm: JSON
 }
 
 type ConvictionVote @entity {
