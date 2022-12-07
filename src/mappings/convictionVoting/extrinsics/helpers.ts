@@ -119,7 +119,7 @@ export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>,
     if (delegations && delegations.length > 0) {
         for (let i = 0; i < delegations.length; i++) {
             const delegation = delegations[i]
-            return [...delegations, ...(await getAllNestedDelegations(ctx, delegation.wallet, track))]
+            return await Promise.all([...delegations, ...(await getAllNestedDelegations(ctx, delegation.wallet, track))])
         }
     }
     else {
