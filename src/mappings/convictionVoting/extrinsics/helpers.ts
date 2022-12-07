@@ -117,10 +117,12 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
 export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>, voter: string | undefined, track: number): Promise<any> {
     let delegations = await ctx.store.find(ConvictionVotingDelegation, { where: { to: voter, blockNumberEnd: IsNull(), track} })
     if (delegations && delegations.length > 0) {
+        let nestedDelegations = []
         for (let i = 0; i < delegations.length; i++) {
             const delegation = delegations[i]
-            return await Promise.all([...delegations, ...(await getAllNestedDelegations(ctx, delegation.wallet, track))])
+            nestedDelegations.push(await getAllNestedDelegations(ctx, delegation.wallet, track))
         }
+        return [...delegations, ...nestedDelegations]
     }
     else {
         return []
