@@ -8,7 +8,7 @@ const processor = new SubstrateBatchProcessor()
         chain: 'wss://kusama.api.onfinality.io/public-ws',
         archive: lookupArchive('kusama', { release: 'FireSquid' }),
     })
-    .setBlockRange({from: 9950401})
+    // .setBlockRange({from: 15601402})
     .addCall('System.remark', {
         data: {
             call: {
