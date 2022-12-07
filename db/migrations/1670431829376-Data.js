@@ -1,5 +1,5 @@
-module.exports = class Data1670406706403 {
-    name = 'Data1670406706403'
+module.exports = class Data1670431829376 {
+    name = 'Data1670431829376'
 
     async up(db) {
         await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -59,15 +59,13 @@ module.exports = class Data1670406706403 {
         await db.query(`CREATE INDEX "IDX_9424bd1981faae099575c84ebc" ON "delegation" ("block_number_start") `)
         await db.query(`CREATE INDEX "IDX_847a3bbf681c929004c84e3eba" ON "delegation" ("wallet") `)
         await db.query(`CREATE INDEX "IDX_0e0774ed46340a85f1d43ca808" ON "delegation" ("to") `)
-        await db.query(`CREATE TABLE "referendum_submission" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "track" integer NOT NULL, "proposer" text, CONSTRAINT "PK_281c2a3e1e9a8b39e087e689424" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_3743e27726452386a9babffe7a" ON "referendum_submission" ("index") `)
         await db.query(`CREATE TABLE "conviction_vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_removed" TIMESTAMP WITH TIME ZONE, "decision" character varying(7) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, "is_validator" boolean, CONSTRAINT "PK_ff0112254d31eff17e0ab8f8245" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_552d9c543713fc54cc38890eef" ON "conviction_vote" ("referendum_id") `)
         await db.query(`CREATE INDEX "IDX_b876b7e68aa24e2ae90d4c87c4" ON "conviction_vote" ("block_number_voted") `)
         await db.query(`CREATE INDEX "IDX_c8a538b3d48d5d1b35fde183f7" ON "conviction_vote" ("block_number_removed") `)
         await db.query(`CREATE INDEX "IDX_37bb25129607e84811b933e28e" ON "conviction_vote" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_a81ffffaa6320ab1f65e30aaf5" ON "conviction_vote" ("timestamp_removed") `)
-        await db.query(`CREATE TABLE "open_gov_referendum" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "track" integer NOT NULL, "status" character varying(15) NOT NULL, "status_history" jsonb NOT NULL, "origin_kind" text NOT NULL, "enactment_kind" text NOT NULL, "enactment_value" integer NOT NULL, "len" integer, "submitted" integer NOT NULL, "submission_deposit_who" text NOT NULL, "submission_deposit_amount" numeric NOT NULL, "decision_deposit_who" text, "decision_deposit_amount" numeric, "deciding_since" integer, "deciding_confirming" integer, "ayes" numeric, "nays" numeric, "support" numeric, "in_queue" boolean, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "ended_at_block" integer, "ended_at" TIMESTAMP WITH TIME ZONE, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, "total_issuance" numeric NOT NULL, "preimage_section" text, "preimage_method" text, "preimage_args" jsonb, "preimage_description" text, CONSTRAINT "PK_a960ba71269b2bea02f7a8e55c9" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "open_gov_referendum" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "track" integer NOT NULL, "status" character varying(15) NOT NULL, "status_history" jsonb NOT NULL, "origin_kind" text NOT NULL, "enactment_kind" text NOT NULL, "enactment_value" integer NOT NULL, "len" integer, "submitted" integer NOT NULL, "submission_deposit_who" text NOT NULL, "submission_deposit_amount" numeric NOT NULL, "decision_deposit_who" text, "decision_deposit_amount" numeric, "deciding_since" integer, "deciding_confirming" integer, "ayes" numeric, "nays" numeric, "support" numeric, "in_queue" boolean, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "ended_at_block" integer, "ended_at" TIMESTAMP WITH TIME ZONE, "updated_at_block" integer, "updated_at" TIMESTAMP WITH TIME ZONE, "total_issuance" numeric NOT NULL, "preimage_section" text, "preimage_method" text, "preimage_args" jsonb, "preimage_description" text, "alarm" jsonb, CONSTRAINT "PK_a960ba71269b2bea02f7a8e55c9" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_99ce930390f32bef851dc73cf6" ON "open_gov_referendum" ("index") `)
         await db.query(`CREATE INDEX "IDX_b8b857bdc1bac6cc75292813fb" ON "open_gov_referendum" ("created_at_block") `)
         await db.query(`CREATE INDEX "IDX_0a3b987d1ee09e92bc61966d8f" ON "open_gov_referendum" ("created_at") `)
@@ -146,8 +144,6 @@ module.exports = class Data1670406706403 {
         await db.query(`DROP INDEX "public"."IDX_9424bd1981faae099575c84ebc"`)
         await db.query(`DROP INDEX "public"."IDX_847a3bbf681c929004c84e3eba"`)
         await db.query(`DROP INDEX "public"."IDX_0e0774ed46340a85f1d43ca808"`)
-        await db.query(`DROP TABLE "referendum_submission"`)
-        await db.query(`DROP INDEX "public"."IDX_3743e27726452386a9babffe7a"`)
         await db.query(`DROP TABLE "conviction_vote"`)
         await db.query(`DROP INDEX "public"."IDX_552d9c543713fc54cc38890eef"`)
         await db.query(`DROP INDEX "public"."IDX_b876b7e68aa24e2ae90d4c87c4"`)
