@@ -56,7 +56,7 @@ export async function updateReferendum(ctx: BatchContext<Store, unknown>, index:
     await ctx.store.save(referendum)
 }
 
-export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>, index: number, status: OpenGovReferendumStatus, header: SubstrateBlock, storageData?: any) {
+export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>, index: number, status: OpenGovReferendumStatus, header: SubstrateBlock, storageData?: any, decodedCall?: any) {
     const referendum = await ctx.store.get(OpenGovReferendum, {
         where: {
             index,
@@ -84,6 +84,12 @@ export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>,
     referendum.decidingConfirming = storageData.decidingConfirming ? storageData.decidingConfirming : referendum.decidingConfirming
     referendum.inQueue = storageData.inQueue ? storageData.inQueue : referendum.inQueue
     referendum.alarm = storageData.alarm ? toJSON(storageData.alarm) : referendum.alarm
+    if (decodedCall) {
+        referendum.preimageSection = decodedCall.section,
+        referendum.preimageMethod = decodedCall.method,
+        referendum.preimageDescription = decodedCall.description,
+        referendum.preimageArgs = toJSON(decodedCall.args)
+    }
 
     switch (status) {
         case OpenGovReferendumStatus.Confirmed:

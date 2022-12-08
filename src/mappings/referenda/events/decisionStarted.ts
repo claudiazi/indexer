@@ -8,6 +8,7 @@ import { getReferendumInfoOf } from '../../../storage/referenda'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Chain } from '@subsquid/substrate-processor/lib/chain'
 import { updateOpenGovReferendum } from '../../utils/proposals'
+import { getPreimageProposalCall } from '../../utils/preimages'
 
 function decodeProposal(chain: Chain, data: Uint8Array) {
     // @ts-ignore
@@ -29,5 +30,9 @@ export async function handleDecisionStarted(ctx: BatchContext<Store, unknown>,
         return
     }
 
-    await updateOpenGovReferendum(ctx, index, OpenGovReferendumStatus.DecisionStarted, header, storageData)
+    let decodedCall
+    if (storageData.len){
+        decodedCall = await getPreimageProposalCall(ctx, hash, storageData.len, header)
+    }
+    await updateOpenGovReferendum(ctx, index, OpenGovReferendumStatus.DecisionStarted, header, storageData, decodedCall)
 }

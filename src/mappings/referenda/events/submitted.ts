@@ -13,11 +13,7 @@ import { getPreimageData } from '../../../storage/preimage'
 import { parseProposalCall, ss58codec } from '../../../common/tools'
 import { Chain } from '@subsquid/substrate-processor/lib/chain'
 import { toJSON } from '@subsquid/util-internal-json'
-
-function decodeProposal(chain: Chain, data: Uint8Array) {
-    // @ts-ignore
-    return chain.scaleCodec.decodeBinary(chain.description.call, data)
-}
+import { getPreimageProposalCall } from '../../utils/preimages'
 
 export async function handleSubmitted(ctx: BatchContext<Store, unknown>,
     item: EventItem<'Referenda.Submitted', { event: { args: true; extrinsic: { hash: true } } }>,
@@ -84,30 +80,12 @@ export async function handleSubmitted(ctx: BatchContext<Store, unknown>,
         //print some error
         return
     }
-    const preimageData = await getPreimageData(ctx, hash, len, header)
-    if (!preimageData) return
-    let decodedCall:
-        | {
-            section: string
-            method: string
-            description: string
-            args: Record<string, unknown>
-        }
-        | undefined
-
-    const hexHash = toHex(hash)
-
-    try {
-        const preimage = decodeProposal(ctx._chain as Chain, preimageData.data)
-
-        decodedCall = parseProposalCall(ctx._chain, preimage)
-    } catch (e) {
-        ctx.log.warn(`Failed to decode ProposedCall of Preimage ${hexHash} at block ${header.height}:\n ${e}`)
-    }
+    const decodedCall = await getPreimageProposalCall(ctx, hash, len, header)
+    
     const referendum = new OpenGovReferendum({
         id,
         index,
-        status: OpenGovReferendumStatus.DecisionStarted,
+        status: OpenGovReferendumStatus.Submitted,
         track,
         originKind,
         enactmentKind,
