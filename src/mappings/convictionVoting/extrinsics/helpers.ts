@@ -1,9 +1,7 @@
 import { BatchContext, SubstrateBlock } from "@subsquid/substrate-processor"
 import { Store } from "@subsquid/typeorm-store"
 import { IsNull } from "typeorm"
-import { encodeId } from "../../../common/tools"
 import { ConvictionVotingDelegation, OpenGovReferendum, StandardVoteBalance, ConvictionVote, VoteType } from "../../../model"
-import { ElectionProviderMultiPhaseCurrentPhaseStorage, SessionCurrentIndexStorage, SessionValidatorsStorage } from "../../../types/storage"
 import { currentValidators, setValidators } from "../../session/events/newSession"
 import { NoOpenVoteFound, TooManyOpenVotes } from "./errors"
 import { getVotesCount } from "./vote"
@@ -20,7 +18,6 @@ export async function removeDelegatedVotesOngoingReferenda(ctx: BatchContext<Sto
         const ongoingReferendum = ongoingReferenda[i]
         await removeDelegatedVotesReferendum(ctx, block, blockTime, ongoingReferendum.index, nestedDelegations)
     }
-
 }
 
 export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, block: number, blockTime: number, index: number, nestedDelegations: ConvictionVotingDelegation[]): Promise<void> {
@@ -65,7 +62,7 @@ export async function removeVote(ctx: BatchContext<Store, unknown>, wallet: stri
 }
 
 export async function addOngoingReferendaDelegatedVotes(ctx: BatchContext<Store, unknown>, toWallet: string | undefined, header: SubstrateBlock, track: number): Promise<void> {
-    const ongoingReferenda = await ctx.store.find(OpenGovReferendum, { where: { endedAt: IsNull() } })
+    const ongoingReferenda = await ctx.store.find(OpenGovReferendum, { where: { endedAt: IsNull(), track } })
     const nestedDelegations = await getAllNestedDelegations(ctx, toWallet, track)
     const validators = currentValidators || setValidators(ctx, header)
     for (let i = 0; i < ongoingReferenda.length; i++) {

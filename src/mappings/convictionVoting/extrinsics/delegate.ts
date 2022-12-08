@@ -25,7 +25,8 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
         //should never be the case
         ctx.log.warn(TooManyOpenDelegations(header.height, track, wallet))
     }
-    const ongoingReferenda = await ctx.store.find(OpenGovReferendum, { where: { endedAt: IsNull() } })
+    //get ongoingReferenda for track
+    const ongoingReferenda = await ctx.store.find(OpenGovReferendum, { where: { endedAt: IsNull(), track } })
     if (delegations.length > 0) {
         const delegation = delegations[0]
         delegation.blockNumberEnd = header.height
@@ -52,7 +53,7 @@ export async function handleDelegate(ctx: BatchContext<Store, unknown>,
             timestamp: new Date(header.timestamp),
         })
     )
-    // add votes for ongoing referenda
+    // add votes for ongoing referenda for this track
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const referendum = ongoingReferenda[i]
         const votes = await ctx.store.find(ConvictionVote, { where: { voter: toWallet, referendumIndex: referendum.index, blockNumberRemoved: IsNull() } })

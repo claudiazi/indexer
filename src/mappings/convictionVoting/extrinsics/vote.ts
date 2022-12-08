@@ -47,7 +47,7 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     }
 
     const nestedDelegations = await getAllNestedDelegations(ctx, wallet, openGovReferendum.track)
-    await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, index, nestedDelegations, openGovReferendum.track)
+    await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, index, nestedDelegations)
 
     let decision: VoteDecision
     switch (vote.type) {

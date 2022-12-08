@@ -14,6 +14,7 @@ import {
 import { BalancesTotalIssuanceStorage } from '../../types/storage'
 import { MissingPreimageWarn, MissingReferendumWarn } from './errors'
 import { toJSON } from '@subsquid/util-internal-json'
+import { ss58codec } from '../../common/tools'
 
 export async function updateReferendum(ctx: BatchContext<Store, unknown>, index: number, status: ReferendumStatus, header: SubstrateBlock, totalIssuance?: string) {
     const referendum = await ctx.store.get(Referendum, {
@@ -78,7 +79,7 @@ export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>,
     referendum.nays = storageData.nays ? storageData.nays : referendum.nays 
     referendum.support = storageData.support ? storageData.support : referendum.support
     referendum.decisionDepositAmount = storageData.decisionDepositAmount ? storageData.decisionDepositAmount : referendum.decisionDepositAmount
-    referendum.decisionDepositWho = storageData.decisionDepositWho ? storageData.decisionDepositWho : referendum.decisionDepositWho
+    referendum.decisionDepositWho = storageData.decisionDepositWho ? ss58codec.encode(storageData.decisionDepositWho) : referendum.decisionDepositWho
     referendum.decidingSince = storageData.decidingSince ? storageData.decidingSince : referendum.decidingSince
     referendum.decidingConfirming = storageData.decidingConfirming ? storageData.decidingConfirming : referendum.decidingConfirming
     referendum.inQueue = storageData.inQueue ? storageData.inQueue : referendum.inQueue

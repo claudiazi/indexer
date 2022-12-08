@@ -5,7 +5,7 @@ import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelec
 import { NoDelegationFound, TooManyOpenDelegations, TooManyOpenVotes } from './errors'
 import { IsNull } from 'typeorm'
 import { removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
-import { Referendum, VoteType } from '../../../model'
+import { OpenGovReferendum, VoteType } from '../../../model'
 import { getUndelegateData } from './getters'
 import {
     ConvictionVotingDelegation
@@ -32,7 +32,7 @@ export async function handleUndelegate(ctx: BatchContext<Store, unknown>,
     delegation.timestampEnd = new Date(header.timestamp)
     await ctx.store.save(delegation)
     //remove currently delegated votes from ongoing referenda for this wallet
-    const ongoingReferenda = await ctx.store.find(Referendum, { where: { endedAt: IsNull() } })
+    const ongoingReferenda = await ctx.store.find(OpenGovReferendum, { where: { endedAt: IsNull(), track } })
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const referendum = ongoingReferenda[i]
         await removeVote(ctx, wallet, referendum.index, header.height, header.timestamp, false, VoteType.Delegated, delegation.to)
