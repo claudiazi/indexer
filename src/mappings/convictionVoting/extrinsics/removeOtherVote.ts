@@ -7,7 +7,7 @@ import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelec
 import { IsNull } from 'typeorm'
 import { NoOpenVoteFound, TooManyOpenVotes } from './errors'
 import { MissingReferendumWarn } from '../../utils/errors'
-import { removeDelegatedVotesOngoingReferenda } from './helpers'
+import { getAllNestedDelegations, removeDelegatedVotesReferendum } from './helpers'
 
 export async function handleRemoveOtherVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'ConvictionVoting.remove_other_vote', { call: { args: true; origin: true; } }>,
@@ -39,5 +39,6 @@ export async function handleRemoveOtherVote(ctx: BatchContext<Store, unknown>,
     vote.blockNumberRemoved = header.height
     vote.timestampRemoved = new Date(header.timestamp)
     await ctx.store.save(vote)
-    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height, header.timestamp, referendum.track)
+    let nestedDelegations = await getAllNestedDelegations(ctx, wallet, referendum.track)
+    await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, index, nestedDelegations)
 }

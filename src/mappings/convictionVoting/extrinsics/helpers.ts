@@ -18,12 +18,12 @@ export async function removeDelegatedVotesOngoingReferenda(ctx: BatchContext<Sto
     let nestedDelegations = await getAllNestedDelegations(ctx, wallet, track)
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const ongoingReferendum = ongoingReferenda[i]
-        await removeDelegatedVotesReferendum(ctx, block, blockTime, ongoingReferendum.index, nestedDelegations, track)
+        await removeDelegatedVotesReferendum(ctx, block, blockTime, ongoingReferendum.index, nestedDelegations)
     }
 
 }
 
-export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, block: number, blockTime: number, index: number, nestedDelegations: ConvictionVotingDelegation[], track: number): Promise<void> {
+export async function removeDelegatedVotesReferendum(ctx: BatchContext<Store, unknown>, block: number, blockTime: number, index: number, nestedDelegations: ConvictionVotingDelegation[]): Promise<void> {
     for (let i = 0; i < nestedDelegations.length; i++) {
         //remove active votes
         const delegation = nestedDelegations[i]

@@ -5,7 +5,7 @@ import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { MissingReferendumWarn } from '../../utils/errors'
-import { removeDelegatedVotesOngoingReferenda, removeVote } from './helpers'
+import { getAllNestedDelegations, removeDelegatedVotesReferendum, removeVote } from './helpers'
 
 export async function handleRemoveVote(ctx: BatchContext<Store, unknown>,
     item: CallItem<'ConvictionVoting.remove_vote', { call: { args: true; origin: true; } }>,
@@ -23,5 +23,6 @@ export async function handleRemoveVote(ctx: BatchContext<Store, unknown>,
     }
     const wallet = getOriginAccountId(item.call.origin)
     await removeVote(ctx, wallet, index, header.height, header.timestamp, true)
-    await removeDelegatedVotesOngoingReferenda(ctx, wallet, header.height, header.timestamp, referendum.track)
+    let nestedDelegations = await getAllNestedDelegations(ctx, wallet, referendum.track)
+    await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, index, nestedDelegations)
 }
