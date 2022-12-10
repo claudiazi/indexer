@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 import {OpenGovReferendum} from "./openGovReferendum.model"
-import {VoteDecision} from "./_voteDecision"
-import {VoteBalance, fromJsonVoteBalance} from "./_voteBalance"
+import {VoteDecisionOpenGov} from "./_voteDecisionOpenGov"
+import {VoteBalanceOpenGov, fromJsonVoteBalanceOpenGov} from "./_voteBalanceOpenGov"
 import {VoteType} from "./_voteType"
 
 @Entity_()
@@ -43,11 +43,11 @@ export class ConvictionVote {
     @Column_("timestamp with time zone", {nullable: true})
     timestampRemoved!: Date | undefined | null
 
-    @Column_("varchar", {length: 7, nullable: false})
-    decision!: VoteDecision
+    @Column_("varchar", {length: 12, nullable: false})
+    decision!: VoteDecisionOpenGov
 
-    @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => obj == null ? undefined : fromJsonVoteBalance(obj)}, nullable: false})
-    balance!: VoteBalance
+    @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => obj == null ? undefined : fromJsonVoteBalanceOpenGov(obj)}, nullable: false})
+    balance!: VoteBalanceOpenGov
 
     @Column_("int4", {nullable: true})
     lockPeriod!: number | undefined | null

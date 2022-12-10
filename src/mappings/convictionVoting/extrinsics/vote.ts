@@ -1,10 +1,11 @@
 import {
     OpenGovReferendum,
     SplitVoteBalance,
+    SplitAbstainVoteBalance,
     StandardVoteBalance,
     ConvictionVote,
-    VoteBalance,
-    VoteDecision,
+    VoteBalanceOpenGov,
+    VoteDecisionOpenGov,
     VoteType,
 } from '../../../model'
 import { encodeId, getOriginAccountId } from '../../../common/tools'
@@ -38,7 +39,7 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
         vote.timestampRemoved = new Date(header.timestamp)
         await ctx.store.save(vote)
     }
-   
+
 
     const openGovReferendum = await ctx.store.get(OpenGovReferendum, { where: { index } })
     if (!openGovReferendum) {
@@ -49,24 +50,35 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
     const nestedDelegations = await getAllNestedDelegations(ctx, wallet, openGovReferendum.track)
     await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, index, nestedDelegations)
 
-    let decision: VoteDecision
+    let decision: VoteDecisionOpenGov
     switch (vote.type) {
         case 'Standard':
-            decision = vote.value < 128 ? VoteDecision.no : VoteDecision.yes
+            decision = vote.value < 128 ? VoteDecisionOpenGov.no : VoteDecisionOpenGov.yes
             break
         case 'Split':
-            decision = VoteDecision.abstain
+            decision = VoteDecisionOpenGov.split
+            break
+        case 'SplitAbstain':
+            decision = VoteDecisionOpenGov.splitAbstain
             break
     }
 
     let lockPeriod: number | undefined
-    let balance: VoteBalance | undefined
+    let balance: VoteBalanceOpenGov | undefined
     if (vote.type === 'Split') {
         balance = new SplitVoteBalance({
             aye: vote.aye,
             nay: vote.nay,
         })
-    } else if (vote.type === 'Standard') {
+    }
+    else if (vote.type === 'SplitAbstain') {
+        balance = new SplitAbstainVoteBalance({
+            aye: vote.aye,
+            nay: vote.nay,
+            abstain: vote.abstain,
+        })
+    }
+    else if (vote.type === 'Standard') {
         balance = new StandardVoteBalance({
             value: vote.balance,
         })

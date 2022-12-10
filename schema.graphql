@@ -390,6 +390,21 @@ type OpenGovReferendum @entity {
   alarm: JSON
 }
 
+enum VoteDecisionOpenGov {
+  yes
+  no
+  split
+  splitAbstain
+}
+
+type SplitAbstainVoteBalance {
+  aye: BigInt
+  nay: BigInt
+  abstain: BigInt
+}
+
+union VoteBalanceOpenGov = StandardVoteBalance | SplitVoteBalance | SplitAbstainVoteBalance
+
 type ConvictionVote @entity {
   id: ID!
   voter: String
@@ -400,8 +415,8 @@ type ConvictionVote @entity {
   blockNumberRemoved: Int @index
   timestamp: DateTime! @index
   timestampRemoved: DateTime @index
-  decision: VoteDecision!
-  balance: VoteBalance!
+  decision: VoteDecisionOpenGov!
+  balance: VoteBalanceOpenGov!
   lockPeriod: Int
   delegatedTo: String
   type: VoteType!

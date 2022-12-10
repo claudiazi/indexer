@@ -18,6 +18,12 @@ type DemocracyVote =
         value: number
     }
     | {
+        type: 'SplitAbstain'
+        aye: bigint
+        nay: bigint
+        abstain: bigint
+    }
+    | {
         type: 'Split'
         aye: bigint
         nay: bigint
@@ -43,6 +49,40 @@ export function getVoteData(ctx: BatchContext<Store, unknown>, itemCall: any): D
                 },
             }
         } else {
+            return {
+                index: pollIndex,
+                vote: {
+                    type: 'Split',
+                    aye: vote.aye,
+                    nay: vote.nay,
+                },
+            }
+        }
+    }
+    else if (event.isV9340) {
+        const { pollIndex, vote } = event.asV9340
+        if (vote.__kind === 'Standard') {
+            return {
+                index: pollIndex,
+                vote: {
+                    type: 'Standard',
+                    value: vote.vote,
+                    balance: vote.balance,
+                },
+            }
+        } 
+        else if (vote.__kind === 'SplitAbstain') {
+            return {
+                index: pollIndex,
+                vote: {
+                    type: 'SplitAbstain',
+                    aye: vote.aye,
+                    nay: vote.nay,
+                    abstain: vote.abstain
+                },
+            }
+        }
+        else {
             return {
                 index: pollIndex,
                 vote: {
