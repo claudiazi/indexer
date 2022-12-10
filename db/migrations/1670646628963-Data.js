@@ -1,5 +1,5 @@
-module.exports = class Data1670431829376 {
-    name = 'Data1670431829376'
+module.exports = class Data1670646628963 {
+    name = 'Data1670646628963'
 
     async up(db) {
         await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -59,7 +59,7 @@ module.exports = class Data1670431829376 {
         await db.query(`CREATE INDEX "IDX_9424bd1981faae099575c84ebc" ON "delegation" ("block_number_start") `)
         await db.query(`CREATE INDEX "IDX_847a3bbf681c929004c84e3eba" ON "delegation" ("wallet") `)
         await db.query(`CREATE INDEX "IDX_0e0774ed46340a85f1d43ca808" ON "delegation" ("to") `)
-        await db.query(`CREATE TABLE "conviction_vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_removed" TIMESTAMP WITH TIME ZONE, "decision" character varying(7) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, "is_validator" boolean, CONSTRAINT "PK_ff0112254d31eff17e0ab8f8245" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "conviction_vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_removed" TIMESTAMP WITH TIME ZONE, "decision" character varying(12) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, "is_validator" boolean, CONSTRAINT "PK_ff0112254d31eff17e0ab8f8245" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_552d9c543713fc54cc38890eef" ON "conviction_vote" ("referendum_id") `)
         await db.query(`CREATE INDEX "IDX_b876b7e68aa24e2ae90d4c87c4" ON "conviction_vote" ("block_number_voted") `)
         await db.query(`CREATE INDEX "IDX_c8a538b3d48d5d1b35fde183f7" ON "conviction_vote" ("block_number_removed") `)
