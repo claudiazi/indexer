@@ -9,9 +9,7 @@ import { Store } from '@subsquid/typeorm-store'
 import { getReferendumInfoOf } from '../../../storage/referenda'
 import { BalancesTotalIssuanceStorage } from '../../../types/storage'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
-import { getPreimageData } from '../../../storage/preimage'
-import { parseProposalCall, ss58codec } from '../../../common/tools'
-import { Chain } from '@subsquid/substrate-processor/lib/chain'
+import { ss58codec } from '../../../common/tools'
 import { toJSON } from '@subsquid/util-internal-json'
 import { getPreimageProposalCall } from '../../utils/preimages'
 
@@ -67,19 +65,7 @@ export async function handleSubmitted(ctx: BatchContext<Store, unknown>,
             alarm
         } = storageData)
     }
-
-    // const { hash } = storageData
     const id = await getReferendumId(ctx.store)
-
-    // const openGovReferendumId = await ctx.store.count(OpenGovReferendum)
-
-    // const preimage = await ctx.store.get(Preimage, { where: { hash: toHex(hash), len } })
-
-    //lookup preimagestorage
-    if (!len) {
-        //print some error
-        return
-    }
     const decodedCall = await getPreimageProposalCall(ctx, hash, len, header)
     
     const referendum = new OpenGovReferendum({

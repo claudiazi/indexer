@@ -9,7 +9,8 @@ function decodeProposal(chain: Chain, data: Uint8Array) {
     return chain.scaleCodec.decodeBinary(chain.description.call, data)
 }
 
-export async function getPreimageProposalCall(ctx: BatchContext<Store, unknown>, hash: Uint8Array, len: number, block: SubstrateBlock) {
+export async function getPreimageProposalCall(ctx: BatchContext<Store, unknown>, hash: Uint8Array, len: number | undefined, block: SubstrateBlock) {
+    if (!len) return
     const preimageData = await getPreimageData(ctx, hash, len, block)
     if (!preimageData) return
     let decodedCall:

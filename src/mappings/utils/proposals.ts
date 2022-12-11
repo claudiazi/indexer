@@ -74,6 +74,7 @@ export async function updateOpenGovReferendum(ctx: BatchContext<Store, unknown>,
     referendum.updatedAt = new Date(header.timestamp)
     referendum.updatedAtBlock = header.height
     referendum.status = status
+    referendum.len = storageData.len
     referendum.totalIssuance = await new BalancesTotalIssuanceStorage(ctx, header).asV1020.get() || 0n
     referendum.ayes = storageData.ayes ? storageData.ayes : referendum.ayes 
     referendum.nays = storageData.nays ? storageData.nays : referendum.nays 
