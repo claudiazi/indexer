@@ -8,12 +8,8 @@ export const referendumVotes = `
               , voter
               , timestamp::timestamp AS timestamp
               , CASE WHEN lock_period = 0 THEN 0.1
-                  WHEN lock_period = 4 THEN 3
-                  WHEN lock_period = 8 THEN 4
-                  WHEN lock_period = 16 THEN 5
-                  WHEN lock_period = 32 THEN 6
-                  ELSE lock_period 
-              END AS conviction
+                     ELSE lock_period 
+                END AS conviction
               , decision
               , CASE WHEN decision = 'abstain' THEN COALESCE((balance ->> 'aye')::decimal(38,0) / 1000000000000, 0) + COALESCE((balance ->> 'nay')::decimal(38,0) / 1000000000000, 0)
                     ELSE COALESCE((balance ->> 'value')::decimal(38,0) / 1000000000000, 0)
