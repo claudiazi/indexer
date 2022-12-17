@@ -58,6 +58,15 @@ export class ReferendaStats {
     voted_amount_total!: number
 
     @Field(() => Number, { nullable: true })
+    voted_amount_with_conviction_aye!: number
+
+    @Field(() => Number, { nullable: true })
+    voted_amount_with_conviction_nay!: number
+
+    @Field(() => Number, { nullable: true })
+    voted_amount_with_conviction_total!: number
+
+    @Field(() => Number, { nullable: true })
     total_issuance!: number
 
     @Field(() => Number, { nullable: true })
@@ -160,10 +169,10 @@ export class ReferendaStats {
     count_delegated!: number
 
     @Field(() => Number, { nullable: true })
-    voted_amount_direct!: number
+    voted_amount_with_conviction_direct!: number
 
     @Field(() => Number, { nullable: true })
-    voted_amount_delegated!: number
+    voted_amount_with_conviction_delegated!: number
 
     @Field(() => Number, { nullable: true })
     count_validator!: number
@@ -175,13 +184,13 @@ export class ReferendaStats {
     count_normal!: number
 
     @Field(() => Number, { nullable: true })
-    voted_amount_validator!: number
+    voted_amount_with_conviction_validator!: number
 
     @Field(() => Number, { nullable: true })
-    voted_amount_councillor!: number
+    voted_amount_with_conviction_councillor!: number
 
     @Field(() => Number, { nullable: true })
-    voted_amount_normal!: number
+    voted_amount_with_conviction_normal!: number
 
 
     constructor(props: Partial<ReferendaStats>) {
