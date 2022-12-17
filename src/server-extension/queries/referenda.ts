@@ -117,9 +117,9 @@ export const referendaStats = `
               , CASE WHEN lock_period = 0 THEN 0.1
                      ELSE lock_period 
                 END AS conviction
-              , (balance ->> 'value')::decimal(38,0) AS balance_value
-              , (balance ->> 'aye')::decimal(38,0) AS balance_aye
-              , (balance ->> 'nay')::decimal(38,0) AS balance_nay
+              , (balance ->> 'value')::decimal(38,0) / 1000000000000 AS balance_value
+              , (balance ->> 'aye')::decimal(38,0) / 1000000000000 AS balance_aye
+              , (balance ->> 'nay')::decimal(38,0) / 1000000000000 AS balance_nay
               , DATE_PART('day', v.timestamp - r.created_at) + 
                 DATE_PART('hour', v.timestamp - r.created_at) / 24 As voting_time
               , v.timestamp
@@ -193,9 +193,14 @@ export const referendaStats = `
                 referendum_index
               , decision
               , COUNT(*) AS count
-              , SUM(CASE WHEN decision = 'yes' THEN COALESCE(balance_value / 1000000000000, 0) + COALESCE(balance_aye / 1000000000000, 0)
-                         ELSE  COALESCE(balance_value / 1000000000000, 0) + COALESCE(balance_nay / 1000000000000, 0) END)
+              , SUM(CASE WHEN decision = 'yes' THEN COALESCE(balance_value, 0) + COALESCE(balance_aye, 0)
+                         ELSE COALESCE(balance_value, 0) + COALESCE(balance_nay, 0) 
+                    END)
                 AS voted_amount
+              , SUM(CASE WHEN decision = 'yes' THEN COALESCE(balance_value, 0) + COALESCE(balance_aye, 0)
+                         ELSE COALESCE(balance_value, 0) + COALESCE(balance_nay, 0)
+                    END * conviction)
+                AS voted_amount_with_conviction
               , AVG(conviction) AS conviction_mean
               , PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY conviction DESC) AS conviction_median
               FROM refined_votes
@@ -209,6 +214,7 @@ export const referendaStats = `
                 referendum_index
               , SUM(count) AS count_aye
               , SUM(voted_amount) AS voted_amount_aye
+              , SUM(voted_amount_with_conviction) as voted_amount_with_conviction_aye
               , SUM(conviction_mean) AS conviction_mean_aye
               , SUM(conviction_median) AS conviction_median_aye
               FROM pre_calculation
@@ -223,6 +229,7 @@ export const referendaStats = `
                 referendum_index
               , SUM(count) AS count_nay
               , SUM(voted_amount) AS voted_amount_nay
+              , SUM(voted_amount_with_conviction) as voted_amount_with_conviction_nay
               , SUM(conviction_mean) AS conviction_mean_nay
               , SUM(conviction_median) AS conviction_median_nay
               FROM pre_calculation
@@ -235,10 +242,16 @@ export const referendaStats = `
 
               SELECT 
                 referendum_index
-              , SUM(CASE WHEN type = 'Direct' THEN 1 else 0 END) AS count_direct
-              , SUM(CASE WHEN type = 'Delegated' THEN 1 else 0 END) AS count_delegated
-              , SUM(CASE WHEN type = 'Direct' THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_direct
-              , SUM(CASE WHEN type = 'Delegated' THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_delegated
+              , SUM(CASE WHEN type = 'Direct' THEN 1 ELSE 0 END) AS count_direct
+              , SUM(CASE WHEN type = 'Delegated' THEN 1 ELSE 0 END) AS count_delegated
+              , SUM(CASE WHEN type = 'Direct' 
+                         THEN COALESCE(balance_value, 0) 
+                         ELSE 0 
+                    END * conviction) AS voted_amount_with_conviction_direct
+              , SUM(CASE WHEN type = 'Delegated' 
+                         THEN COALESCE(balance_value, 0) 
+                         ELSE 0 
+                    END * conviction) AS voted_amount_with_conviction_delegated
               FROM refined_votes
               group by 1
 
@@ -247,16 +260,22 @@ export const referendaStats = `
             voter_type AS (
               SELECT 
                 referendum_index
-              , SUM(CASE WHEN is_validator = true THEN 1 else 0 END) AS count_validator
-              , SUM(CASE WHEN is_councillor = true THEN 1 else 0 END) AS count_councillor
+              , SUM(CASE WHEN is_validator = true THEN 1 ELSE 0 END) AS count_validator
+              , SUM(CASE WHEN is_councillor = true THEN 1 ELSE 0 END) AS count_councillor
               , SUM(CASE WHEN (is_validator = false OR is_validator IS NULL)
                           AND (is_councillor = false OR is_councillor IS NULL)
-                         THEN 1 else 0 END) AS count_normal
-              , SUM(CASE WHEN is_validator = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_validator
-              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_councillor
+                         THEN 1 ELSE 0 END) AS count_normal
+              , SUM(CASE WHEN is_validator = true THEN COALESCE(balance_value, 0) 
+                         ELSE 0 
+                    END * conviction) AS voted_amount_with_conviction_validator
+              , SUM(CASE WHEN is_councillor = true THEN COALESCE(balance_value, 0) 
+                         ELSE 0 
+                    END * conviction) AS voted_amount_with_conviction_councillor
               , SUM(CASE WHEN (is_validator = false OR is_validator IS NULL)
                           AND (is_councillor = false OR is_councillor IS NULL)
-                    THEN COALESCE(balance_value / 1000000000000, 0) else 0 END) AS voted_amount_normal
+                         THEN COALESCE(balance_value, 0) 
+                         ELSE 0 
+                    END * conviction) AS voted_amount_with_conviction_normal
               FROM refined_votes
               group by 1
 
@@ -307,6 +326,8 @@ export const referendaStats = `
               , COALESCE(count_nay, 0) AS count_nay
               , COALESCE(voted_amount_aye, 0) AS voted_amount_aye
               , COALESCE(voted_amount_nay, 0) AS voted_amount_nay
+              , COALESCE(voted_amount_with_conviction_aye, 0) AS voted_amount_with_conviction_aye
+              , COALESCE(voted_amount_with_conviction_nay, 0) AS voted_amount_with_conviction_nay
               , COALESCE(conviction_mean_aye, 0) AS conviction_mean_aye
               , COALESCE(conviction_mean_nay, 0) AS conviction_mean_nay
               , COALESCE(conviction_mean, 0) AS conviction_mean
@@ -443,6 +464,9 @@ export const referendaStats = `
               , voted_amount_aye
               , voted_amount_nay
               , voted_amount_aye + voted_amount_nay AS voted_amount_total
+              , voted_amount_with_conviction_aye
+              , voted_amount_with_conviction_nay
+              , voted_amount_with_conviction_aye + voted_amount_with_conviction_nay AS voted_amount_with_conviction_total
               , total_issuance::decimal(38,0) AS total_issuance
               , COALESCE(voted_amount_aye / total_issuance * 100, 0) AS turnout_aye_perc
               , COALESCE(voted_amount_nay / total_issuance * 100, 0) AS turnout_nay_perc
@@ -477,14 +501,14 @@ export const referendaStats = `
               , count_3_question_correct AS count_3_question_correct_perc
               , count_direct
               , count_delegated
-              , voted_amount_direct
-              , voted_amount_delegated
+              , voted_amount_with_conviction_direct
+              , voted_amount_with_conviction_delegated
               , count_validator
               , count_councillor
               , count_normal
-              , voted_amount_validator
-              , voted_amount_councillor
-              , voted_amount_normal
+              , voted_amount_with_conviction_validator
+              , voted_amount_with_conviction_councillor
+              , voted_amount_with_conviction_normal
               FROM calculation AS c
               INNER JOIN refined_referendum AS r
                 ON c.referendum_index = r.referendum_index
