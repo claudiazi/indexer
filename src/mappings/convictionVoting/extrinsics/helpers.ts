@@ -1,7 +1,7 @@
 import { BatchContext, SubstrateBlock } from "@subsquid/substrate-processor"
 import { Store } from "@subsquid/typeorm-store"
 import { IsNull } from "typeorm"
-import { ConvictionVotingDelegation, OpenGovReferendum, StandardVoteBalance, ConvictionVote, VoteType } from "../../../model"
+import { ConvictionVotingDelegation, OpenGovReferendum, StandardVoteBalance, ConvictionVote, VoteType, VoteDecisionOpenGov, SplitVoteBalance, SplitAbstainVoteBalance } from "../../../model"
 import { currentValidators, setValidators } from "../../session/events/newSession"
 import { NoOpenVoteFound, TooManyOpenVotes } from "./errors"
 import { getVotesCount } from "./vote"
@@ -88,9 +88,55 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
         //add votes
         const delegation = nestedDelegations[i]
         const count = await getVotesCount(ctx, referendum.id)
-        const voteBalance = new StandardVoteBalance({
-            value: delegation.balance,
-        })
+        let voteBalance
+        switch (true) {
+            case vote.balance instanceof StandardVoteBalance:
+                voteBalance = new StandardVoteBalance({
+                    value: delegation.balance
+                });
+                break;
+            case vote.balance instanceof SplitVoteBalance:
+                if ('aye' in vote.balance && 'nay' in vote.balance) { // type guard
+                    const aye =
+                        delegation.balance *
+                        (vote.balance.aye /
+                            (vote.balance.aye + vote.balance.nay))
+                    const nay =
+                        delegation.balance *
+                        (vote.balance.nay /
+                            (vote.balance.aye + vote.balance.nay))
+                    voteBalance = new SplitVoteBalance({
+                        aye,
+                        nay
+                    });
+                }
+                break;
+            case vote.balance instanceof SplitAbstainVoteBalance:
+                if ('aye' in vote.balance && 'nay' in vote.balance && 'abstain' in vote.balance) { // type guard
+                    const ayePercentage =
+                        vote.balance.aye /
+                        (vote.balance.aye +
+                            vote.balance.nay +
+                            vote.balance.abstain)
+                    const nayPercentage =
+                        vote.balance.nay /
+                        (vote.balance.aye +
+                            vote.balance.nay +
+                            vote.balance.abstain)
+                    const abstainPercentage =
+                        vote.balance.nay /
+                        (vote.balance.aye +
+                            vote.balance.nay +
+                            vote.balance.abstain)
+                    voteBalance = new SplitAbstainVoteBalance({
+                        aye: delegation.balance * ayePercentage,
+                        nay: delegation.balance * nayPercentage,
+                        abstain: delegation.balance * abstainPercentage,
+                    })
+                }
+                break;
+        }
+
         await ctx.store.insert(
             new ConvictionVote({
                 id: `${referendum.id}-${count.toString().padStart(8, '0')}`,
@@ -112,7 +158,7 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
 
 
 export async function getAllNestedDelegations(ctx: BatchContext<Store, unknown>, voter: string | undefined, track: number): Promise<any> {
-    let delegations = await ctx.store.find(ConvictionVotingDelegation, { where: { to: voter, blockNumberEnd: IsNull(), track} })
+    let delegations = await ctx.store.find(ConvictionVotingDelegation, { where: { to: voter, blockNumberEnd: IsNull(), track } })
     if (delegations && delegations.length > 0) {
         let nestedDelegations = []
         for (let i = 0; i < delegations.length; i++) {

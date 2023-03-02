@@ -1,5 +1,5 @@
-module.exports = class Data1670646628963 {
-    name = 'Data1670646628963'
+module.exports = class Data1677748902949 {
+    name = 'Data1677748902949'
 
     async up(db) {
         await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -69,7 +69,7 @@ module.exports = class Data1670646628963 {
         await db.query(`CREATE INDEX "IDX_99ce930390f32bef851dc73cf6" ON "open_gov_referendum" ("index") `)
         await db.query(`CREATE INDEX "IDX_b8b857bdc1bac6cc75292813fb" ON "open_gov_referendum" ("created_at_block") `)
         await db.query(`CREATE INDEX "IDX_0a3b987d1ee09e92bc61966d8f" ON "open_gov_referendum" ("created_at") `)
-        await db.query(`CREATE TABLE "conviction_voting_delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text NOT NULL, "to" text NOT NULL, "balance" numeric, "lock_period" integer NOT NULL, "track" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_end" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_3651740e6da05567ce2db5ce4c5" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "conviction_voting_delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text NOT NULL, "to" text NOT NULL, "balance" numeric NOT NULL, "lock_period" integer NOT NULL, "track" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_end" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_3651740e6da05567ce2db5ce4c5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_cf657dcffa4a087edd11908a9d" ON "conviction_voting_delegation" ("block_number_start") `)
         await db.query(`CREATE INDEX "IDX_1dc6318c295b5c1b8b7c93ed4b" ON "conviction_voting_delegation" ("wallet") `)
         await db.query(`CREATE INDEX "IDX_f2e329d77851cff8b6c03fdd12" ON "conviction_voting_delegation" ("to") `)

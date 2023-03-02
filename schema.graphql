@@ -163,12 +163,12 @@ enum VoteDecision {
 }
 
 type StandardVoteBalance {
-  value: BigInt
+  value: BigInt!
 }
 
 type SplitVoteBalance {
-  aye: BigInt
-  nay: BigInt
+  aye: BigInt!
+  nay: BigInt!
 }
 
 union VoteBalance = StandardVoteBalance | SplitVoteBalance
@@ -347,7 +347,7 @@ type Delegation @entity {
   blockNumberEnd: Int
   wallet: String! @index
   to: String! @index
-  balance: BigInt
+  balance: BigInt!
   lockPeriod: Int!
   timestamp: DateTime!
   timestampEnd: DateTime
@@ -398,9 +398,9 @@ enum VoteDecisionOpenGov {
 }
 
 type SplitAbstainVoteBalance {
-  aye: BigInt
-  nay: BigInt
-  abstain: BigInt
+  aye: BigInt!
+  nay: BigInt!
+  abstain: BigInt!
 }
 
 union VoteBalanceOpenGov = StandardVoteBalance | SplitVoteBalance | SplitAbstainVoteBalance
@@ -429,9 +429,9 @@ type ConvictionVotingDelegation @entity {
   blockNumberEnd: Int
   wallet: String! @index
   to: String! @index
-  balance: BigInt
+  balance: BigInt!
   lockPeriod: Int!
-  track: Int
+  track: Int!
   timestamp: DateTime!
   timestampEnd: DateTime
 }

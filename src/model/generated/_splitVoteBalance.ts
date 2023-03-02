@@ -3,38 +3,40 @@ import * as marshal from "./marshal"
 
 export class SplitVoteBalance {
     public readonly isTypeOf = 'SplitVoteBalance'
-    private _aye!: bigint | undefined | null
-    private _nay!: bigint | undefined | null
+    private _aye!: bigint
+    private _nay!: bigint
 
     constructor(props?: Partial<Omit<SplitVoteBalance, 'toJSON'>>, json?: any) {
         Object.assign(this, props)
         if (json != null) {
-            this._aye = json.aye == null ? undefined : marshal.bigint.fromJSON(json.aye)
-            this._nay = json.nay == null ? undefined : marshal.bigint.fromJSON(json.nay)
+            this._aye = marshal.bigint.fromJSON(json.aye)
+            this._nay = marshal.bigint.fromJSON(json.nay)
         }
     }
 
-    get aye(): bigint | undefined | null {
+    get aye(): bigint {
+        assert(this._aye != null, 'uninitialized access')
         return this._aye
     }
 
-    set aye(value: bigint | undefined | null) {
+    set aye(value: bigint) {
         this._aye = value
     }
 
-    get nay(): bigint | undefined | null {
+    get nay(): bigint {
+        assert(this._nay != null, 'uninitialized access')
         return this._nay
     }
 
-    set nay(value: bigint | undefined | null) {
+    set nay(value: bigint) {
         this._nay = value
     }
 
     toJSON(): object {
         return {
             isTypeOf: this.isTypeOf,
-            aye: this.aye == null ? undefined : marshal.bigint.toJSON(this.aye),
-            nay: this.nay == null ? undefined : marshal.bigint.toJSON(this.nay),
+            aye: marshal.bigint.toJSON(this.aye),
+            nay: marshal.bigint.toJSON(this.nay),
         }
     }
 }

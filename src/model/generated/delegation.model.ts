@@ -25,8 +25,8 @@ export class Delegation {
     @Column_("text", {nullable: false})
     to!: string
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
-    balance!: bigint | undefined | null
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    balance!: bigint
 
     @Column_("int4", {nullable: false})
     lockPeriod!: number
