@@ -147,6 +147,7 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
                 lockPeriod: delegation.lockPeriod,
                 referendum: referendum,
                 balance: voteBalance,
+                direction: vote.direction,
                 timestamp: new Date(blockTime),
                 delegatedTo: delegation.to,
                 type: VoteType.Delegated,

@@ -1,5 +1,5 @@
-module.exports = class Data1677748902949 {
-    name = 'Data1677748902949'
+module.exports = class Data1677750820035 {
+    name = 'Data1677750820035'
 
     async up(db) {
         await db.query(`CREATE TABLE "council_motion" ("id" character varying NOT NULL, "index" integer NOT NULL, "hash" text NOT NULL, "proposal_hash" text, "proposer" text, "type" character varying(19), CONSTRAINT "PK_ce06fd343334df7069ba751703c" PRIMARY KEY ("id"))`)
@@ -55,11 +55,11 @@ module.exports = class Data1677748902949 {
         await db.query(`CREATE INDEX "IDX_aecfc55f7d8e7bb703193e0311" ON "question" ("quiz_id") `)
         await db.query(`CREATE TABLE "answer_option" ("id" character varying NOT NULL, "question_id" character varying NOT NULL, "text" text, CONSTRAINT "PK_69dad60c2f58e523232f06f5d8d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c8ff81963b1cf29c3e4188e5ba" ON "answer_option" ("question_id") `)
-        await db.query(`CREATE TABLE "delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text NOT NULL, "to" text NOT NULL, "balance" numeric, "lock_period" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_end" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_a2cb6c9b942d68b109131beab44" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "delegation" ("id" character varying NOT NULL, "block_number_start" integer NOT NULL, "block_number_end" integer, "wallet" text NOT NULL, "to" text NOT NULL, "balance" numeric NOT NULL, "lock_period" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_end" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_a2cb6c9b942d68b109131beab44" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9424bd1981faae099575c84ebc" ON "delegation" ("block_number_start") `)
         await db.query(`CREATE INDEX "IDX_847a3bbf681c929004c84e3eba" ON "delegation" ("wallet") `)
         await db.query(`CREATE INDEX "IDX_0e0774ed46340a85f1d43ca808" ON "delegation" ("to") `)
-        await db.query(`CREATE TABLE "conviction_vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_removed" TIMESTAMP WITH TIME ZONE, "decision" character varying(12) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, "is_validator" boolean, CONSTRAINT "PK_ff0112254d31eff17e0ab8f8245" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "conviction_vote" ("id" character varying NOT NULL, "voter" text, "referendum_id" character varying NOT NULL, "referendum_index" integer NOT NULL, "block_number_voted" integer NOT NULL, "block_number_removed" integer, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "timestamp_removed" TIMESTAMP WITH TIME ZONE, "decision" character varying(12) NOT NULL, "direction" character varying(7) NOT NULL, "balance" jsonb NOT NULL, "lock_period" integer, "delegated_to" text, "type" character varying(9) NOT NULL, "is_validator" boolean, CONSTRAINT "PK_ff0112254d31eff17e0ab8f8245" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_552d9c543713fc54cc38890eef" ON "conviction_vote" ("referendum_id") `)
         await db.query(`CREATE INDEX "IDX_b876b7e68aa24e2ae90d4c87c4" ON "conviction_vote" ("block_number_voted") `)
         await db.query(`CREATE INDEX "IDX_c8a538b3d48d5d1b35fde183f7" ON "conviction_vote" ("block_number_removed") `)

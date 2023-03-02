@@ -2,6 +2,7 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, M
 import * as marshal from "./marshal"
 import {OpenGovReferendum} from "./openGovReferendum.model"
 import {VoteDecisionOpenGov} from "./_voteDecisionOpenGov"
+import {VoteDirectionOpenGov} from "./_voteDirectionOpenGov"
 import {VoteBalanceOpenGov, fromJsonVoteBalanceOpenGov} from "./_voteBalanceOpenGov"
 import {VoteType} from "./_voteType"
 
@@ -45,6 +46,9 @@ export class ConvictionVote {
 
     @Column_("varchar", {length: 12, nullable: false})
     decision!: VoteDecisionOpenGov
+
+    @Column_("varchar", {length: 7, nullable: false})
+    direction!: VoteDirectionOpenGov
 
     @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => obj == null ? undefined : fromJsonVoteBalanceOpenGov(obj)}, nullable: false})
     balance!: VoteBalanceOpenGov

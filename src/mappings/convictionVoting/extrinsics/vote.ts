@@ -7,6 +7,7 @@ import {
     VoteBalanceOpenGov,
     VoteDecisionOpenGov,
     VoteType,
+    VoteDirectionOpenGov,
 } from '../../../model'
 import { encodeId, getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
@@ -65,11 +66,13 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
 
     let lockPeriod: number | undefined
     let balance: VoteBalanceOpenGov | undefined
+    let direction: VoteDirectionOpenGov | undefined
     if (vote.type === 'Split') {
         balance = new SplitVoteBalance({
             aye: vote.aye,
             nay: vote.nay,
         })
+        direction = vote.aye >= vote.nay ? VoteDirectionOpenGov.yes : VoteDirectionOpenGov.no
     }
     else if (vote.type === 'SplitAbstain') {
         balance = new SplitAbstainVoteBalance({
@@ -77,12 +80,18 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             nay: vote.nay,
             abstain: vote.abstain,
         })
+        direction = vote.abstain >= vote.aye && vote.abstain >= vote.nay
+            ? VoteDirectionOpenGov.abstain
+            : vote.aye >= vote.nay
+                ? VoteDirectionOpenGov.yes
+                : VoteDirectionOpenGov.no
     }
     else if (vote.type === 'Standard') {
         balance = new StandardVoteBalance({
             value: vote.balance,
         })
         lockPeriod = vote.value < 128 ? vote.value : vote.value - 128
+        direction = decision == VoteDecisionOpenGov.yes ? VoteDirectionOpenGov.yes : VoteDirectionOpenGov.no
     }
 
     const count = await getVotesCount(ctx, openGovReferendum.id)
@@ -96,6 +105,7 @@ export async function handleVote(ctx: BatchContext<Store, unknown>,
             voter,
             blockNumberVoted: header.height,
             decision,
+            direction,
             lockPeriod,
             referendum: openGovReferendum,
             balance,

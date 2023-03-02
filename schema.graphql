@@ -405,6 +405,12 @@ type SplitAbstainVoteBalance {
 
 union VoteBalanceOpenGov = StandardVoteBalance | SplitVoteBalance | SplitAbstainVoteBalance
 
+enum VoteDirectionOpenGov {
+  yes
+  no
+  abstain
+}
+
 type ConvictionVote @entity {
   id: ID!
   voter: String
@@ -416,6 +422,7 @@ type ConvictionVote @entity {
   timestamp: DateTime! @index
   timestampRemoved: DateTime @index
   decision: VoteDecisionOpenGov!
+  direction: VoteDirectionOpenGov!
   balance: VoteBalanceOpenGov!
   lockPeriod: Int
   delegatedTo: String
