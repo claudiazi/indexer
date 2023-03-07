@@ -16,6 +16,10 @@ export const gov2referendaStats = `
               , total_issuance::decimal(38,0) / 1000000000000 AS total_issuance
               , ayes::decimal(38,0) / 1000000000000 AS referendum_ayes
               , nays::decimal(38,0) / 1000000000000 AS referendum_nays
+              , decision_deposit_who
+              , decision_deposit_amount::decimal(38,0) / 1000000000000 AS decision_deposit_amount
+              , submission_deposit_who
+              , submission_deposit_amount::decimal(38,0) / 1000000000000 AS submission_deposit_amount
               FROM open_gov_referendum
               WHERE NOT (index = ANY ($1) )
 
@@ -433,6 +437,10 @@ export const gov2referendaStats = `
               , r.status
               , r.referendum_ayes
               , r.referendum_nays
+              , decision_deposit_who
+              , decision_deposit_amount
+              , submission_deposit_who
+              , submission_deposit_amount
               , r.preimage_method AS method
               , r.preimage_section AS section
               , c.count_aye
