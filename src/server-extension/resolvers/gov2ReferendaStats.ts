@@ -27,18 +27,6 @@ export class gov2ReferendaStats {
     @Field(() => Number, { nullable: true })
     referendum_nays!: number
 
-    // @Field(() => Number, { nullable: false })
-    // delay!: number
-
-    // @Field(() => Number, { nullable: false })
-    // ends_at!: number
-
-    // @Field(() => String, { nullable: false })
-    // proposer!: string
-
-    // @Field(() => String, { nullable: true })
-    // preimage_proposer!: string
-
     @Field(() => String, { nullable: true })
     method!: string
 
@@ -183,17 +171,11 @@ export class gov2ReferendaStats {
     @Field(() => Number, { nullable: true })
     count_validator!: number
 
-    // @Field(() => Number, { nullable: true })
-    // count_councillor!: number
-
     @Field(() => Number, { nullable: true })
     count_normal!: number
 
     @Field(() => Number, { nullable: true })
     voted_amount_with_conviction_validator!: number
-
-    // @Field(() => Number, { nullable: true })
-    // voted_amount_with_conviction_councillor!: number
 
     @Field(() => Number, { nullable: true })
     voted_amount_with_conviction_normal!: number
