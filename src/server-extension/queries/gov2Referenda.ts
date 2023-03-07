@@ -4,20 +4,20 @@ export const gov2referendaStats = `
             referendum_data AS (
 
               SELECT
-                referendum_index
-              , index
+                index as referendum_index
               , preimage_section
               , preimage_method
               , status
+              , index
               , created_at::timestamp AS created_at
               , ended_at::timestamp AS ended_at
               , DATE_PART('day', ended_at::timestamp - created_at::timestamp) + 
                 DATE_PART('hour', ended_at::timestamp - created_at::timestamp) / 24 AS vote_duration
               , total_issuance::decimal(38,0) / 1000000000000 AS total_issuance
               , ayes::decimal(38,0) / 1000000000000 AS referendum_ayes
-              , nays::decimal(38,0) / 1000000000000 AS referendum_nayes
-              FROM opengovreferendum
-              WHERE NOT (index::text = ANY ($1) )
+              , nays::decimal(38,0) / 1000000000000 AS referendum_nays
+              FROM open_gov_referendum
+              WHERE NOT (index = ANY ($1) )
 
             ),
 
@@ -27,11 +27,21 @@ export const gov2referendaStats = `
                 index AS referendum_index
               , (status_history_flatten ->> 'status')::text AS status
               , (status_history_flatten ->> 'timestamp')::timestamp AS timestamp
-              FROM opengovreferendum, 
+              FROM open_gov_referendum, 
               jsonb_array_elements(status_history) AS status_history_flatten
-              WHERE NOT (index::text = ANY ($1) )
+              WHERE NOT (index = ANY ($1) )
 
             ),
+
+            timeline_executed AS (
+
+              SELECT 
+                referendum_index
+              , timestamp as executed_at
+              FROM referendum_timeline_flatten
+              WHERE status = 'Executed'
+            
+            ), 
 
             timeline_passed AS (
 
@@ -39,7 +49,7 @@ export const gov2referendaStats = `
                 referendum_index
               , timestamp as passed_at
               FROM referendum_timeline_flatten
-              WHERE status = 'Passed'
+              WHERE status = 'Approved'
             
             ), 
 
@@ -91,8 +101,8 @@ export const gov2referendaStats = `
               SELECT 
                 *
               , ROW_NUMBER() OVER (PARTITION BY referendum_index, voter ORDER BY timestamp desc) as seq
-              FROM vote
-              WHERE NOT (referendum_index::text = ANY ($1) )
+              FROM conviction_vote
+              WHERE NOT (referendum_index = ANY ($1) )
               AND block_number_removed IS NULL
 
             ),
@@ -248,13 +258,11 @@ export const gov2referendaStats = `
                 referendum_index
               , SUM(CASE WHEN is_validator = true THEN 1 ELSE 0 END) AS count_validator
               , SUM(CASE WHEN (is_validator = false OR is_validator IS NULL)
-                          AND (is_councillor = false OR is_councillor IS NULL)
                          THEN 1 ELSE 0 END) AS count_normal
               , SUM(CASE WHEN is_validator = true THEN COALESCE(balance_value, 0) 
                          ELSE 0 
                     END * conviction) AS voted_amount_with_conviction_validator
               , SUM(CASE WHEN (is_validator = false OR is_validator IS NULL)
-                          AND (is_councillor = false OR is_councillor IS NULL)
                          THEN COALESCE(balance_value, 0) 
                          ELSE 0 
                     END * conviction) AS voted_amount_with_conviction_normal
@@ -425,8 +433,8 @@ export const gov2referendaStats = `
               , r.status
               , r.referendum_ayes
               , r.referendum_nays
-              , r.method
-              , r.section
+              , r.preimage_method AS method
+              , r.preimage_section AS section
               , c.count_aye
               , c.count_nay
               , c.count_aye + c.count_nay AS count_total
