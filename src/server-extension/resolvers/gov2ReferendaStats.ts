@@ -28,6 +28,18 @@ export class gov2ReferendaStats {
     referendum_nays!: number
 
     @Field(() => String, { nullable: true })
+    decision_deposit_who!: string
+
+    @Field(() => Number, { nullable: true })
+    decision_deposit_amount!: number
+
+    @Field(() => String, { nullable: true })
+    submission_deposit_who!: string
+
+    @Field(() => Number, { nullable: true })
+    submission_deposit_amount!: number
+
+    @Field(() => String, { nullable: true })
     method!: string
 
     @Field(() => String, { nullable: true })
