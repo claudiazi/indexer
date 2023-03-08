@@ -5,10 +5,10 @@ import * as modules from './mappings'
 
 const processor = new SubstrateBatchProcessor()
     .setDataSource({
-        chain: 'wss://kusama.api.onfinality.io/public-ws',
+        chain: 'wss://kusama-rpc.polkadot.io',
         archive: lookupArchive('kusama', { release: 'FireSquid' }),
     })
-    // .setBlockRange({from: 12118689})
+    .setBlockRange({from: 15426831})
     .addCall('System.remark', {
         data: {
             call: {
