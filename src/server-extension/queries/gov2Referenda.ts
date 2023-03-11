@@ -141,7 +141,7 @@ export const gov2referendaStats = `
                 voter
               , referendum_index
               , ROW_NUMBER() OVER (PARTITION BY voter order by timestamp) as referendum_seq
-              FROM vote
+              FROM conviction_vote
 
             ),
 
