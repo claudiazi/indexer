@@ -3,4 +3,5 @@ export * from './referendumStats'
 export * from './accountStats'
 export * from './referendumVotes'
 export * from './gov2ReferendaStats'
-
+export * from './gov2ReferendumStats'
+export * from './gov2ReferendumVotes'
