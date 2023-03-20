@@ -97,14 +97,21 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
                 break;
             case vote.balance instanceof SplitVoteBalance:
                 if ('aye' in vote.balance && 'nay' in vote.balance) { // type guard
-                    const aye =
-                        delegation.balance *
-                        (vote.balance.aye /
-                            (vote.balance.aye + vote.balance.nay))
-                    const nay =
-                        delegation.balance *
-                        (vote.balance.nay /
-                            (vote.balance.aye + vote.balance.nay))
+                    let aye, nay
+                    if (vote.balance.aye + vote.balance.nay === 0n) {
+                        aye = 0n
+                        nay = 0n
+                    } else {
+                        aye =
+                            delegation.balance *
+                            (vote.balance.aye /
+                                (vote.balance.aye + vote.balance.nay))
+                        nay =
+                            delegation.balance *
+                            (vote.balance.nay /
+                                (vote.balance.aye + vote.balance.nay))
+                    }
+
                     voteBalance = new SplitVoteBalance({
                         aye,
                         nay
@@ -113,26 +120,34 @@ export async function addDelegatedVotesReferendum(ctx: BatchContext<Store, unkno
                 break;
             case vote.balance instanceof SplitAbstainVoteBalance:
                 if ('aye' in vote.balance && 'nay' in vote.balance && 'abstain' in vote.balance) { // type guard
-                    const ayePercentage =
-                        vote.balance.aye /
-                        (vote.balance.aye +
-                            vote.balance.nay +
-                            vote.balance.abstain)
-                    const nayPercentage =
-                        vote.balance.nay /
-                        (vote.balance.aye +
-                            vote.balance.nay +
-                            vote.balance.abstain)
-                    const abstainPercentage =
-                        vote.balance.nay /
-                        (vote.balance.aye +
-                            vote.balance.nay +
-                            vote.balance.abstain)
+                    let ayePercentage, nayPercentage, abstainPercentage
+                    if (vote.balance.aye + vote.balance.nay + vote.balance.abstain === 0n) {
+                        ayePercentage = 0n
+                        nayPercentage = 0n
+                        abstainPercentage = 0n
+                    } else {
+                        ayePercentage =
+                            vote.balance.aye /
+                            (vote.balance.aye +
+                                vote.balance.nay +
+                                vote.balance.abstain)
+                        nayPercentage =
+                            vote.balance.nay /
+                            (vote.balance.aye +
+                                vote.balance.nay +
+                                vote.balance.abstain)
+                        abstainPercentage =
+                            vote.balance.nay /
+                            (vote.balance.aye +
+                                vote.balance.nay +
+                                vote.balance.abstain)
+                    }
                     voteBalance = new SplitAbstainVoteBalance({
                         aye: delegation.balance * ayePercentage,
                         nay: delegation.balance * nayPercentage,
                         abstain: delegation.balance * abstainPercentage,
                     })
+
                 }
                 break;
         }
