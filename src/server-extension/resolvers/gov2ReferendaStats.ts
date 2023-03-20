@@ -1,7 +1,7 @@
 import { Arg, Field, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { ConvictionVote } from '../../model/generated'
-import { gov2referendaStats } from '../queries/gov2Referenda';
+import { gov2referendaStatsQuery } from '../queries/gov2Referenda';
 
 // Define custom GraphQL ObjectType of the query result
 @ObjectType()
@@ -217,7 +217,7 @@ export class gov2ReferendaStatsResolver {
             gov2NeedUpdate.splice(index, 1)
         })
         const manager = await this.tx()
-        const newRefs: gov2ReferendaStats[] = await manager.getRepository(ConvictionVote).query(gov2referendaStats, [[...(Array.from(gov2ReferendaCache.keys())), ...ids]])
+        const newRefs: gov2ReferendaStats[] = await manager.getRepository(ConvictionVote).query(gov2referendaStatsQuery, [[...(Array.from(gov2ReferendaCache.keys())), ...ids]])
         let toSendBack: gov2ReferendaStats[] = []
         gov2ReferendaCache.forEach((value: gov2ReferendaStats, key: number) => { if (!(key in ids)) (toSendBack.push(value)) })
         const result: gov2ReferendaStats[] = [...toSendBack, ...newRefs]

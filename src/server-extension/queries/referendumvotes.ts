@@ -1,4 +1,4 @@
-export const referendumVotes = `
+export const referendumVotesQuery = `
             WITH
             
             refined_votes AS (

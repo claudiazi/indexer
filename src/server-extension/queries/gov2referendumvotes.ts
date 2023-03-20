@@ -1,4 +1,4 @@
-export const gov2referendumVotes = `
+export const gov2ReferendumVotesQuery = `
             WITH
             
             refined_votes AS (

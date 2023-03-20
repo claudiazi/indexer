@@ -1,7 +1,7 @@
 import { Arg, Field, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { Vote } from '../../model/generated'
-import { referendumVotes } from '../queries/referendumvotes';
+import { referendumVotesQuery } from '../queries/referendumvotes';
 import { referendaCache } from './referendaStats';
 
 // Define custom GraphQL ObjectType of the query result
@@ -44,7 +44,7 @@ export class ReferendumVotesResolver {
     ): Promise<ReferendumVotes> {
         const manager = await this.tx()
         let result: ReferendumVotes
-        result = referendumCache.get(id) || await manager.getRepository(Vote).query(referendumVotes, [id])
+        result = referendumCache.get(id) || await manager.getRepository(Vote).query(referendumVotesQuery, [id])
         if (referendaCache.get(id)?.ended_at){
             referendumCache.set(id, result)
         } 

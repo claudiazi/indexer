@@ -1,7 +1,7 @@
 import { Arg, Field, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { Vote } from '../../model/generated'
-import { referendaStats } from '../queries/referenda';
+import { referendaStatsQuery } from '../queries/referenda';
 
 // Define custom GraphQL ObjectType of the query result
 @ObjectType()
@@ -217,7 +217,7 @@ export class ReferendaStatsResolver {
             needUpdate.splice(index, 1)
         })
         const manager = await this.tx()
-        const newRefs: ReferendaStats[] = await manager.getRepository(Vote).query(referendaStats, [[...(Array.from(referendaCache.keys())), ...ids]])
+        const newRefs: ReferendaStats[] = await manager.getRepository(Vote).query(referendaStatsQuery, [[...(Array.from(referendaCache.keys())), ...ids]])
         let toSendBack: ReferendaStats[] = []
         referendaCache.forEach((value: ReferendaStats, key: number) => { if (!(key in ids)) (toSendBack.push(value)) })
         const result: ReferendaStats[] = [...toSendBack, ...newRefs]

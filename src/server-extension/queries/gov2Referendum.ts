@@ -1,4 +1,4 @@
-export const gov2referendumStats = `
+export const gov2referendumStatsQuery = `
             WITH
             
             vote_sequence AS (

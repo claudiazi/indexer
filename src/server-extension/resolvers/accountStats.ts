@@ -1,7 +1,7 @@
 import { Arg, Field, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { Vote } from '../../model/generated'
-import { accountStats } from '../queries/account';
+import { accountStatsQuery } from '../queries/account';
 
 // Define custom GraphQL ObjectType of the query result
 @ObjectType()
@@ -71,7 +71,7 @@ export class AccountStatsResolver {
         address: string
     ): Promise<AccountStats> {
         const manager = await this.tx()
-        const result: AccountStats = await manager.getRepository(Vote).query(accountStats, [address])
+        const result: AccountStats = await manager.getRepository(Vote).query(accountStatsQuery, [address])
         return result
     }
 }
