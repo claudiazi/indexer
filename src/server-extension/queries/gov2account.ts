@@ -51,12 +51,12 @@ export const gov2accountStatsQuery = `
                      WHEN status in ('NotPassed') THEN 'nay'
                 END AS referendum_result
               , created_at::timestamp AS created_at
-              , DATE_PART('day', r.ended_at - r.created_at) + 
-                DATE_PART('hour', r.ended_at - r.created_at) / 24 As vote_duration
+              , DATE_PART('day', r.ended_at::timestamp - r.created_at::timestamp) + 
+                DATE_PART('hour', r.ended_at::timestamp - r.created_at::timestamp) / 24 As vote_duration
               FROM open_gov_referendum AS r
               INNER JOIN valid_vote AS v
                 ON v.referendum_index = r.index
-              WHERE status IN ('Passed', 'Executed', 'NotPassed')
+              WHERE r.ended_at IS NOT NULL
 
             ),
 
@@ -91,8 +91,8 @@ export const gov2accountStatsQuery = `
                 , CASE WHEN decision = 'abstain' THEN COALESCE((balance ->> 'aye')::decimal(38,0) / 1000000000000, 0) + COALESCE((balance ->> 'nay')::decimal(38,0) / 1000000000000, 0)
                        ELSE COALESCE((balance ->> 'value')::decimal(38,0) / 1000000000000, 0)
                   END AS balance_value
-                , DATE_PART('day', v.timestamp - r.created_at) + 
-                  DATE_PART('hour', v.timestamp - r.created_at) / 24 As voting_time
+                , DATE_PART('day', v.timestamp::timestamp - r.created_at) + 
+                  DATE_PART('hour', v.timestamp::timestamp - r.created_at) / 24 As voting_time
                 , vote_duration_1_4
                 , vote_duration_1_2
                 , vote_duration_3_4
